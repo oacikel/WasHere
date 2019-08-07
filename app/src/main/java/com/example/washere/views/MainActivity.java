@@ -22,8 +22,12 @@ import com.here.android.mpa.common.GeoCoordinate;
 import com.here.android.mpa.common.OnEngineInitListener;
 import com.here.android.mpa.mapping.Map;
 import com.here.android.mpa.mapping.MapMarker;
+import com.here.android.mpa.mapping.MapObject;
 import com.here.android.mpa.mapping.MapState;
 import com.here.android.mpa.mapping.SupportMapFragment;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.example.washere.helpers.PermissionHelper.getRequestCodeAskPermissions;
 
@@ -40,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mainActivityViewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
+        mainActivityViewModel.init();
 
         //Permission management start
         permissionHelper = new PermissionHelper(this);
@@ -56,6 +61,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         //Map initiation End
+
+        //Add Markers of Was Elements Start
+
+        //Add Markers of Was Elements End
     }
 
     @Override
@@ -92,7 +101,8 @@ public class MainActivity extends AppCompatActivity {
                             // retrieve a reference of the map from the map fragment
                             map = supportMapFragment.getMap();
                             mainActivityViewModel.onMapEngineInitialized();
-                            map.setZoomLevel(19);
+                            map.setZoomLevel(15);
+                            map.addMapObjects(mainActivityViewModel.getWasMapMarkers());
                         } else {
                             Toast.makeText(getApplicationContext(), "ERROR: Cannot initialize Map with error " + error,
                                     Toast.LENGTH_LONG).show();

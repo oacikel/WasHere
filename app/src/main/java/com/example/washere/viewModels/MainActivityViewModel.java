@@ -9,11 +9,9 @@ This class will serve to manipulate audio files.
 */
 
 
-import android.app.Activity;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.ViewModel;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -23,15 +21,22 @@ import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.example.washere.R;
 import com.example.washere.models.WHAudioData;
+import com.example.washere.models.Was;
+import com.example.washere.repositories.WasRepository;
 import com.here.android.mpa.common.GeoCoordinate;
 import com.here.android.mpa.common.GeoPosition;
+import com.here.android.mpa.common.Image;
 import com.here.android.mpa.common.PositioningManager;
-import com.here.services.location.internal.PositionListener;
+import com.here.android.mpa.mapping.MapMarker;
+import com.here.android.mpa.mapping.MapObject;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivityViewModel extends AndroidViewModel {
 
@@ -42,13 +47,13 @@ public class MainActivityViewModel extends AndroidViewModel {
     public MutableLiveData<GeoCoordinate> currentLocation = new MutableLiveData<>();
     private PositioningManager positioningManager;
     private PositioningManager.OnPositionChangedListener positionListener;
-    private MutableLiveData<Boolean> isPermissionGranted =new MutableLiveData<>();
+    private MutableLiveData<List<Was>> wasList;
+    private WasRepository wasRepository;
 
     public MainActivityViewModel(@NonNull Application application) {
         super(application);
         context = application.getApplicationContext();
     }
-
 
 
     //Map Management Part Start
@@ -67,22 +72,17 @@ public class MainActivityViewModel extends AndroidViewModel {
         return success;
     }
 
-    public void init(){
-
-    }
-
-    public void onMapEngineInitialized(){
+    public void onMapEngineInitialized() {
         positioningManager = PositioningManager.getInstance();
         positioningManager.start(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR);
-        positionListener= new PositioningManager.OnPositionChangedListener() {
+        positionListener = new PositioningManager.OnPositionChangedListener() {
             @Override
             public void onPositionUpdated(PositioningManager.LocationMethod locationMethod, GeoPosition geoPosition, boolean b) {
 
-                if (currentLocation.getValue()!=positioningManager.getPosition().getCoordinate()) {
+                if (currentLocation.getValue() != positioningManager.getPosition().getCoordinate()) {
                     currentLocation.setValue(updateCurrentLocation().getValue());
                     System.out.println("Position updated and changed");
-                }
-                else{
+                } else {
                     System.out.println("Position just updated");
                 }
             }
@@ -110,9 +110,35 @@ public class MainActivityViewModel extends AndroidViewModel {
         return currentLocation;
     }
 
+    public void init() {
+        //Iterate through all elements of the received Mutable Was Arraylist and create a list of Map Markers
 
+        if (wasList != null) {
+            return;
+        }
+        wasRepository = WasRepository.getInstance();
+        wasList = wasRepository.getWasList();
+    }
 
-
+    public  List<MapObject> getWasMapMarkers() {
+        List<MapObject> markerList = new ArrayList<MapObject>();
+        for (int i = 0; i < wasList.getValue().size(); i++) {
+            Was was=wasList.getValue().get(i);
+            MapMarker marker = new MapMarker();
+            Image image = new Image();
+            try {
+                image.setImageResource(was.getMarkerDirectory());
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("Error in setting image Resource: " + e.getMessage());
+            }
+            GeoCoordinate coordinate=new GeoCoordinate(was.getLocationLatitude(),was.getLocationLongitude(),was.getLocationAltitude());
+            marker.setCoordinate(coordinate);
+            marker.setIcon(image);
+            markerList.add(marker);
+        }
+        return markerList;
+    }
 
     //Map Management Part End
 
