@@ -12,6 +12,7 @@ This class will serve to manipulate audio files.
 import android.app.Activity;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
@@ -23,22 +24,35 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.example.washere.models.WHAudioData;
+import com.here.android.mpa.common.GeoCoordinate;
+import com.here.android.mpa.common.GeoPosition;
+import com.here.android.mpa.common.PositioningManager;
+import com.here.services.location.internal.PositionListener;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 
 public class MainActivityViewModel extends AndroidViewModel {
 
     private String diskCacheRoot;
     private String intentName;
-    private ApplicationInfo applicationInfo;
-    private Bundle bundle;
     private Context context;
     private boolean success;
+    public MutableLiveData<GeoCoordinate> currentLocation = new MutableLiveData<>();
+    private PositioningManager positioningManager;
+    private PositioningManager.OnPositionChangedListener positionListener;
+    private MutableLiveData<Boolean> isPermissionGranted =new MutableLiveData<>();
 
     public MainActivityViewModel(@NonNull Application application) {
         super(application);
         context = application.getApplicationContext();
+    }
+
+
+
+    //Map Management Part Start
+    public boolean isSuccess() {
 
         diskCacheRoot = Environment.getExternalStorageDirectory().getPath() + File.separator + ".isolated-here-maps";
         try {
@@ -50,10 +64,55 @@ public class MainActivityViewModel extends AndroidViewModel {
         }
         success = com.here.android.mpa.common.MapSettings.setIsolatedDiskCacheRootPath(diskCacheRoot, intentName);
 
+        return success;
+    }
+
+    public void init(){
+
+    }
+
+    public void onMapEngineInitialized(){
+        positioningManager = PositioningManager.getInstance();
+        positioningManager.start(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR);
+        positionListener= new PositioningManager.OnPositionChangedListener() {
+            @Override
+            public void onPositionUpdated(PositioningManager.LocationMethod locationMethod, GeoPosition geoPosition, boolean b) {
+
+                if (currentLocation.getValue()!=positioningManager.getPosition().getCoordinate()) {
+                    currentLocation.setValue(updateCurrentLocation().getValue());
+                    System.out.println("Position updated and changed");
+                }
+                else{
+                    System.out.println("Position just updated");
+                }
+            }
+
+            @Override
+            public void onPositionFixChanged(PositioningManager.LocationMethod locationMethod, PositioningManager.LocationStatus locationStatus) {
+                System.out.println("Position Fix Changed");
+            }
+        };
+        positioningManager.addListener(new WeakReference<>(positionListener));
+
     }
 
 
-    //Map Management Part Start
+    public MutableLiveData<GeoCoordinate> getCurrentLocation() {
+        return currentLocation;
+    }
+
+    public void setCurrentLocation(MutableLiveData<GeoCoordinate> currentLocation) {
+        this.currentLocation = currentLocation;
+    }
+
+    public MutableLiveData<GeoCoordinate> updateCurrentLocation() {
+        currentLocation.setValue(positioningManager.getPosition().getCoordinate());
+        return currentLocation;
+    }
+
+
+
+
 
     //Map Management Part End
 
@@ -84,7 +143,5 @@ public class MainActivityViewModel extends AndroidViewModel {
 
     //Audio Management Part End
 
-    public boolean isSuccess() {
-        return success;
-    }
+
 }
