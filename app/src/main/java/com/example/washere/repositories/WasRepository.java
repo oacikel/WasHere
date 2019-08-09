@@ -33,7 +33,12 @@ public class WasRepository {
     //Pretend to retrieve the data from a database
     private void setWasItems(){
         dataSet.add(
-                new Was("","",40.966670, 29.252350, 0.0, R.drawable.place_holder_icon) //Sancaktepe
+                new Was("","",40.975513, 29.233847, 0.0, R.drawable.place_holder_icon) //Sancaktepe 01
+        );
+
+        dataSet.add(
+                new Was("","",40.976403, 29.229676, 0.0, R.drawable.place_holder_icon) //Sancaktepe 02
         );
     }
+
 }

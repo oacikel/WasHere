@@ -40,15 +40,22 @@ import java.util.List;
 
 public class MainActivityViewModel extends AndroidViewModel {
 
-    private String diskCacheRoot;
     private String intentName;
     private Context context;
-    private boolean success;
-    public MutableLiveData<GeoCoordinate> currentLocation = new MutableLiveData<>();
+    private MutableLiveData<GeoCoordinate> currentLocation = new MutableLiveData<>();
     private PositioningManager positioningManager;
-    private PositioningManager.OnPositionChangedListener positionListener;
-    private MutableLiveData<List<Was>> wasList;
-    private WasRepository wasRepository;
+    private MutableLiveData<List<Was>> wasList=new MutableLiveData<>();
+    private boolean isUpdating = false;
+    private List<MapObject> markerList = new ArrayList<MapObject>();
+
+    public void setUpdating(boolean updating) {
+        isUpdating = updating;
+    }
+
+    public boolean isUpdating() {
+        return isUpdating;
+    }
+
 
     public MainActivityViewModel(@NonNull Application application) {
         super(application);
@@ -59,7 +66,7 @@ public class MainActivityViewModel extends AndroidViewModel {
     //Map Management Part Start
     public boolean isSuccess() {
 
-        diskCacheRoot = Environment.getExternalStorageDirectory().getPath() + File.separator + ".isolated-here-maps";
+        String diskCacheRoot = Environment.getExternalStorageDirectory().getPath() + File.separator + ".isolated-here-maps";
         try {
             ApplicationInfo ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
             Bundle bundle = ai.metaData;
@@ -67,63 +74,55 @@ public class MainActivityViewModel extends AndroidViewModel {
         } catch (PackageManager.NameNotFoundException e) {
             Log.e(context.getClass().toString(), "Failed to find intent name, NameNotFound: " + e.getMessage());
         }
-        success = com.here.android.mpa.common.MapSettings.setIsolatedDiskCacheRootPath(diskCacheRoot, intentName);
 
-        return success;
+        return com.here.android.mpa.common.MapSettings.setIsolatedDiskCacheRootPath(diskCacheRoot, intentName);
     }
 
     public void onMapEngineInitialized() {
         positioningManager = PositioningManager.getInstance();
         positioningManager.start(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR);
-        positionListener = new PositioningManager.OnPositionChangedListener() {
+        updateCurrentLocation();
+        //System.out.println("Will update map marker");
+        //updateMarkerList();
+        //System.out.println("Updated map marker");
+        PositioningManager.OnPositionChangedListener positionListener = new PositioningManager.OnPositionChangedListener() {
+
             @Override
             public void onPositionUpdated(PositioningManager.LocationMethod locationMethod, GeoPosition geoPosition, boolean b) {
-
-                if (currentLocation.getValue() != positioningManager.getPosition().getCoordinate()) {
-                    currentLocation.setValue(updateCurrentLocation().getValue());
-                    System.out.println("Position updated and changed");
-                } else {
-                    System.out.println("Position just updated");
-                }
+               updateCurrentLocation();
             }
 
             @Override
             public void onPositionFixChanged(PositioningManager.LocationMethod locationMethod, PositioningManager.LocationStatus locationStatus) {
-                System.out.println("Position Fix Changed");
+               updateCurrentLocation();
             }
         };
         positioningManager.addListener(new WeakReference<>(positionListener));
-
     }
-
 
     public MutableLiveData<GeoCoordinate> getCurrentLocation() {
         return currentLocation;
     }
 
-    public void setCurrentLocation(MutableLiveData<GeoCoordinate> currentLocation) {
-        this.currentLocation = currentLocation;
-    }
-
-    public MutableLiveData<GeoCoordinate> updateCurrentLocation() {
+    public void updateCurrentLocation() {
         currentLocation.setValue(positioningManager.getPosition().getCoordinate());
-        return currentLocation;
+
     }
 
     public void init() {
         //Iterate through all elements of the received Mutable Was Arraylist and create a list of Map Markers
-
-        if (wasList != null) {
-            return;
-        }
-        wasRepository = WasRepository.getInstance();
-        wasList = wasRepository.getWasList();
+        WasRepository wasRepository = WasRepository.getInstance();
+        wasList.setValue(wasRepository.getWasList().getValue());
     }
 
-    public  List<MapObject> getWasMapMarkers() {
-        List<MapObject> markerList = new ArrayList<MapObject>();
+    public void updateMarkerList() {
+        if(markerList.size()!=0){
+            System.out.println("Marker list is not empty. Size before clearing: "+markerList.size());
+            markerList.clear();
+            System.out.println("Marker list is cleared. The size is now: "+markerList.size());
+        }
         for (int i = 0; i < wasList.getValue().size(); i++) {
-            Was was=wasList.getValue().get(i);
+            Was was = wasList.getValue().get(i);
             MapMarker marker = new MapMarker();
             Image image = new Image();
             try {
@@ -132,12 +131,37 @@ public class MainActivityViewModel extends AndroidViewModel {
                 e.printStackTrace();
                 System.out.println("Error in setting image Resource: " + e.getMessage());
             }
-            GeoCoordinate coordinate=new GeoCoordinate(was.getLocationLatitude(),was.getLocationLongitude(),was.getLocationAltitude());
+            GeoCoordinate coordinate = new GeoCoordinate(was.getLocationLatitude(), was.getLocationLongitude(), was.getLocationAltitude());
             marker.setCoordinate(coordinate);
             marker.setIcon(image);
             markerList.add(marker);
         }
+        System.out.println("Final markerList size is: "+markerList.size());
+        setMarkerList(markerList);
+    }
+
+    public List<MapObject> getMarkerList() {
         return markerList;
+    }
+
+    public void setMarkerList(List<MapObject> markerList) {
+        this.markerList = markerList;
+    }
+
+    public MutableLiveData<List<Was>> getWasList() {
+        return wasList;
+    }
+
+    public void setWasList(MutableLiveData<List<Was>> wasList) {
+        this.wasList = wasList;
+    }
+
+    public void addAnotherWasItem() {
+        List<Was> currentWasItems = wasList.getValue();
+        currentWasItems.add(new Was("", "", 40.977047, 29.0518113, 0.0, R.drawable.place_holder_icon)); //Sancaktepe Additional
+        currentWasItems.add(new Was("", "", 40.985381, 29.042111, 0.0, R.drawable.place_holder_icon));  //Kızıltoprak Additional
+        wasList.postValue(currentWasItems);
+        System.out.println("was list updated"+ wasList.getValue().size());
     }
 
     //Map Management Part End
