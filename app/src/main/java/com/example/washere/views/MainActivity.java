@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Map map;
     MainActivityViewModel mainActivityViewModel;
     PermissionHelper permissionHelper;
-    Button buttonUpdateMarkers;
+    Button buttonUpdateMarkers, buttonPlaySampleSound;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,9 +73,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onChanged(@Nullable List<Was> was) {
                 //TODO: Her keresinde yaratılan markerList aslında başka bir liste olduğu için üst üste marker binmiş gibi gözüküyor. Update marker diye bir method çağırılmalı.
                 map.removeMapObjects(mainActivityViewModel.getMarkerList());
-                System.out.println("Marker count to be cleared is: "+mainActivityViewModel.getMarkerList().size());
                 mainActivityViewModel.updateMarkerList();
-                System.out.println("Marker count to be put is: "+mainActivityViewModel.getMarkerList().size());
                 map.addMapObjects(mainActivityViewModel.getMarkerList());
             }
         });
@@ -102,6 +100,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         if (v == buttonUpdateMarkers) {
             mainActivityViewModel.addAnotherWasItem();
+        }
+        else if(v==buttonPlaySampleSound){
+        mainActivityViewModel.playAudio(mainActivityViewModel.getWasList().getValue().get(0));
         }
     }
 
@@ -232,10 +233,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void initViews() {
         buttonUpdateMarkers = findViewById(R.id.buttonUpdateMarkers);
+        buttonPlaySampleSound=findViewById(R.id.buttonPlaySampleSound);
     }
 
     public void setOnClickListeners() {
         buttonUpdateMarkers.setOnClickListener(this);
+        buttonPlaySampleSound.setOnClickListener(this);
     }
 
 }

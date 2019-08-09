@@ -1,6 +1,7 @@
 package com.example.washere.repositories;
 
 import android.arch.lifecycle.MutableLiveData;
+import android.support.v7.app.AppCompatActivity;
 
 import com.example.washere.R;
 import com.example.washere.models.Was;
@@ -33,11 +34,11 @@ public class WasRepository {
     //Pretend to retrieve the data from a database
     private void setWasItems(){
         dataSet.add(
-                new Was("","",40.975513, 29.233847, 0.0, R.drawable.place_holder_icon) //Sancaktepe 01
+                new Was(R.raw.tekerleme01,"/storage/emulated/0/VoiceRecorder/my_sounds/tekerleme01.3gp","tekerleme01.3gp",40.975513, 29.233847, 0.0, R.drawable.place_holder_icon) //Sancaktepe 01
         );
 
         dataSet.add(
-                new Was("","",40.976403, 29.229676, 0.0, R.drawable.place_holder_icon) //Sancaktepe 02
+                new Was(R.raw.tekerleme02,"","",40.976403, 29.229676, 0.0, R.drawable.place_holder_icon) //Sancaktepe 02
         );
     }
 

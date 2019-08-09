@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">Was Here</string>
     <string name="update_marker_list">Update Markers</string>
+    <string name="playSound">Play Sample Sound</string>
+
+
+    <string name="file_directory_01">/storage/emulated/0/VoiceRecorder/my_sounds/tekerleme01.3gp</string>
+    <string name="file_name_01">tekerleme01.3gp</string>
+
 </resources>

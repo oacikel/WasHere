@@ -22,6 +22,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.example.washere.R;
+import com.example.washere.helpers.PlayAudioHelper;
 import com.example.washere.models.WHAudioData;
 import com.example.washere.models.Was;
 import com.example.washere.repositories.WasRepository;
@@ -47,6 +48,7 @@ public class MainActivityViewModel extends AndroidViewModel {
     private MutableLiveData<List<Was>> wasList=new MutableLiveData<>();
     private boolean isUpdating = false;
     private List<MapObject> markerList = new ArrayList<MapObject>();
+    private PlayAudioHelper playAudioHelper;
 
     public void setUpdating(boolean updating) {
         isUpdating = updating;
@@ -113,13 +115,12 @@ public class MainActivityViewModel extends AndroidViewModel {
         //Iterate through all elements of the received Mutable Was Arraylist and create a list of Map Markers
         WasRepository wasRepository = WasRepository.getInstance();
         wasList.setValue(wasRepository.getWasList().getValue());
+        playAudioHelper=new PlayAudioHelper();
     }
 
     public void updateMarkerList() {
         if(markerList.size()!=0){
-            System.out.println("Marker list is not empty. Size before clearing: "+markerList.size());
             markerList.clear();
-            System.out.println("Marker list is cleared. The size is now: "+markerList.size());
         }
         for (int i = 0; i < wasList.getValue().size(); i++) {
             Was was = wasList.getValue().get(i);
@@ -136,7 +137,6 @@ public class MainActivityViewModel extends AndroidViewModel {
             marker.setIcon(image);
             markerList.add(marker);
         }
-        System.out.println("Final markerList size is: "+markerList.size());
         setMarkerList(markerList);
     }
 
@@ -158,37 +158,17 @@ public class MainActivityViewModel extends AndroidViewModel {
 
     public void addAnotherWasItem() {
         List<Was> currentWasItems = wasList.getValue();
-        currentWasItems.add(new Was("", "", 40.977047, 29.0518113, 0.0, R.drawable.place_holder_icon)); //Sancaktepe Additional
-        currentWasItems.add(new Was("", "", 40.985381, 29.042111, 0.0, R.drawable.place_holder_icon));  //Kızıltoprak Additional
+        currentWasItems.add(new Was(R.raw.tekerleme01,"", "", 40.977047, 29.0518113, 0.0, R.drawable.place_holder_icon)); //Sancaktepe Additional
+        currentWasItems.add(new Was(1,"", "", 40.985381, 29.042111, 0.0, R.drawable.place_holder_icon));  //Kızıltoprak Additional
         wasList.postValue(currentWasItems);
-        System.out.println("was list updated"+ wasList.getValue().size());
     }
 
     //Map Management Part End
 
     //Audio Management Part Start
 
-    public void playAudio(WHAudioData whAudioData) {
-        MediaPlayer mediaPlayer = new MediaPlayer();
-        String path = whAudioData.getPath();
-        String fileName = whAudioData.getFileName();
-        try {
-            mediaPlayer.setDataSource(path + File.separator + fileName);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            mediaPlayer.prepare();
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        mediaPlayer.start();
+    public void playAudio(Was was) {
+playAudioHelper.play(context,was.getResId());
     }
 
     //Audio Management Part End

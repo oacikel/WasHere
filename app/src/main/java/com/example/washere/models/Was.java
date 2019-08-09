@@ -6,14 +6,26 @@ public class Was {
     private double locationLongitude;
     private double locationAltitude;
     private int markerDirectory;
+    private int resId;
 
-    public Was(String fileLocation, String fileName, double locationLatitude, double locationLongitude, double locationAltitude, int markerDirectory) {
+
+    public Was( int resId, String fileLocation, String fileName, double locationLatitude, double locationLongitude, double locationAltitude, int markerDirectory) {
+        this.resId=resId;
         this.fileLocation = fileLocation;
         this.fileName = fileName;
         this.locationLatitude = locationLatitude;
         this.locationLongitude = locationLongitude;
         this.locationAltitude = locationAltitude;
         this.markerDirectory = markerDirectory;
+
+    }
+
+    public int getResId() {
+        return resId;
+    }
+
+    public void setResId(int resId) {
+        this.resId = resId;
     }
 
     public String getFileLocation() {
