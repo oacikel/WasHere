@@ -100,9 +100,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         if (v == buttonUpdateMarkers) {
             mainActivityViewModel.addAnotherWasItem();
-        }
-        else if(v==buttonPlaySampleSound){
-        mainActivityViewModel.playAudio(mainActivityViewModel.getWasList().getValue().get(0));
+        } else if (v == buttonPlaySampleSound) {
+
         }
     }
 
@@ -158,10 +157,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             MapObject mapObject = (MapObject) viewObject;
 
                                             if (mapObject.getType() == MapObject.Type.MARKER) {
+                                                mapObject.toString();
+                                                mainActivityViewModel.playAudio(mainActivityViewModel.getWasList().getValue(), (MapMarker) mapObject);
 
-                                                MapMarker window_marker = ((MapMarker) mapObject);
-
-                                                System.out.println("Laitude is................." + window_marker.getCoordinate().getLatitude());
                                             }
                                         }
                                     }
@@ -233,7 +231,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void initViews() {
         buttonUpdateMarkers = findViewById(R.id.buttonUpdateMarkers);
-        buttonPlaySampleSound=findViewById(R.id.buttonPlaySampleSound);
+        buttonPlaySampleSound = findViewById(R.id.buttonPlaySampleSound);
     }
 
     public void setOnClickListeners() {

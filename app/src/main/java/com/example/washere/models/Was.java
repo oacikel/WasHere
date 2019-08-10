@@ -1,4 +1,5 @@
 package com.example.washere.models;
+
 public class Was {
     private String fileLocation;
     private String fileName;
@@ -7,22 +8,29 @@ public class Was {
     private double locationAltitude;
     private int markerDirectory;
     private int resId;
+    private int order;
 
 
-    public Was( int resId, String fileLocation, String fileName, double locationLatitude, double locationLongitude, double locationAltitude, int markerDirectory) {
-        this.resId=resId;
+    public Was(int order, int resId, String fileLocation, String fileName, double locationLatitude, double locationLongitude, double locationAltitude, int markerDirectory) {
+        this.order = order;
+        this.resId = resId;
         this.fileLocation = fileLocation;
         this.fileName = fileName;
         this.locationLatitude = locationLatitude;
         this.locationLongitude = locationLongitude;
         this.locationAltitude = locationAltitude;
         this.markerDirectory = markerDirectory;
-
     }
 
-    public int getResId() {
-        return resId;
+    public int getOrder() {
+        return order;
     }
+
+    public void setOrder(int order) {
+        this.order = order;
+    }
+
+    public int getResId() { return resId; }
 
     public void setResId(int resId) {
         this.resId = resId;

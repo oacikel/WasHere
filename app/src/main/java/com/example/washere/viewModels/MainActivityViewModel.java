@@ -15,7 +15,6 @@ import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
@@ -23,7 +22,6 @@ import android.util.Log;
 
 import com.example.washere.R;
 import com.example.washere.helpers.PlayAudioHelper;
-import com.example.washere.models.WHAudioData;
 import com.example.washere.models.Was;
 import com.example.washere.repositories.WasRepository;
 import com.here.android.mpa.common.GeoCoordinate;
@@ -45,7 +43,7 @@ public class MainActivityViewModel extends AndroidViewModel {
     private Context context;
     private MutableLiveData<GeoCoordinate> currentLocation = new MutableLiveData<>();
     private PositioningManager positioningManager;
-    private MutableLiveData<List<Was>> wasList=new MutableLiveData<>();
+    private MutableLiveData<List<Was>> wasList = new MutableLiveData<>();
     private boolean isUpdating = false;
     private List<MapObject> markerList = new ArrayList<MapObject>();
     private PlayAudioHelper playAudioHelper;
@@ -91,12 +89,12 @@ public class MainActivityViewModel extends AndroidViewModel {
 
             @Override
             public void onPositionUpdated(PositioningManager.LocationMethod locationMethod, GeoPosition geoPosition, boolean b) {
-               updateCurrentLocation();
+                updateCurrentLocation();
             }
 
             @Override
             public void onPositionFixChanged(PositioningManager.LocationMethod locationMethod, PositioningManager.LocationStatus locationStatus) {
-               updateCurrentLocation();
+                updateCurrentLocation();
             }
         };
         positioningManager.addListener(new WeakReference<>(positionListener));
@@ -115,11 +113,11 @@ public class MainActivityViewModel extends AndroidViewModel {
         //Iterate through all elements of the received Mutable Was Arraylist and create a list of Map Markers
         WasRepository wasRepository = WasRepository.getInstance();
         wasList.setValue(wasRepository.getWasList().getValue());
-        playAudioHelper=new PlayAudioHelper();
+        playAudioHelper = new PlayAudioHelper();
     }
 
     public void updateMarkerList() {
-        if(markerList.size()!=0){
+        if (markerList.size() != 0) {
             markerList.clear();
         }
         for (int i = 0; i < wasList.getValue().size(); i++) {
@@ -135,7 +133,9 @@ public class MainActivityViewModel extends AndroidViewModel {
             GeoCoordinate coordinate = new GeoCoordinate(was.getLocationLatitude(), was.getLocationLongitude(), was.getLocationAltitude());
             marker.setCoordinate(coordinate);
             marker.setIcon(image);
+            marker.setTitle(String.valueOf(i));
             markerList.add(marker);
+
         }
         setMarkerList(markerList);
     }
@@ -149,6 +149,7 @@ public class MainActivityViewModel extends AndroidViewModel {
     }
 
     public MutableLiveData<List<Was>> getWasList() {
+        MapMarker marker = new MapMarker();
         return wasList;
     }
 
@@ -158,8 +159,8 @@ public class MainActivityViewModel extends AndroidViewModel {
 
     public void addAnotherWasItem() {
         List<Was> currentWasItems = wasList.getValue();
-        currentWasItems.add(new Was(R.raw.tekerleme01,"", "", 40.977047, 29.0518113, 0.0, R.drawable.place_holder_icon)); //Sancaktepe Additional
-        currentWasItems.add(new Was(1,"", "", 40.985381, 29.042111, 0.0, R.drawable.place_holder_icon));  //Kızıltoprak Additional
+        currentWasItems.add(new Was(2, R.raw.tekerleme03, "", "", 40.977047, 29.0518113, 0.0, R.drawable.place_holder_icon)); //Sancaktepe Additional
+        currentWasItems.add(new Was(3, R.raw.tekerleme04, "", "", 40.985381, 29.042111, 0.0, R.drawable.place_holder_icon));  //Kızıltoprak Additional
         wasList.postValue(currentWasItems);
     }
 
@@ -167,8 +168,8 @@ public class MainActivityViewModel extends AndroidViewModel {
 
     //Audio Management Part Start
 
-    public void playAudio(Was was) {
-playAudioHelper.play(context,was.getResId());
+    public void playAudio(List<Was> wasList, MapMarker marker) {
+        playAudioHelper.play(context, wasList.get(Integer.parseInt(marker.getTitle())).getResId());
     }
 
     //Audio Management Part End
