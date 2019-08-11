@@ -37,7 +37,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Map map;
     MainActivityViewModel mainActivityViewModel;
     PermissionHelper permissionHelper;
-    Button buttonUpdateMarkers, buttonPlaySampleSound;
+    Button buttonUpdateMarkers;
+    MainButtonSetFragment mainButtonSetFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initViews();
         setOnClickListeners();
         mainActivityViewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
+        initiateMainButtonsFragment();
         //mainActivityViewModel.init();
 
         //Permission management start
@@ -100,11 +102,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         if (v == buttonUpdateMarkers) {
             mainActivityViewModel.addAnotherWasItem();
-        } else if (v == buttonPlaySampleSound) {
-
         }
     }
-
 
     public void initiateMap(boolean success) {
 
@@ -231,12 +230,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void initViews() {
         buttonUpdateMarkers = findViewById(R.id.buttonUpdateMarkers);
-        buttonPlaySampleSound = findViewById(R.id.buttonPlaySampleSound);
     }
 
     public void setOnClickListeners() {
         buttonUpdateMarkers.setOnClickListener(this);
-        buttonPlaySampleSound.setOnClickListener(this);
+    }
+
+    public void initiateMainButtonsFragment(){
+        mainButtonSetFragment=new MainButtonSetFragment();
+        getSupportFragmentManager().beginTransaction().replace(R.id.frameLatourButtonSet, mainButtonSetFragment).commit();
+
     }
 
 }

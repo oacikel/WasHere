@@ -27,7 +27,9 @@ public class PermissionHelper extends AppCompatActivity {
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE};
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.RECORD_AUDIO
+    };
 
     public PermissionHelper(Activity activity) {
         this.activity = activity;
@@ -50,9 +52,11 @@ public class PermissionHelper extends AppCompatActivity {
                 break;
         }
     }
+
     public static int getRequestCodeAskPermissions() {
         return REQUEST_CODE_ASK_PERMISSIONS;
     }
+
     public void checkPermissions() {
         final List<String> missingPermissions = new ArrayList<String>();
         // check all required dynamic permissions

@@ -12,6 +12,8 @@
         android:name="com.here.android.mpa.mapping.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginBottom="100dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:layout_editor_absoluteX="255dp" />
 
@@ -28,12 +30,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/hereMapFragment" />
 
-    <Button
-        android:id="@+id/buttonPlaySampleSound"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/playSound"
-        app:layout_constraintEnd_toEndOf="@+id/buttonUpdateMarkers"
-        app:layout_constraintTop_toBottomOf="@+id/buttonUpdateMarkers" />
+    <FrameLayout
+        android:id="@+id/frameLatourButtonSet"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/hereMapFragment">
+
+    </FrameLayout>
 </android.support.constraint.ConstraintLayout>

@@ -22,6 +22,7 @@ import android.util.Log;
 
 import com.example.washere.R;
 import com.example.washere.helpers.PlayAudioHelper;
+import com.example.washere.helpers.RecordAudioHelper;
 import com.example.washere.models.Was;
 import com.example.washere.repositories.WasRepository;
 import com.here.android.mpa.common.GeoCoordinate;
@@ -47,6 +48,8 @@ public class MainActivityViewModel extends AndroidViewModel {
     private boolean isUpdating = false;
     private List<MapObject> markerList = new ArrayList<MapObject>();
     private PlayAudioHelper playAudioHelper;
+    private RecordAudioHelper recordAudioHelper;
+    private WasRepository wasRepository;
 
     public void setUpdating(boolean updating) {
         isUpdating = updating;
@@ -81,6 +84,7 @@ public class MainActivityViewModel extends AndroidViewModel {
     public void onMapEngineInitialized() {
         positioningManager = PositioningManager.getInstance();
         positioningManager.start(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR);
+        wasRepository.setCurrentLocation(positioningManager.getPosition().getCoordinate());
         updateCurrentLocation();
         //System.out.println("Will update map marker");
         //updateMarkerList();
@@ -90,11 +94,13 @@ public class MainActivityViewModel extends AndroidViewModel {
             @Override
             public void onPositionUpdated(PositioningManager.LocationMethod locationMethod, GeoPosition geoPosition, boolean b) {
                 updateCurrentLocation();
+                wasRepository.setCurrentLocation(positioningManager.getPosition().getCoordinate());
             }
 
             @Override
             public void onPositionFixChanged(PositioningManager.LocationMethod locationMethod, PositioningManager.LocationStatus locationStatus) {
                 updateCurrentLocation();
+                wasRepository.setCurrentLocation(positioningManager.getPosition().getCoordinate());
             }
         };
         positioningManager.addListener(new WeakReference<>(positionListener));
@@ -105,15 +111,17 @@ public class MainActivityViewModel extends AndroidViewModel {
     }
 
     public void updateCurrentLocation() {
-        currentLocation.setValue(positioningManager.getPosition().getCoordinate());
+        currentLocation.setValue(wasRepository.getCurrentLocation());
 
     }
 
     public void init() {
         //Iterate through all elements of the received Mutable Was Arraylist and create a list of Map Markers
-        WasRepository wasRepository = WasRepository.getInstance();
+        wasRepository = WasRepository.getInstance();
         wasList.setValue(wasRepository.getWasList().getValue());
         playAudioHelper = new PlayAudioHelper();
+
+
     }
 
     public void updateMarkerList() {
@@ -149,7 +157,8 @@ public class MainActivityViewModel extends AndroidViewModel {
     }
 
     public MutableLiveData<List<Was>> getWasList() {
-        MapMarker marker = new MapMarker();
+        wasRepository = WasRepository.getInstance();
+        wasRepository.getWasList();
         return wasList;
     }
 
@@ -160,8 +169,10 @@ public class MainActivityViewModel extends AndroidViewModel {
     public void addAnotherWasItem() {
         List<Was> currentWasItems = wasList.getValue();
         currentWasItems.add(new Was(2, R.raw.tekerleme03, "", "", 40.977047, 29.0518113, 0.0, R.drawable.place_holder_icon)); //Sancaktepe Additional
+        wasRepository.setCount(wasRepository.getCount() + 1);
         currentWasItems.add(new Was(3, R.raw.tekerleme04, "", "", 40.985381, 29.042111, 0.0, R.drawable.place_holder_icon));  //Kızıltoprak Additional
         wasList.postValue(currentWasItems);
+        wasRepository.setCount(wasRepository.getCount() + 1);
     }
 
     //Map Management Part End
@@ -169,7 +180,8 @@ public class MainActivityViewModel extends AndroidViewModel {
     //Audio Management Part Start
 
     public void playAudio(List<Was> wasList, MapMarker marker) {
-        playAudioHelper.play(context, wasList.get(Integer.parseInt(marker.getTitle())).getResId());
+        playAudioHelper.startPlaying(wasList.get(wasRepository.getCount()));
+        //playAudioHelper.play(context, wasList.get(Integer.parseInt(marker.getTitle())).getResId());
     }
 
     //Audio Management Part End
