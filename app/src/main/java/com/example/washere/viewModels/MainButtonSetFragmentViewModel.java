@@ -43,7 +43,7 @@ public class MainButtonSetFragmentViewModel extends AndroidViewModel {
 
     public void addWasItemAfterRecording(){
         Was was=createWas();
-        List<Was>currentWasList=wasList.getValue();
+        List<Was>currentWasList=wasRepository.getWasList().getValue();
         currentWasList.add(was);
         wasList.postValue(currentWasList);
     }
@@ -60,7 +60,6 @@ public class MainButtonSetFragmentViewModel extends AndroidViewModel {
     }
 
     public void addMarkersOnMainActivity(){
-
         activity.placeMarkersOnMap();
     }
 }

@@ -24,6 +24,7 @@ public class MainButtonSetFragment extends Fragment implements View.OnTouchListe
 
     private Button buttonRecordAudio;
     MainButtonSetFragmentViewModel mainButtonSetFragmentViewModel;
+    MainActivity activity;
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -39,7 +40,7 @@ public class MainButtonSetFragment extends Fragment implements View.OnTouchListe
         view = inflater.inflate(R.layout.fragment_main_button_set, container, false);
         initViews(view);
         setButtonListeners();
-        final MainActivity activity=(MainActivity) getActivity();
+      activity=(MainActivity) getActivity();
 
         mainButtonSetFragmentViewModel = ViewModelProviders.of(this).get(MainButtonSetFragmentViewModel.class);
         mainButtonSetFragmentViewModel.init();
@@ -49,7 +50,7 @@ public class MainButtonSetFragment extends Fragment implements View.OnTouchListe
             public void onChanged(@Nullable List<Was> was) {
                 //TODO: Repository'deki waslist update olduğunda. Main activity'nin de "getWasList" metodu  çağırılmalı. Ancak çağırılmıyor. Çözüm bulmak gerekiyor.
                 System.out.println("OCUL: New was item added from fragment side, changes should occur in main activity.");
-                activity.placeMarkersOnMap();
+
 
             }
         });
@@ -78,9 +79,9 @@ public class MainButtonSetFragment extends Fragment implements View.OnTouchListe
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 mainButtonSetFragmentViewModel.startRecordingWasItem();
             } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                System.out.println("Button released");
                 mainButtonSetFragmentViewModel.addWasItemAfterRecording();
                 int order = mainButtonSetFragmentViewModel.getWasList().getValue().size() - 1;
+                activity.placeMarkersOnMap();
 
             }
         }

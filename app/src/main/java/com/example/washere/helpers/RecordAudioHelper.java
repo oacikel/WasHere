@@ -59,6 +59,7 @@ public class RecordAudioHelper {
 
 
         } catch (IOException e) {
+            System.out.println("Sıkıntı var!");
             Log.e(LOG_TAG, "prepare() failed: " + e.getMessage());
         }
     }
@@ -80,7 +81,7 @@ public class RecordAudioHelper {
         } while (file.exists() && !file.isDirectory());
 
         try {
-            // Make sure the Pictures directory exists.
+            // Make sure the directory exists.
             file.getParentFile().mkdirs();
         } catch (Exception e) {
             System.out.println("Error in file creation: " + e.getMessage());

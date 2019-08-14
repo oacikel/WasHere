@@ -64,21 +64,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mainActivityViewModel.getCurrentLocation().observe(this, new Observer<GeoCoordinate>() {
             @Override
             public void onChanged(@Nullable GeoCoordinate geoCoordinate) {
-                map.setCenter(geoCoordinate, Map.Animation.BOW);
                 supportMapFragment.getPositionIndicator().setVisible(true);
+                map.setCenter(geoCoordinate, Map.Animation.LINEAR);
             }
         });
         //Observe Changes in Current Location End
 
         //Observe Changes in Was Items Start
-        mainActivityViewModel.getWasList().observe(this, new Observer<List<Was>>() {
-            @Override
-            public void onChanged(@Nullable List<Was> was) {
-                System.out.println("OCUL: Was item list değişti ve observe'e girildi.!");
-                //   placeMarkersOnMap();
 
-            }
-        });
         //Observe Changes in Was Items End
 
     }
