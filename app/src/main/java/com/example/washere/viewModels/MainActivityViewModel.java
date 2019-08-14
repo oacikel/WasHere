@@ -116,7 +116,7 @@ public class MainActivityViewModel extends AndroidViewModel {
     }
 
     public void init() {
-        //Iterate through all elements of the received Mutable Was Arraylist and create a list of Map Markers
+
         wasRepository = WasRepository.getInstance();
         wasList.setValue(wasRepository.getWasList().getValue());
         playAudioHelper = new PlayAudioHelper();
@@ -157,8 +157,7 @@ public class MainActivityViewModel extends AndroidViewModel {
     }
 
     public MutableLiveData<List<Was>> getWasList() {
-        wasRepository = WasRepository.getInstance();
-        wasRepository.getWasList();
+        wasList=WasRepository.getInstance().getWasList();
         return wasList;
     }
 

@@ -50,6 +50,7 @@ public class WasRepository {
 
     public void addWasItem(Was was) {
         dataSet.add(was);
+        count++;
     }
 
     //Pretend to retrieve the data from a database

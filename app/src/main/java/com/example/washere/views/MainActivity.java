@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.example.washere.R;
 import com.example.washere.helpers.PermissionHelper;
 import com.example.washere.models.Was;
+import com.example.washere.repositories.WasRepository;
 import com.example.washere.viewModels.MainActivityViewModel;
 import com.here.android.mpa.common.GeoCoordinate;
 import com.here.android.mpa.common.OnEngineInitListener;
@@ -73,10 +74,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mainActivityViewModel.getWasList().observe(this, new Observer<List<Was>>() {
             @Override
             public void onChanged(@Nullable List<Was> was) {
-                //TODO: Her keresinde yaratılan markerList aslında başka bir liste olduğu için üst üste marker binmiş gibi gözüküyor. Update marker diye bir method çağırılmalı.
-                map.removeMapObjects(mainActivityViewModel.getMarkerList());
-                mainActivityViewModel.updateMarkerList();
-                map.addMapObjects(mainActivityViewModel.getMarkerList());
+                System.out.println("OCUL: Was item list değişti ve observe'e girildi.!");
+                //   placeMarkersOnMap();
+
             }
         });
         //Observe Changes in Was Items End
@@ -151,12 +151,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 @Override
                                 public boolean onMapObjectsSelected(List<ViewObject> list) {
                                     for (ViewObject viewObject : list) {
-                                        System.out.println(list.toString());
                                         if (viewObject.getBaseType() == ViewObject.Type.USER_OBJECT) {
                                             MapObject mapObject = (MapObject) viewObject;
 
                                             if (mapObject.getType() == MapObject.Type.MARKER) {
-                                                mapObject.toString();
+                                                System.out.println("Marker pressed is: "+ mapObject.toString());
                                                 mainActivityViewModel.playAudio(mainActivityViewModel.getWasList().getValue(), (MapMarker) mapObject);
 
                                             }
@@ -240,6 +239,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mainButtonSetFragment=new MainButtonSetFragment();
         getSupportFragmentManager().beginTransaction().replace(R.id.frameLatourButtonSet, mainButtonSetFragment).commit();
 
+    }
+
+    public void placeMarkersOnMap(){
+        if(map!=null){
+            map.removeMapObjects(mainActivityViewModel.getMarkerList());
+            mainActivityViewModel.updateMarkerList();
+            map.addMapObjects(mainActivityViewModel.getMarkerList());
+        }
     }
 
 }

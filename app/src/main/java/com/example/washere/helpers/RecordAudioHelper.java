@@ -63,7 +63,6 @@ public class RecordAudioHelper {
         }
     }
 
-
     public void setFileNameAndPath() {
         int count = 0;
         File file;
@@ -74,14 +73,10 @@ public class RecordAudioHelper {
                     + "_" + (wasRepository.getCount() + count) + ".mp4";
             filePath = Environment.getExternalStorageDirectory().getAbsolutePath();
             filePath += "/WasHere/" + fileName;
-            System.out.println("File path should be: "+filePath);
-            System.out.println("File name should be: "+ fileName);
 
 
 
             file = new File(filePath);
-            System.out.println("The file path of the file is: "+file.getAbsolutePath());
-            System.out.println("The file name of the file is: "+file.getName());
         } while (file.exists() && !file.isDirectory());
 
         try {
@@ -96,7 +91,6 @@ public class RecordAudioHelper {
     public void stopRecording() {
         mediaRecorder.stop();
         mediaRecorder.release();
-
         mediaRecorder = null;
     }
 
