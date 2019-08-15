@@ -1,5 +1,7 @@
 package com.example.washere.models;
 
+import com.here.android.mpa.mapping.MapMarker;
+
 public class Was {
     private String fileLocation;
     private String fileName;
@@ -9,6 +11,7 @@ public class Was {
     private int markerDirectory;
     private int resId;
     private int order;
+    private MapMarker mapMarker;
 
 
     public Was(int order, int resId, String fileLocation, String fileName, double locationLatitude, double locationLongitude, double locationAltitude, int markerDirectory) {
@@ -30,7 +33,9 @@ public class Was {
         this.order = order;
     }
 
-    public int getResId() { return resId; }
+    public int getResId() {
+        return resId;
+    }
 
     public void setResId(int resId) {
         this.resId = resId;
@@ -83,5 +88,11 @@ public class Was {
 
     public void setLocationAltitude(double locationAltitude) {
         this.locationAltitude = locationAltitude;
+    }
+    public MapMarker getMapMarker() {
+        return mapMarker;
+    }
+    public void setMapMarker(MapMarker mapMarker) {
+        this.mapMarker = mapMarker;
     }
 }

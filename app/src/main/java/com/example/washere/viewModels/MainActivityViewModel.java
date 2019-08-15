@@ -25,6 +25,7 @@ import com.example.washere.helpers.PlayAudioHelper;
 import com.example.washere.helpers.RecordAudioHelper;
 import com.example.washere.models.Was;
 import com.example.washere.repositories.WasRepository;
+import com.here.android.mpa.cluster.ClusterLayer;
 import com.here.android.mpa.common.GeoCoordinate;
 import com.here.android.mpa.common.GeoPosition;
 import com.here.android.mpa.common.Image;
@@ -35,6 +36,7 @@ import com.here.android.mpa.mapping.MapObject;
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,6 +52,7 @@ public class MainActivityViewModel extends AndroidViewModel {
     private PlayAudioHelper playAudioHelper;
     private RecordAudioHelper recordAudioHelper;
     private WasRepository wasRepository;
+    private ClusterLayer clusterLayer;
 
     public void setUpdating(boolean updating) {
         isUpdating = updating;
@@ -111,7 +114,7 @@ public class MainActivityViewModel extends AndroidViewModel {
     }
 
     public void updateCurrentLocation() {
-        currentLocation.setValue(wasRepository.getCurrentLocation());
+        currentLocation.postValue(wasRepository.getCurrentLocation());
 
     }
 
@@ -120,13 +123,16 @@ public class MainActivityViewModel extends AndroidViewModel {
         wasRepository = WasRepository.getInstance();
         wasList.setValue(wasRepository.getWasList().getValue());
         playAudioHelper = new PlayAudioHelper();
+        clusterLayer=new ClusterLayer();
 
 
     }
 
     public void updateMarkerList() {
+        System.out.println("OCUL: Marker list will be updated now...");
         if (markerList.size() != 0) {
             markerList.clear();
+            wasRepository.setCount(0);
         }
         for (int i = 0; i < wasList.getValue().size(); i++) {
             Was was = wasList.getValue().get(i);
@@ -142,7 +148,13 @@ public class MainActivityViewModel extends AndroidViewModel {
             marker.setCoordinate(coordinate);
             marker.setIcon(image);
             marker.setTitle(String.valueOf(i));
+            System.out.println("Values of the new was item: ");
+            System.out.println("File name: "+was.getFileName()+" File location: "+was.getFileLocation());
+            System.out.println("This is the "+i+"th Was Item in the list");
+            wasRepository.setCount(wasRepository.getCount()+1);
             markerList.add(marker);
+            clusterLayer.addMarker(marker);
+            was.setMapMarker(marker);
 
         }
         setMarkerList(markerList);
@@ -154,6 +166,14 @@ public class MainActivityViewModel extends AndroidViewModel {
 
     public void setMarkerList(List<MapObject> markerList) {
         this.markerList = markerList;
+    }
+
+    public ClusterLayer getClusterLayer() {
+        return clusterLayer;
+    }
+
+    public void setClusterLayer(ClusterLayer clusterLayer) {
+        this.clusterLayer = clusterLayer;
     }
 
     public MutableLiveData<List<Was>> getWasList() {
@@ -168,10 +188,10 @@ public class MainActivityViewModel extends AndroidViewModel {
     public void addAnotherWasItem() {
         List<Was> currentWasItems = wasList.getValue();
         currentWasItems.add(new Was(2, R.raw.tekerleme03, "", "", 40.977047, 29.0518113, 0.0, R.drawable.place_holder_icon)); //Sancaktepe Additional
-        wasRepository.setCount(wasRepository.getCount() + 1);
+       // wasRepository.setCount(wasRepository.getCount() + 1);
         currentWasItems.add(new Was(3, R.raw.tekerleme04, "", "", 40.985381, 29.042111, 0.0, R.drawable.place_holder_icon));  //Kızıltoprak Additional
         wasList.postValue(currentWasItems);
-        wasRepository.setCount(wasRepository.getCount() + 1);
+       // wasRepository.setCount(wasRepository.getCount() + 1);
     }
 
     //Map Management Part End
@@ -179,8 +199,17 @@ public class MainActivityViewModel extends AndroidViewModel {
     //Audio Management Part Start
 
     public void playAudio(List<Was> wasList, MapMarker marker) {
-        playAudioHelper.startPlaying(wasList.get(wasRepository.getCount()));
-        //playAudioHelper.play(context, wasList.get(Integer.parseInt(marker.getTitle())).getResId());
+        System.out.println("A Was Item will be played now...");
+        String addressToBeSearched=marker.toString();
+        String address;
+        for (int i=0;i<wasList.size();i++){
+            address=wasList.get(i).getMapMarker().toString();
+            if(address.equals(addressToBeSearched)){
+                playAudioHelper.startPlaying(wasList.get(i));
+                break;
+            }
+        }
+
     }
 
     //Audio Management Part End

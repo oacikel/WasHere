@@ -148,7 +148,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             MapObject mapObject = (MapObject) viewObject;
 
                                             if (mapObject.getType() == MapObject.Type.MARKER) {
-                                                System.out.println("Marker pressed is: "+ mapObject.toString());
+                                                System.out.println("Marker pressed is: " + mapObject.toString());
+                                                /*
+                                                TODO: Çalınacak audio dosyası Marker'ın title attributeuna bağlı olarak çağırılıyor. Onun yerine Was item'a bir marker tanımlanmalı ve tıklandığında direk was item çağırılmalı...
+                                                */
                                                 mainActivityViewModel.playAudio(mainActivityViewModel.getWasList().getValue(), (MapMarker) mapObject);
 
                                             }
@@ -228,17 +231,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         buttonUpdateMarkers.setOnClickListener(this);
     }
 
-    public void initiateMainButtonsFragment(){
-        mainButtonSetFragment=new MainButtonSetFragment();
+    public void initiateMainButtonsFragment() {
+        mainButtonSetFragment = new MainButtonSetFragment();
         getSupportFragmentManager().beginTransaction().replace(R.id.frameLatourButtonSet, mainButtonSetFragment).commit();
 
     }
 
-    public void placeMarkersOnMap(){
-        if(map!=null){
-            map.removeMapObjects(mainActivityViewModel.getMarkerList());
+    public void placeMarkersOnMap() {
+        if (map != null) {
+            map.removeClusterLayer(mainActivityViewModel.getClusterLayer());
             mainActivityViewModel.updateMarkerList();
-            map.addMapObjects(mainActivityViewModel.getMarkerList());
+            //map.addMapObjects(mainActivityViewModel.getMarkerList());
+            map.addClusterLayer(mainActivityViewModel.getClusterLayer());
         }
     }
 
