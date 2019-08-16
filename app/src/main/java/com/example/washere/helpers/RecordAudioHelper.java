@@ -22,10 +22,19 @@ public class RecordAudioHelper {
     private MediaRecorder mediaRecorder = null;
     private Application application;
     private int count = 0;
+    private File file;
 
     public RecordAudioHelper(Application application, WasRepository wasRepository) {
         this.application = application;
         this.wasRepository = wasRepository;
+    }
+
+    public File getFile() {
+        return file;
+    }
+
+    public void setFile(File file) {
+        this.file = file;
     }
 
     public String getFileName() {
@@ -66,7 +75,6 @@ public class RecordAudioHelper {
 
     public void setFileNameAndPath() {
         int count = 0;
-        File file;
 
         do {
             count++;

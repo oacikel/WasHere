@@ -10,14 +10,14 @@ This class will serve to manipulate audio files.
 
 
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.MutableLiveData;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 
 import com.example.washere.R;
@@ -36,7 +36,6 @@ import com.here.android.mpa.mapping.MapObject;
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 

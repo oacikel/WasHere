@@ -1,9 +1,9 @@
 package com.example.washere.viewModels;
 
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.MutableLiveData;
-import android.support.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.MutableLiveData;
+import androidx.annotation.NonNull;
 
 import com.example.washere.R;
 import com.example.washere.helpers.RecordAudioHelper;
@@ -44,6 +44,7 @@ public class MainButtonSetFragmentViewModel extends AndroidViewModel {
     public void addWasItemAfterRecording(){
         Was was=createWas();
         List<Was>currentWasList=wasRepository.getWasList().getValue();
+        wasRepository.sendFilesToDatabase(recordAudioHelper.getFile());
         currentWasList.add(was);
         wasList.postValue(currentWasList);
     }
