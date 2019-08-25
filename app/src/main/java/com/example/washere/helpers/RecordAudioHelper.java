@@ -21,7 +21,6 @@ public class RecordAudioHelper {
     private WasRepository wasRepository;
     private MediaRecorder mediaRecorder = null;
     private Application application;
-    private int count = 0;
     private File file;
 
     public RecordAudioHelper(Application application, WasRepository wasRepository) {
@@ -64,25 +63,19 @@ public class RecordAudioHelper {
 
         try {
             mediaRecorder.prepare();
-            mediaRecorder.start();
-
 
         } catch (IOException e) {
-            System.out.println("Sıkıntı var!");
-            Log.e(LOG_TAG, "prepare() failed: " + e.getMessage());
+            Log.e(LOG_TAG, "Mediarecorder couldn't be prepared: " + e.getMessage());
         }
+            mediaRecorder.start();
     }
 
     public void setFileNameAndPath() {
-        int count = 0;
-
         do {
-            count++;
             fileName = application.getString(R.string.default_file_name)
-                    + "_" + (wasRepository.getCount() + count) + ".mp4";
+                    + "_" + (wasRepository.getUserName()+"_"+wasRepository.getTimeStamp()) + ".mp3";
             filePath = Environment.getExternalStorageDirectory().getAbsolutePath();
             filePath += "/WasHere/" + fileName;
-
 
 
             file = new File(filePath);

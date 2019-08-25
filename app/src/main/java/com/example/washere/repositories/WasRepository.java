@@ -1,32 +1,34 @@
 package com.example.washere.repositories;
 
-import android.net.Uri;
-
-import androidx.annotation.NonNull;
-import androidx.lifecycle.MutableLiveData;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.MutableLiveData;
 
-import com.example.washere.R;
+import com.example.washere.helpers.FirebaseFireStoreHelper;
+import com.example.washere.helpers.FirebseStorageHelper;
 import com.example.washere.models.Was;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 import com.here.android.mpa.common.GeoCoordinate;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
-public class WasRepository {
+public class WasRepository extends AppCompatActivity {
 
     private static WasRepository instance;
     private ArrayList<Was> dataSet = new ArrayList<>();
-    private int count = 0;
     private GeoCoordinate currentLocation;
-    private StorageReference storageReference= FirebaseStorage.getInstance().getReference();
-    private StorageReference audioReference;
+    private FirebseStorageHelper firebseStorageHelper = new FirebseStorageHelper();
+    private FirebaseFireStoreHelper firebaseFireStoreHelper = new FirebaseFireStoreHelper();
+    private boolean isUpdated = false;
+    private MutableLiveData<String> downloadUrl = new MutableLiveData<>();
+    private MutableLiveData<List<Was>> wasList=new MutableLiveData<>();
+
+
+    private String userName = ("Ocul");
+
 
     public static WasRepository getInstance() {
         if (instance == null) {
@@ -35,8 +37,8 @@ public class WasRepository {
         return instance;
     }
 
-    public StorageReference getStorageReference() {
-        return storageReference;
+    public FirebseStorageHelper getFirebseStorageHelper() {
+        return firebseStorageHelper;
     }
 
     public GeoCoordinate getCurrentLocation() {
@@ -47,45 +49,62 @@ public class WasRepository {
         this.currentLocation = currentLocation;
     }
 
+    public boolean isUpdated() {
+        return isUpdated;
+    }
+
+    public void setUpdated(boolean updated) {
+        isUpdated = updated;
+    }
+
+
+    public void uploadFilesToFirebaseStorage(File file) {
+        firebseStorageHelper.uploadFilesToStorage(file);
+    }
+
+    public String getDownloadUri() {
+        String downloadUri;
+
+        downloadUri = firebseStorageHelper.getDownloadUri().getValue();
+
+        return downloadUri;
+    }
+
+    public void addWasHashMapToFireStore(Was was) {
+        firebaseFireStoreHelper.addWasMapToFireStore(was);
+    }
+
+    public FirebaseFireStoreHelper getFirebaseFireStoreHelper() {
+        return firebaseFireStoreHelper;
+    }
+
+    public void setFirebaseFireStoreHelper(FirebaseFireStoreHelper firebaseFireStoreHelper) {
+        this.firebaseFireStoreHelper = firebaseFireStoreHelper;
+    }
+
+    //Misc
+    //Mock UserName
+    public String getUserName() {
+        return userName;
+    }
+
+    public String getTimeStamp() {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy-hh-mm-ss");
+        String timeStamp = simpleDateFormat.format(new Date());
+
+        return timeStamp;
+    }
+
+    public MutableLiveData<String> getDownloadUrl() {
+        MutableLiveData<String> downloadUrl = new MutableLiveData<>();
+        return downloadUrl;
+    }
+
     public MutableLiveData<List<Was>> getWasList() {
-        //setWasItems();
-        MutableLiveData<List<Was>> data = new MutableLiveData<>();
-        data.setValue(dataSet);
-        return data;
+        return wasList;
     }
 
-    public int getCount() {
-        return count;
+    public void setWasList(MutableLiveData<List<Was>> wasList) {
+        this.wasList = wasList;
     }
-
-    public void setCount(int count) {
-        this.count = count;
-    }
-
-    public void addWasItem(Was was) {
-        dataSet.add(was);
-        count++;
-    }
-
-    //Send data to the database
-    public void sendFilesToDatabase(File file){
-        Uri uri =Uri.fromFile(file);
-        audioReference=storageReference.child("audio/"+file.getName());
-        audioReference.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                System.out.println("Dosya yüklendi!");
-            }
-
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                System.out.println("Dosya yüklenemedi: "+e.getMessage());
-            }
-        });
-    }
-
-
-
-
 }

@@ -1,53 +1,45 @@
 package com.example.washere.models;
 
+import android.net.Uri;
+
 import com.here.android.mpa.mapping.MapMarker;
 
+import java.io.File;
+
+
 public class Was {
-    private String fileLocation;
     private String fileName;
     private double locationLatitude;
     private double locationLongitude;
     private double locationAltitude;
     private int markerDirectory;
-    private int resId;
-    private int order;
     private MapMarker mapMarker;
+    private String downloadUrl;
+    private File audioFile;
 
 
-    public Was(int order, int resId, String fileLocation, String fileName, double locationLatitude, double locationLongitude, double locationAltitude, int markerDirectory) {
-        this.order = order;
-        this.resId = resId;
-        this.fileLocation = fileLocation;
-        this.fileName = fileName;
+    public Was(double locationLatitude, double locationLongitude, double locationAltitude, int markerDirectory) {
         this.locationLatitude = locationLatitude;
         this.locationLongitude = locationLongitude;
         this.locationAltitude = locationAltitude;
         this.markerDirectory = markerDirectory;
     }
 
-    public int getOrder() {
-        return order;
+    public Was(String downloadUrl,double locationLatitude, double locationLongitude, double locationAltitude) {
+        this.downloadUrl=downloadUrl;
+        this.locationLatitude = locationLatitude;
+        this.locationLongitude = locationLongitude;
+        this.locationAltitude = locationAltitude;
     }
 
-    public void setOrder(int order) {
-        this.order = order;
+    public String getDownloadUrl() {
+        return downloadUrl;
     }
 
-    public int getResId() {
-        return resId;
+    public void setDownloadUrl(String downloadUrl) {
+        this.downloadUrl = downloadUrl;
     }
 
-    public void setResId(int resId) {
-        this.resId = resId;
-    }
-
-    public String getFileLocation() {
-        return fileLocation;
-    }
-
-    public void setFileLocation(String fileLocation) {
-        this.fileLocation = fileLocation;
-    }
 
     public String getFileName() {
         return fileName;
@@ -94,5 +86,13 @@ public class Was {
     }
     public void setMapMarker(MapMarker mapMarker) {
         this.mapMarker = mapMarker;
+    }
+
+    public File getAudioFile() {
+        return audioFile;
+    }
+
+    public void setAudioFile(File audioFile) {
+        this.audioFile = audioFile;
     }
 }

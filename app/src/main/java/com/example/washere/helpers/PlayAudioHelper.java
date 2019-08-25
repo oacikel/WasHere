@@ -1,12 +1,15 @@
 package com.example.washere.helpers;
 
 import android.content.Context;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.util.Log;
 import android.view.WindowManager;
 
 import com.example.washere.models.Was;
 
+import java.io.File;
 import java.io.IOException;
 
 public class PlayAudioHelper {
@@ -21,11 +24,18 @@ public class PlayAudioHelper {
     }
 
 
-    public void startPlaying(Was was) {
+
+    public void startPlaying(Context context,Was was) {
         mMediaPlayer = new MediaPlayer();
+        //mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+
 
         try {
-            mMediaPlayer.setDataSource(was.getFileLocation());
+            //mMediaPlayer.setDataSource(was.getAudioFile().getPath());
+
+
+            mMediaPlayer.setDataSource(was.getDownloadUrl());
+            System.out.println("Ocul, downloadURL is : "+was.getDownloadUrl());
             mMediaPlayer.prepare();
 
             mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -34,8 +44,8 @@ public class PlayAudioHelper {
                     mMediaPlayer.start();
                 }
             });
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "prepare() failed");
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "prepare() failed"+e.getMessage());
         }
 
         mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {

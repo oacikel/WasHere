@@ -9,6 +9,6 @@
     <string name="file_name_01">tekerleme01.3gp</string>
     <string name="default_file_name">was_recording</string>
 
-
-
+    <string name="audio_extension">mp3</string>
+    <string name="audio_child">audio/</string>
 </resources>

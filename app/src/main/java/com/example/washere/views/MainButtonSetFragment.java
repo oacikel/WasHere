@@ -2,12 +2,15 @@ package com.example.washere.views;
 
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+
 import android.content.Context;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.appcompat.app.AppCompatActivity;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -18,6 +21,7 @@ import com.example.washere.R;
 import com.example.washere.models.Was;
 import com.example.washere.viewModels.MainButtonSetFragmentViewModel;
 
+import java.sql.SQLOutput;
 import java.util.List;
 
 public class MainButtonSetFragment extends Fragment implements View.OnTouchListener {
@@ -40,21 +44,18 @@ public class MainButtonSetFragment extends Fragment implements View.OnTouchListe
         view = inflater.inflate(R.layout.fragment_main_button_set, container, false);
         initViews(view);
         setButtonListeners();
-      activity=(MainActivity) getActivity();
+        activity = (MainActivity) getActivity();
 
         mainButtonSetFragmentViewModel = ViewModelProviders.of(this).get(MainButtonSetFragmentViewModel.class);
         mainButtonSetFragmentViewModel.init();
-
-        mainButtonSetFragmentViewModel.getWasList().observe(getViewLifecycleOwner(), new Observer<List<Was>>() {
+        mainButtonSetFragmentViewModel.getDownloadUrl().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
-            public void onChanged(@Nullable List<Was> was) {
-                //TODO: Repository'deki waslist update olduğunda. Main activity'nin de "getWasList" metodu  çağırılmalı. Ancak çağırılmıyor. Çözüm bulmak gerekiyor.
-                System.out.println("OCUL: New was item added from fragment side, changes should occur in main activity.");
-
-
+            public void onChanged(String url) {
+                System.out.println("Ocul: url değişti");
+                mainButtonSetFragmentViewModel.addWasHashMapToFireStore(url);
+                System.out.println(url);
             }
         });
-
 
 
         return view;
@@ -80,8 +81,6 @@ public class MainButtonSetFragment extends Fragment implements View.OnTouchListe
                 mainButtonSetFragmentViewModel.startRecordingWasItem();
             } else if (event.getAction() == MotionEvent.ACTION_UP) {
                 mainButtonSetFragmentViewModel.addWasItemAfterRecording();
-                int order = mainButtonSetFragmentViewModel.getWasList().getValue().size() - 1;
-                activity.placeMarkersOnMap();
 
             }
         }

@@ -9,6 +9,7 @@ This class will serve to manipulate audio files.
 */
 
 
+import android.app.Activity;
 import android.app.Application;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
@@ -21,6 +22,8 @@ import androidx.annotation.NonNull;
 import android.util.Log;
 
 import com.example.washere.R;
+import com.example.washere.helpers.FirebaseFireStoreHelper;
+import com.example.washere.helpers.FirebseStorageHelper;
 import com.example.washere.helpers.PlayAudioHelper;
 import com.example.washere.helpers.RecordAudioHelper;
 import com.example.washere.models.Was;
@@ -45,13 +48,12 @@ public class MainActivityViewModel extends AndroidViewModel {
     private Context context;
     private MutableLiveData<GeoCoordinate> currentLocation = new MutableLiveData<>();
     private PositioningManager positioningManager;
-    private MutableLiveData<List<Was>> wasList = new MutableLiveData<>();
+    private MutableLiveData<List<Was>> wasList;
     private boolean isUpdating = false;
     private List<MapObject> markerList = new ArrayList<MapObject>();
     private PlayAudioHelper playAudioHelper;
-    private RecordAudioHelper recordAudioHelper;
     private WasRepository wasRepository;
-    private ClusterLayer clusterLayer;
+    private FirebaseFireStoreHelper firebaseFireStoreHelper=new FirebaseFireStoreHelper();
 
     public void setUpdating(boolean updating) {
         isUpdating = updating;
@@ -81,6 +83,14 @@ public class MainActivityViewModel extends AndroidViewModel {
         }
 
         return com.here.android.mpa.common.MapSettings.setIsolatedDiskCacheRootPath(diskCacheRoot, intentName);
+    }
+
+    public FirebaseFireStoreHelper getFirebaseFireStoreHelper() {
+        return firebaseFireStoreHelper;
+    }
+
+    public void setFirebaseFireStoreHelper(FirebaseFireStoreHelper firebaseFireStoreHelper) {
+        this.firebaseFireStoreHelper = firebaseFireStoreHelper;
     }
 
     public void onMapEngineInitialized() {
@@ -120,25 +130,20 @@ public class MainActivityViewModel extends AndroidViewModel {
     public void init() {
 
         wasRepository = WasRepository.getInstance();
-        wasList.setValue(wasRepository.getWasList().getValue());
         playAudioHelper = new PlayAudioHelper();
-        clusterLayer=new ClusterLayer();
-
-
     }
 
     public void updateMarkerList() {
-        System.out.println("OCUL: Marker list will be updated now...");
+
         if (markerList.size() != 0) {
             markerList.clear();
-            wasRepository.setCount(0);
         }
-        for (int i = 0; i < wasList.getValue().size(); i++) {
+        for (int i = 0; i < wasRepository.getWasList().getValue().size(); i++) {
             Was was = wasList.getValue().get(i);
             MapMarker marker = new MapMarker();
             Image image = new Image();
             try {
-                image.setImageResource(was.getMarkerDirectory());
+                image.setImageResource(R.drawable.place_holder_icon);
             } catch (IOException e) {
                 e.printStackTrace();
                 System.out.println("Error in setting image Resource: " + e.getMessage());
@@ -147,12 +152,7 @@ public class MainActivityViewModel extends AndroidViewModel {
             marker.setCoordinate(coordinate);
             marker.setIcon(image);
             marker.setTitle(String.valueOf(i));
-            System.out.println("Values of the new was item: ");
-            System.out.println("File name: "+was.getFileName()+" File location: "+was.getFileLocation());
-            System.out.println("This is the "+i+"th Was Item in the list");
-            wasRepository.setCount(wasRepository.getCount()+1);
             markerList.add(marker);
-            clusterLayer.addMarker(marker);
             was.setMapMarker(marker);
 
         }
@@ -163,16 +163,12 @@ public class MainActivityViewModel extends AndroidViewModel {
         return markerList;
     }
 
+    public WasRepository getWasRepository() {
+        return wasRepository;
+    }
+
     public void setMarkerList(List<MapObject> markerList) {
         this.markerList = markerList;
-    }
-
-    public ClusterLayer getClusterLayer() {
-        return clusterLayer;
-    }
-
-    public void setClusterLayer(ClusterLayer clusterLayer) {
-        this.clusterLayer = clusterLayer;
     }
 
     public MutableLiveData<List<Was>> getWasList() {
@@ -180,18 +176,6 @@ public class MainActivityViewModel extends AndroidViewModel {
         return wasList;
     }
 
-    public void setWasList(MutableLiveData<List<Was>> wasList) {
-        this.wasList = wasList;
-    }
-
-    public void addAnotherWasItem() {
-        List<Was> currentWasItems = wasList.getValue();
-        currentWasItems.add(new Was(2, R.raw.tekerleme03, "", "", 40.977047, 29.0518113, 0.0, R.drawable.place_holder_icon)); //Sancaktepe Additional
-       // wasRepository.setCount(wasRepository.getCount() + 1);
-        currentWasItems.add(new Was(3, R.raw.tekerleme04, "", "", 40.985381, 29.042111, 0.0, R.drawable.place_holder_icon));  //Kızıltoprak Additional
-        wasList.postValue(currentWasItems);
-       // wasRepository.setCount(wasRepository.getCount() + 1);
-    }
 
     //Map Management Part End
 
@@ -204,7 +188,7 @@ public class MainActivityViewModel extends AndroidViewModel {
         for (int i=0;i<wasList.size();i++){
             address=wasList.get(i).getMapMarker().toString();
             if(address.equals(addressToBeSearched)){
-                playAudioHelper.startPlaying(wasList.get(i));
+                playAudioHelper.startPlaying(context,wasList.get(i));
                 break;
             }
         }

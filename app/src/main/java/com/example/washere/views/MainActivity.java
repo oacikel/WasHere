@@ -2,12 +2,15 @@ package com.example.washere.views;
 
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+
 import android.content.pm.PackageManager;
 import android.graphics.PointF;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -15,6 +18,7 @@ import android.widget.Toast;
 
 import com.example.washere.R;
 import com.example.washere.helpers.PermissionHelper;
+import com.example.washere.models.Was;
 import com.example.washere.viewModels.MainActivityViewModel;
 import com.here.android.mpa.common.GeoCoordinate;
 import com.here.android.mpa.common.OnEngineInitListener;
@@ -36,8 +40,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Map map;
     MainActivityViewModel mainActivityViewModel;
     PermissionHelper permissionHelper;
-    Button buttonUpdateMarkers;
     MainButtonSetFragment mainButtonSetFragment;
+    Button buttonUpdateMarkers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +51,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setOnClickListeners();
         mainActivityViewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
         initiateMainButtonsFragment();
-        //mainActivityViewModel.init();
 
         //Permission management start
         permissionHelper = new PermissionHelper(this);
@@ -69,6 +72,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //Observe Changes in Current Location End
 
         //Observe Changes in Was Items Start
+        mainActivityViewModel.getWasList().observe(this, new Observer<List<Was>>() {
+            @Override
+            public void onChanged(List<Was> was) {
+
+                System.out.println("Was List to be updsfdf s");
+                placeMarkersOnMap();
+            }
+        });
 
         //Observe Changes in Was Items End
 
@@ -91,9 +102,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        if (v == buttonUpdateMarkers) {
-            mainActivityViewModel.addAnotherWasItem();
+        if (v==buttonUpdateMarkers){
+            System.out.println("Ocul: Marker'ların update edilmesi lazım şimdi");
+            mainActivityViewModel.getWasRepository().getFirebaseFireStoreHelper().getAllWasObjectsFromFireStore();
+            mainActivityViewModel.getWasRepository().getWasList(); //Was Item'ları firestore'dan indirdik. (Henüz dosya yok)
+
+
         }
+
     }
 
     public void initiateMap(boolean success) {
@@ -146,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             MapObject mapObject = (MapObject) viewObject;
 
                                             if (mapObject.getType() == MapObject.Type.MARKER) {
-                                                System.out.println("Marker pressed is: " + mapObject.toString());
+
                                                 /*
                                                 TODO: Çalınacak audio dosyası Marker'ın title attributeuna bağlı olarak çağırılıyor. Onun yerine Was item'a bir marker tanımlanmalı ve tıklandığında direk was item çağırılmalı...
                                                 */
@@ -236,10 +252,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void placeMarkersOnMap() {
         if (map != null) {
-            map.removeClusterLayer(mainActivityViewModel.getClusterLayer());
             mainActivityViewModel.updateMarkerList();
-            //map.addMapObjects(mainActivityViewModel.getMarkerList());
-            map.addClusterLayer(mainActivityViewModel.getClusterLayer());
+            map.addMapObjects(mainActivityViewModel.getMarkerList());
         }
     }
 
