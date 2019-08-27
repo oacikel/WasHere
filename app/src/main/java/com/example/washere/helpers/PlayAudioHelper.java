@@ -29,11 +29,8 @@ public class PlayAudioHelper {
         mMediaPlayer = new MediaPlayer();
         //mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 
-
         try {
             //mMediaPlayer.setDataSource(was.getAudioFile().getPath());
-
-
             mMediaPlayer.setDataSource(was.getDownloadUrl());
             System.out.println("Ocul, downloadURL is : "+was.getDownloadUrl());
             mMediaPlayer.prepare();

@@ -11,14 +11,18 @@ This class will serve to manipulate audio files.
 
 import android.app.Activity;
 import android.app.Application;
+
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
+
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
+
 import androidx.annotation.NonNull;
+
 import android.util.Log;
 
 import com.example.washere.R;
@@ -29,6 +33,7 @@ import com.example.washere.helpers.RecordAudioHelper;
 import com.example.washere.models.Was;
 import com.example.washere.repositories.WasRepository;
 import com.here.android.mpa.cluster.ClusterLayer;
+import com.here.android.mpa.cluster.ClusterViewObject;
 import com.here.android.mpa.common.GeoCoordinate;
 import com.here.android.mpa.common.GeoPosition;
 import com.here.android.mpa.common.Image;
@@ -40,6 +45,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class MainActivityViewModel extends AndroidViewModel {
@@ -53,7 +59,8 @@ public class MainActivityViewModel extends AndroidViewModel {
     private List<MapObject> markerList = new ArrayList<MapObject>();
     private PlayAudioHelper playAudioHelper;
     private WasRepository wasRepository;
-    private FirebaseFireStoreHelper firebaseFireStoreHelper=new FirebaseFireStoreHelper();
+    private FirebaseFireStoreHelper firebaseFireStoreHelper = new FirebaseFireStoreHelper();
+    private ClusterLayer clusterLayer;
 
     public void setUpdating(boolean updating) {
         isUpdating = updating;
@@ -98,9 +105,7 @@ public class MainActivityViewModel extends AndroidViewModel {
         positioningManager.start(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR);
         wasRepository.setCurrentLocation(positioningManager.getPosition().getCoordinate());
         updateCurrentLocation();
-        //System.out.println("Will update map marker");
-        //updateMarkerList();
-        //System.out.println("Updated map marker");
+        clusterLayer = new ClusterLayer();
         PositioningManager.OnPositionChangedListener positionListener = new PositioningManager.OnPositionChangedListener() {
 
             @Override
@@ -154,6 +159,7 @@ public class MainActivityViewModel extends AndroidViewModel {
             marker.setTitle(String.valueOf(i));
             markerList.add(marker);
             was.setMapMarker(marker);
+            clusterLayer.addMarker(marker);
 
         }
         setMarkerList(markerList);
@@ -172,10 +178,31 @@ public class MainActivityViewModel extends AndroidViewModel {
     }
 
     public MutableLiveData<List<Was>> getWasList() {
-        wasList=WasRepository.getInstance().getWasList();
+        wasList = WasRepository.getInstance().getWasList();
         return wasList;
     }
 
+    public ClusterLayer getClusterLayer() {
+        return clusterLayer;
+    }
+
+    public ArrayList<Was> getWasObjectsInCluster(ClusterViewObject clusterViewObject, ArrayList<Was> wasList) {
+        Collection<MapMarker> markerList = clusterViewObject.getMarkers();
+        String adressToBeSearched;
+        String adress;
+        ArrayList<MapMarker> mapMarkerArrayList = new ArrayList<>(markerList);
+        ArrayList<Was> wasListOfCluster = new ArrayList<>();
+        for (int i = 0; i < mapMarkerArrayList.size(); i++) {
+            adressToBeSearched = mapMarkerArrayList.get(i).toString();
+            for (int a = 0; a < wasList.size(); a++) {
+                adress = wasList.get(a).getMapMarker().toString();
+                if (adress.equals(adressToBeSearched)) {
+                    wasListOfCluster.add(wasList.get(a));
+                }
+            }
+        }
+        return wasListOfCluster;
+    }
 
     //Map Management Part End
 
@@ -183,16 +210,20 @@ public class MainActivityViewModel extends AndroidViewModel {
 
     public void playAudio(List<Was> wasList, MapMarker marker) {
         System.out.println("A Was Item will be played now...");
-        String addressToBeSearched=marker.toString();
+        String addressToBeSearched = marker.toString();
         String address;
-        for (int i=0;i<wasList.size();i++){
-            address=wasList.get(i).getMapMarker().toString();
-            if(address.equals(addressToBeSearched)){
-                playAudioHelper.startPlaying(context,wasList.get(i));
+        for (int i = 0; i < wasList.size(); i++) {
+            address = wasList.get(i).getMapMarker().toString();
+            if (address.equals(addressToBeSearched)) {
+                playAudioHelper.startPlaying(context, wasList.get(i));
                 break;
             }
         }
 
+    }
+
+    public void playAudio(Was was) {
+        playAudioHelper.startPlaying(context, was);
     }
 
     //Audio Management Part End

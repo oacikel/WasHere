@@ -29,6 +29,8 @@ public class FirebseStorageHelper {
     private Uri uri;
     private MutableLiveData<Boolean> isUploaded = new MutableLiveData<>();
     private MutableLiveData<String> downloadUri = new MutableLiveData<>();
+    private String uploadTime;
+    private String uploadDate;
 
     private static String audioExtention = ("mp3");
     private static String audioChild = ("audio/");

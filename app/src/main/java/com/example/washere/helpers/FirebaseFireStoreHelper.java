@@ -32,8 +32,11 @@ public class FirebaseFireStoreHelper {
         wasObject.put("downloadURL", was.getDownloadUrl());
         wasObject.put("locationLatitude", was.getLocationLatitude());
         wasObject.put("locationLongitude", was.getLocationLongitude());
-        wasObject.put("locationAltitude",was.getLocationAltitude());
+        wasObject.put("locationAltitude", was.getLocationAltitude());
         wasObject.put("markerDirectory", was.getMarkerDirectory());
+        wasObject.put("uploaderName", was.getUploaderName());
+        wasObject.put("uploadDate", was.getUploadDate());
+        wasObject.put("uploadTime", was.getUploadTime());
 
         firebaseFirestore.collection("wasItems").add(wasObject).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
             @Override
@@ -75,7 +78,14 @@ public class FirebaseFireStoreHelper {
     public ArrayList<Was> createWasArrayFromHashMap(ArrayList<Map> wasMap) {
         ArrayList<Was> wasList = new ArrayList<>();
         for (int i = 0; i < wasMap.size(); i++) {
-            Was was = new Was((String) wasMap.get(i).get("downloadURL"),(double) (wasMap.get(i).get("locationLatitude")), ((double) wasMap.get(i).get("locationLongitude")), ((double) wasMap.get(i).get("locationAltitude")));
+            Was was = new Was(
+                    (double) wasMap.get(i).get("locationLatitude"),
+                    (double) wasMap.get(i).get("locationLongitude"),
+                    (double) wasMap.get(i).get("locationAltitude"),
+                    (String) wasMap.get(i).get("downloadURL"),
+                    (String) wasMap.get(i).get("uploaderName"),
+                    (String) wasMap.get(i).get("uploadTime"),
+                    (String) wasMap.get(i).get("uploadDate"));
             wasList.add(was);
         }
         return wasList;

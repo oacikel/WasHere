@@ -45,6 +45,9 @@ public class MainButtonSetFragmentViewModel extends AndroidViewModel {
 
     public void addWasItemAfterRecording() {
         was = createWas(); //Create a Was File At The Location Of The Recording
+        was.setUploadDate(recordAudioHelper.getFile().getUploadDate());
+        was.setUploadTime(recordAudioHelper.getFile().getUploadTime());
+        was.setUploaderName(recordAudioHelper.getFile().getUploaderName());
         wasRepository.uploadFilesToFirebaseStorage(recordAudioHelper.getFile()); //Upload the audio file of the was to Firebase Storage
     }
 

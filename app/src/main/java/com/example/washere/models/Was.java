@@ -16,6 +16,9 @@ public class Was {
     private MapMarker mapMarker;
     private String downloadUrl;
     private File audioFile;
+    private String uploaderName;
+    private String uploadTime;
+    private String uploadDate;
 
 
     public Was(double locationLatitude, double locationLongitude, double locationAltitude, int markerDirectory) {
@@ -25,11 +28,14 @@ public class Was {
         this.markerDirectory = markerDirectory;
     }
 
-    public Was(String downloadUrl,double locationLatitude, double locationLongitude, double locationAltitude) {
-        this.downloadUrl=downloadUrl;
+    public Was(double locationLatitude, double locationLongitude, double locationAltitude, String downloadUrl, String uploaderName, String uploadTime, String uploadDate) {
         this.locationLatitude = locationLatitude;
         this.locationLongitude = locationLongitude;
         this.locationAltitude = locationAltitude;
+        this.downloadUrl = downloadUrl;
+        this.uploaderName = uploaderName;
+        this.uploadTime = uploadTime;
+        this.uploadDate = uploadDate;
     }
 
     public String getDownloadUrl() {
@@ -94,5 +100,29 @@ public class Was {
 
     public void setAudioFile(File audioFile) {
         this.audioFile = audioFile;
+    }
+
+    public String getUploaderName() {
+        return uploaderName;
+    }
+
+    public void setUploaderName(String uploaderName) {
+        this.uploaderName = uploaderName;
+    }
+
+    public String getUploadTime() {
+        return uploadTime;
+    }
+
+    public void setUploadTime(String uploadTime) {
+        this.uploadTime = uploadTime;
+    }
+
+    public String getUploadDate() {
+        return uploadDate;
+    }
+
+    public void setUploadDate(String uploadDate) {
+        this.uploadDate = uploadDate;
     }
 }

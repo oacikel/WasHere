@@ -10,6 +10,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.View;
@@ -17,9 +19,11 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.washere.R;
+import com.example.washere.adapters.WasCardAdapter;
 import com.example.washere.helpers.PermissionHelper;
 import com.example.washere.models.Was;
 import com.example.washere.viewModels.MainActivityViewModel;
+import com.here.android.mpa.cluster.ClusterViewObject;
 import com.here.android.mpa.common.GeoCoordinate;
 import com.here.android.mpa.common.OnEngineInitListener;
 import com.here.android.mpa.common.ViewObject;
@@ -27,13 +31,16 @@ import com.here.android.mpa.mapping.Map;
 import com.here.android.mpa.mapping.MapGesture;
 import com.here.android.mpa.mapping.MapMarker;
 import com.here.android.mpa.mapping.MapObject;
+import com.here.android.mpa.mapping.MapProxyObject;
 import com.here.android.mpa.mapping.SupportMapFragment;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static com.example.washere.helpers.PermissionHelper.getRequestCodeAskPermissions;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, WasCardAdapter.OnMarkerListener {
 
 
     SupportMapFragment supportMapFragment;
@@ -42,6 +49,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     PermissionHelper permissionHelper;
     MainButtonSetFragment mainButtonSetFragment;
     Button buttonUpdateMarkers;
+    RecyclerView recyclerViewWasCard;
+    WasCardAdapter wasCardAdapter;
+    ArrayList<Was> mapMarkersInCluster;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        if (v==buttonUpdateMarkers){
+        if (v == buttonUpdateMarkers) {
             System.out.println("Ocul: Marker'ların update edilmesi lazım şimdi");
             mainActivityViewModel.getWasRepository().getFirebaseFireStoreHelper().getAllWasObjectsFromFireStore();
             mainActivityViewModel.getWasRepository().getWasList(); //Was Item'ları firestore'dan indirdik. (Henüz dosya yok)
@@ -158,15 +168,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 @Override
                                 public boolean onMapObjectsSelected(List<ViewObject> list) {
                                     for (ViewObject viewObject : list) {
-                                        if (viewObject.getBaseType() == ViewObject.Type.USER_OBJECT) {
-                                            MapObject mapObject = (MapObject) viewObject;
+                                        if (viewObject.getBaseType() == ViewObject.Type.PROXY_OBJECT) {
+                                            MapProxyObject proxyObject = (MapProxyObject) viewObject;
 
-                                            if (mapObject.getType() == MapObject.Type.MARKER) {
+                                            if (proxyObject.getType() == MapProxyObject.Type.CLUSTER_MARKER) {
 
-                                                /*
-                                                TODO: Çalınacak audio dosyası Marker'ın title attributeuna bağlı olarak çağırılıyor. Onun yerine Was item'a bir marker tanımlanmalı ve tıklandığında direk was item çağırılmalı...
-                                                */
-                                                mainActivityViewModel.playAudio(mainActivityViewModel.getWasList().getValue(), (MapMarker) mapObject);
+                                                ClusterViewObject clusterViewObject = (ClusterViewObject) proxyObject;
+
+                                                //Elimizdeki clusterdaki marker listesini markera çevir
+
+
+                                                //
+                                                recyclerViewWasCard.setVisibility(View.VISIBLE);
+                                                mapMarkersInCluster=mainActivityViewModel.getWasObjectsInCluster(clusterViewObject,
+                                                        (ArrayList<Was>)mainActivityViewModel.getWasList().getValue());
+                                                wasCardAdapter.setWasList(mapMarkersInCluster);
+
+
+                                              //  mainActivityViewModel.playAudio(mainActivityViewModel.getWasList().getValue(), (MapMarker) mapObject);
 
                                             }
                                         }
@@ -239,6 +258,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void initViews() {
         buttonUpdateMarkers = findViewById(R.id.buttonUpdateMarkers);
+        recyclerViewWasCard = findViewById(R.id.recyclerViewWasCard);
+        recyclerViewWasCard.setLayoutManager(new LinearLayoutManager(this));
+        recyclerViewWasCard.setHasFixedSize(true);
+        wasCardAdapter = new WasCardAdapter(this);
+        recyclerViewWasCard.setAdapter(wasCardAdapter);
+
+
     }
 
     public void setOnClickListeners() {
@@ -251,10 +277,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void placeMarkersOnMap() {
+        //TODO: Bu kısım daha iyi handle edilmeli. Her refreshte markerlar silinip tekrardan eklenmemeli...
         if (map != null) {
+            if (mainActivityViewModel.getClusterLayer().getMarkers().size() != 0) {
+                map.removeClusterLayer(mainActivityViewModel.getClusterLayer());
+            }
             mainActivityViewModel.updateMarkerList();
-            map.addMapObjects(mainActivityViewModel.getMarkerList());
+            map.addClusterLayer(mainActivityViewModel.getClusterLayer());
         }
     }
 
+    @Override
+    public void onWasCardClick(int position) {
+     Was wasSelected= mapMarkersInCluster.get(position);
+        mainActivityViewModel.playAudio(wasSelected);
+    }
 }

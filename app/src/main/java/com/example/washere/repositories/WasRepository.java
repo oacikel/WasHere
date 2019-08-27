@@ -7,10 +7,12 @@ import com.example.washere.helpers.FirebaseFireStoreHelper;
 import com.example.washere.helpers.FirebseStorageHelper;
 import com.example.washere.models.Was;
 import com.here.android.mpa.common.GeoCoordinate;
+import com.here.android.mpa.mapping.MapMarker;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -22,9 +24,9 @@ public class WasRepository extends AppCompatActivity {
     private GeoCoordinate currentLocation;
     private FirebseStorageHelper firebseStorageHelper = new FirebseStorageHelper();
     private FirebaseFireStoreHelper firebaseFireStoreHelper = new FirebaseFireStoreHelper();
-    private boolean isUpdated = false;
     private MutableLiveData<String> downloadUrl = new MutableLiveData<>();
-    private MutableLiveData<List<Was>> wasList=new MutableLiveData<>();
+    private MutableLiveData<List<Was>> wasList = new MutableLiveData<>();
+    private Collection<MapMarker> mapMarkerCollection;
 
 
     private String userName = ("Ocul");
@@ -48,15 +50,6 @@ public class WasRepository extends AppCompatActivity {
     public void setCurrentLocation(GeoCoordinate currentLocation) {
         this.currentLocation = currentLocation;
     }
-
-    public boolean isUpdated() {
-        return isUpdated;
-    }
-
-    public void setUpdated(boolean updated) {
-        isUpdated = updated;
-    }
-
 
     public void uploadFilesToFirebaseStorage(File file) {
         firebseStorageHelper.uploadFilesToStorage(file);
@@ -95,6 +88,20 @@ public class WasRepository extends AppCompatActivity {
         return timeStamp;
     }
 
+    public String getDate() {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        String date = simpleDateFormat.format(new Date());
+
+        return date;
+    }
+
+    public String getTime(){
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh-mm");
+        String time = simpleDateFormat.format(new Date());
+
+        return time;
+    }
+
     public MutableLiveData<String> getDownloadUrl() {
         MutableLiveData<String> downloadUrl = new MutableLiveData<>();
         return downloadUrl;
@@ -106,5 +113,13 @@ public class WasRepository extends AppCompatActivity {
 
     public void setWasList(MutableLiveData<List<Was>> wasList) {
         this.wasList = wasList;
+    }
+
+    public Collection<MapMarker> getMapMarkerCollection() {
+        return mapMarkerCollection;
+    }
+
+    public void setMapMarkerCollection(Collection<MapMarker> mapMarkerCollection) {
+        this.mapMarkerCollection = mapMarkerCollection;
     }
 }

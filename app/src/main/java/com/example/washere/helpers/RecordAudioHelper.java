@@ -6,11 +6,11 @@ import android.os.Environment;
 import android.util.Log;
 
 import com.example.washere.R;
+import com.example.washere.models.WasAudioFile;
 import com.example.washere.repositories.WasRepository;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.SQLOutput;
 
 public class RecordAudioHelper {
 
@@ -21,18 +21,18 @@ public class RecordAudioHelper {
     private WasRepository wasRepository;
     private MediaRecorder mediaRecorder = null;
     private Application application;
-    private File file;
+    private WasAudioFile file;
 
     public RecordAudioHelper(Application application, WasRepository wasRepository) {
         this.application = application;
         this.wasRepository = wasRepository;
     }
 
-    public File getFile() {
+    public WasAudioFile getFile() {
         return file;
     }
 
-    public void setFile(File file) {
+    public void setFile(WasAudioFile file) {
         this.file = file;
     }
 
@@ -54,6 +54,7 @@ public class RecordAudioHelper {
 
     public void startRecording() {
         setFileNameAndPath();
+        setUploadDateAndTime();
         mediaRecorder = new MediaRecorder();
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
@@ -78,7 +79,7 @@ public class RecordAudioHelper {
             filePath += "/WasHere/" + fileName;
 
 
-            file = new File(filePath);
+            file = new WasAudioFile(filePath);
         } while (file.exists() && !file.isDirectory());
 
         try {
@@ -88,6 +89,12 @@ public class RecordAudioHelper {
             System.out.println("Error in file creation: " + e.getMessage());
         }
 
+    }
+
+    public void setUploadDateAndTime(){
+        file.setUploadDate(wasRepository.getDate());
+        file.setUploadTime(wasRepository.getTime());
+        file.setUploaderName(wasRepository.getUserName());
     }
 
     public void stopRecording() {

@@ -1,119 +1,117 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:id="@+id/cardViewWasCard"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="3dp"
+    android:layout_marginTop="3dp"
+    android:layout_marginRight="3dp"
+    android:orientation="vertical"
+    app:cardBackgroundColor="#4CAF50"
+    app:cardCornerRadius="10dp">
 
-    <TextView
-        android:id="@+id/textViewUserName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:text="OcuL"
-        android:textSize="30sp"
-        app:layout_constraintBottom_toTopOf="@+id/imageViewUserAvatar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageButton
-        android:id="@+id/imageButtonDeleteWas"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintBottom_toBottomOf="@+id/textViewUserName"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/textViewUserName"
-        app:srcCompat="@android:drawable/ic_menu_delete" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:elevation="15dp"
+        android:paddingLeft="5dp"
+        android:paddingTop="10dp"
+        android:paddingRight="5dp"
+        android:paddingBottom="10dp">
 
-    <ImageView
-        android:id="@+id/imageViewUserAvatar"
-        android:layout_width="203dp"
-        android:layout_height="203dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewUserName"
-        tools:srcCompat="@tools:sample/avatars[12]" />
+        <ImageView
+            android:id="@+id/imageViewDateIcon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="8dp"
+            android:tint="@android:color/white"
+            app:layout_constraintBottom_toBottomOf="@+id/imageViewUserAvatar"
+            app:layout_constraintStart_toEndOf="@+id/imageViewUserAvatar"
+            app:layout_constraintTop_toTopOf="@+id/imageViewUserAvatar"
+            app:layout_constraintVertical_bias="1.0"
+            app:srcCompat="@drawable/icon_date" />
 
-    <ProgressBar
-        android:id="@+id/progressBarRating"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:progress="40"
-        app:layout_constraintEnd_toEndOf="@+id/imageViewUserAvatar"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/imageViewUserAvatar"
-        app:layout_constraintTop_toBottomOf="@+id/imageViewUserAvatar" />
+        <ImageView
+            android:id="@+id/imageViewDeleteWas"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:tint="@android:color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_max="wrap"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/icon_delete" />
 
-    <TextView
-        android:id="@+id/textViewUploadDate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:text="14 Nisan 2019"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="@+id/imageViewDateIcon"
-        app:layout_constraintStart_toEndOf="@+id/imageViewDateIcon"
-        app:layout_constraintTop_toTopOf="@+id/imageViewDateIcon" />
+        <ProgressBar
+            android:id="@+id/progressBarRating"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:progress="40"
+            app:layout_constraintBottom_toBottomOf="@+id/textViewUserName"
+            app:layout_constraintEnd_toEndOf="@+id/textViewUploadTime"
+            app:layout_constraintStart_toEndOf="@+id/textViewUserName"
+            app:layout_constraintTop_toTopOf="@+id/textViewUserName" />
 
-    <ImageView
-        android:id="@+id/imageViewDateIcon"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="104dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/progressBarRating"
-        app:srcCompat="@drawable/place_holder_icon" />
+        <TextView
+            android:id="@+id/textViewUserName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="OcuL"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"
+            app:layout_constraintStart_toEndOf="@+id/imageViewUserAvatar"
+            app:layout_constraintTop_toTopOf="@+id/imageViewUserAvatar" />
 
-    <ImageView
-        android:id="@+id/imageViewTimeIcon"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="104dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageViewDateIcon"
-        app:srcCompat="@drawable/place_holder_icon" />
+        <ImageView
+            android:id="@+id/imageViewUserAvatar"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@drawable/place_holder_avatar"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/place_holder_avatar" />
 
-    <TextView
-        android:id="@+id/textViewTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:text="13:30"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="@+id/imageViewTimeIcon"
-        app:layout_constraintStart_toEndOf="@+id/imageViewTimeIcon"
-        app:layout_constraintTop_toTopOf="@+id/imageViewTimeIcon" />
+        <TextView
+            android:id="@+id/textViewUploadDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="14 Nisan 2019"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="@+id/imageViewDateIcon"
+            app:layout_constraintStart_toEndOf="@+id/imageViewDateIcon"
+            app:layout_constraintTop_toTopOf="@+id/imageViewDateIcon" />
 
-    <ProgressBar
-        android:id="@+id/progressBarAudioProgress"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:progress="65"
-        app:layout_constraintEnd_toEndOf="@+id/imageViewUserAvatar"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/imageViewUserAvatar"
-        app:layout_constraintTop_toBottomOf="@+id/imageViewTimeIcon" />
+        <TextView
+            android:id="@+id/textViewUploadTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="13:30"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="@+id/imageViewTimeIcon"
+            app:layout_constraintStart_toEndOf="@+id/imageViewTimeIcon"
+            app:layout_constraintTop_toTopOf="@+id/imageViewTimeIcon" />
 
-    <TextView
-        android:id="@+id/textViewRemainingTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="12s"
-        app:layout_constraintEnd_toEndOf="@+id/progressBarAudioProgress"
-        app:layout_constraintTop_toBottomOf="@+id/progressBarAudioProgress" />
+        <ImageView
+            android:id="@+id/imageViewTimeIcon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="8dp"
+            android:tint="@android:color/white"
+            app:layout_constraintBottom_toBottomOf="@+id/imageViewDateIcon"
+            app:layout_constraintStart_toEndOf="@+id/textViewUploadDate"
+            app:layout_constraintTop_toTopOf="@+id/imageViewDateIcon"
+            app:layout_constraintVertical_bias="0.0"
+            app:srcCompat="@drawable/icon_time" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>
