@@ -1,22 +1,20 @@
 package com.example.washere.views;
 
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
-
 import android.content.pm.PackageManager;
 import android.graphics.PointF;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.Toast;
 
 import com.example.washere.R;
 import com.example.washere.adapters.WasCardAdapter;
@@ -35,7 +33,6 @@ import com.here.android.mpa.mapping.MapProxyObject;
 import com.here.android.mpa.mapping.SupportMapFragment;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import static com.example.washere.helpers.PermissionHelper.getRequestCodeAskPermissions;
@@ -48,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     MainActivityViewModel mainActivityViewModel;
     PermissionHelper permissionHelper;
     MainButtonSetFragment mainButtonSetFragment;
-    Button buttonUpdateMarkers;
+    ImageButton buttonCloseList;
     RecyclerView recyclerViewWasCard;
     WasCardAdapter wasCardAdapter;
     ArrayList<Was> mapMarkersInCluster;
@@ -67,30 +64,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         permissionHelper.checkPermissions();
         //Permission management end
 
-        //Map initiation Start
+        //Map initiation
         initiateMap(mainActivityViewModel.isSuccess());
-        //Map initiation End
 
-        //Observe Changes in Current Location Start
+
+        //Observe Changes in Current Location
         mainActivityViewModel.getCurrentLocation().observe(this, new Observer<GeoCoordinate>() {
             @Override
             public void onChanged(@Nullable GeoCoordinate geoCoordinate) {
-                supportMapFragment.getPositionIndicator().setVisible(true);
+
                 map.setCenter(geoCoordinate, Map.Animation.LINEAR);
+                Log.i("OCUL - MainActivity","Changed Current position is: "+geoCoordinate.getLatitude()+"lat "+
+                        geoCoordinate.getLongitude()+" lng.");
             }
         });
-        //Observe Changes in Current Location End
-
         //Observe Changes in Was Items Start
         mainActivityViewModel.getWasList().observe(this, new Observer<List<Was>>() {
             @Override
             public void onChanged(List<Was> was) {
-
-                System.out.println("Was List to be updsfdf s");
                 placeMarkersOnMap();
             }
         });
-
         //Observe Changes in Was Items End
 
     }
@@ -112,12 +106,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        if (v == buttonUpdateMarkers) {
-            System.out.println("Ocul: Marker'ların update edilmesi lazım şimdi");
-            mainActivityViewModel.getWasRepository().getFirebaseFireStoreHelper().getAllWasObjectsFromFireStore();
-            mainActivityViewModel.getWasRepository().getWasList(); //Was Item'ları firestore'dan indirdik. (Henüz dosya yok)
-
-
+         if (v == buttonCloseList) {
+            recyclerViewWasCard.setVisibility(View.INVISIBLE);
+            buttonCloseList.setVisibility(View.INVISIBLE);
         }
 
     }
@@ -138,12 +129,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onEngineInitializationCompleted(Error error) {
                         if (error == Error.NONE) {
-                            // retrieve a reference of the map from the map fragment
                             map = supportMapFragment.getMap();
                             mainActivityViewModel.init();
                             mainActivityViewModel.onMapEngineInitialized();
+                           supportMapFragment.getPositionIndicator().setVisible(true);
+                            map.setCenter(mainActivityViewModel.getCurrentLocation().getValue(), Map.Animation.NONE);
                             map.setZoomLevel(16);
-                            //map.addMapObjects(mainActivityViewModel.updateMarkerList());
+                         /*   Log.i("OCUL","First Current position is: "+mainActivityViewModel.getCurrentLocation().getValue().getLatitude()+"lat "+
+                                    mainActivityViewModel.getCurrentLocation().getValue().getLongitude()+" lng."); */
                             supportMapFragment.getMapGesture().addOnGestureListener(new MapGesture.OnGestureListener() {
                                 @Override
                                 public void onPanStart() {
@@ -174,19 +167,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             if (proxyObject.getType() == MapProxyObject.Type.CLUSTER_MARKER) {
 
                                                 ClusterViewObject clusterViewObject = (ClusterViewObject) proxyObject;
-
-                                                //Elimizdeki clusterdaki marker listesini markera çevir
-
-
-                                                //
                                                 recyclerViewWasCard.setVisibility(View.VISIBLE);
-                                                mapMarkersInCluster=mainActivityViewModel.getWasObjectsInCluster(clusterViewObject,
-                                                        (ArrayList<Was>)mainActivityViewModel.getWasList().getValue());
+                                                buttonCloseList.setVisibility(View.VISIBLE);
+                                                mapMarkersInCluster = mainActivityViewModel.getWasObjectsInCluster(clusterViewObject,
+                                                        (ArrayList<Was>) mainActivityViewModel.getWasList().getValue());
                                                 wasCardAdapter.setWasList(mapMarkersInCluster);
-
-
-                                              //  mainActivityViewModel.playAudio(mainActivityViewModel.getWasList().getValue(), (MapMarker) mapObject);
-
+                                            }
+                                        } else if (viewObject.getBaseType() == ViewObject.Type.USER_OBJECT) {
+                                            MapObject mapObject = (MapObject) viewObject;
+                                            if (mapObject.getType() == MapObject.Type.MARKER) {
+                                                mainActivityViewModel.playAudio(mainActivityViewModel.getWasList().getValue(), (MapMarker) mapObject);
+                                                return false;
                                             }
                                         }
                                     }
@@ -257,18 +248,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void initViews() {
-        buttonUpdateMarkers = findViewById(R.id.buttonUpdateMarkers);
         recyclerViewWasCard = findViewById(R.id.recyclerViewWasCard);
+        buttonCloseList = findViewById(R.id.buttonCloseList);
         recyclerViewWasCard.setLayoutManager(new LinearLayoutManager(this));
         recyclerViewWasCard.setHasFixedSize(true);
         wasCardAdapter = new WasCardAdapter(this);
         recyclerViewWasCard.setAdapter(wasCardAdapter);
-
-
     }
 
     public void setOnClickListeners() {
-        buttonUpdateMarkers.setOnClickListener(this);
+        buttonCloseList.setOnClickListener(this);
     }
 
     public void initiateMainButtonsFragment() {
@@ -289,7 +278,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onWasCardClick(int position) {
-     Was wasSelected= mapMarkersInCluster.get(position);
+        Was wasSelected = mapMarkersInCluster.get(position);
         mainActivityViewModel.playAudio(wasSelected);
     }
 }

@@ -3,10 +3,12 @@ package com.example.washere.helpers;
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
+
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -27,7 +29,10 @@ public class PermissionHelper extends AppCompatActivity {
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.RECORD_AUDIO
+            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.BLUETOOTH,
+            Manifest.permission.BLUETOOTH_ADMIN,
+            Manifest.permission.WAKE_LOCK
     };
 
     public PermissionHelper(Activity activity) {

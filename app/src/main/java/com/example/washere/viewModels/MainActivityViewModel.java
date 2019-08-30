@@ -9,27 +9,20 @@ This class will serve to manipulate audio files.
 */
 
 
-import android.app.Activity;
 import android.app.Application;
-
-import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.MutableLiveData;
-
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
-
-import androidx.annotation.NonNull;
-
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.MutableLiveData;
+
 import com.example.washere.R;
-import com.example.washere.helpers.FirebaseFireStoreHelper;
-import com.example.washere.helpers.FirebseStorageHelper;
 import com.example.washere.helpers.PlayAudioHelper;
-import com.example.washere.helpers.RecordAudioHelper;
 import com.example.washere.models.Was;
 import com.example.washere.repositories.WasRepository;
 import com.here.android.mpa.cluster.ClusterLayer;
@@ -52,30 +45,27 @@ public class MainActivityViewModel extends AndroidViewModel {
 
     private String intentName;
     private Context context;
-    private MutableLiveData<GeoCoordinate> currentLocation = new MutableLiveData<>();
+    private MutableLiveData<GeoCoordinate> currentLocation = WasRepository.getInstance().getCurrentLocation();
     private PositioningManager positioningManager;
     private MutableLiveData<List<Was>> wasList;
     private boolean isUpdating = false;
-    private List<MapObject> markerList = new ArrayList<MapObject>();
+    private List<MapObject> markerList = new ArrayList<>();
     private PlayAudioHelper playAudioHelper;
     private WasRepository wasRepository;
-    private FirebaseFireStoreHelper firebaseFireStoreHelper = new FirebaseFireStoreHelper();
     private ClusterLayer clusterLayer;
-
     public void setUpdating(boolean updating) {
         isUpdating = updating;
     }
+    private MutableLiveData<PositioningManager.LocationStatus> locationStatus=new MutableLiveData<>();
 
     public boolean isUpdating() {
         return isUpdating;
     }
 
-
     public MainActivityViewModel(@NonNull Application application) {
         super(application);
         context = application.getApplicationContext();
     }
-
 
     //Map Management Part Start
     public boolean isSuccess() {
@@ -91,55 +81,41 @@ public class MainActivityViewModel extends AndroidViewModel {
 
         return com.here.android.mpa.common.MapSettings.setIsolatedDiskCacheRootPath(diskCacheRoot, intentName);
     }
-
-    public FirebaseFireStoreHelper getFirebaseFireStoreHelper() {
-        return firebaseFireStoreHelper;
-    }
-
-    public void setFirebaseFireStoreHelper(FirebaseFireStoreHelper firebaseFireStoreHelper) {
-        this.firebaseFireStoreHelper = firebaseFireStoreHelper;
-    }
-
     public void onMapEngineInitialized() {
         positioningManager = PositioningManager.getInstance();
-        positioningManager.start(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR);
-        wasRepository.setCurrentLocation(positioningManager.getPosition().getCoordinate());
-        updateCurrentLocation();
         clusterLayer = new ClusterLayer();
         PositioningManager.OnPositionChangedListener positionListener = new PositioningManager.OnPositionChangedListener() {
 
             @Override
             public void onPositionUpdated(PositioningManager.LocationMethod locationMethod, GeoPosition geoPosition, boolean b) {
-                updateCurrentLocation();
-                wasRepository.setCurrentLocation(positioningManager.getPosition().getCoordinate());
+                currentLocation.setValue(geoPosition.getCoordinate());
             }
 
             @Override
             public void onPositionFixChanged(PositioningManager.LocationMethod locationMethod, PositioningManager.LocationStatus locationStatus) {
-                updateCurrentLocation();
-                wasRepository.setCurrentLocation(positioningManager.getPosition().getCoordinate());
+                if(locationStatus== PositioningManager.LocationStatus.OUT_OF_SERVICE){
+                    positioningManager.start(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR);
+                }
+                else if(locationStatus==PositioningManager.LocationStatus.TEMPORARILY_UNAVAILABLE){
+                    positioningManager.start(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR);
+                }
             }
         };
         positioningManager.addListener(new WeakReference<>(positionListener));
+        positioningManager.start(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR);
     }
 
     public MutableLiveData<GeoCoordinate> getCurrentLocation() {
-        return currentLocation;
+        return WasRepository.getInstance().getCurrentLocation();
     }
 
-    public void updateCurrentLocation() {
-        currentLocation.postValue(wasRepository.getCurrentLocation());
-
-    }
 
     public void init() {
-
         wasRepository = WasRepository.getInstance();
         playAudioHelper = new PlayAudioHelper();
     }
 
     public void updateMarkerList() {
-
         if (markerList.size() != 0) {
             markerList.clear();
         }
@@ -164,13 +140,10 @@ public class MainActivityViewModel extends AndroidViewModel {
         }
         setMarkerList(markerList);
     }
-
-    public List<MapObject> getMarkerList() {
-        return markerList;
-    }
+    //Map Management Part End
 
     public WasRepository getWasRepository() {
-        return wasRepository;
+        return WasRepository.getInstance();
     }
 
     public void setMarkerList(List<MapObject> markerList) {
@@ -204,12 +177,8 @@ public class MainActivityViewModel extends AndroidViewModel {
         return wasListOfCluster;
     }
 
-    //Map Management Part End
-
     //Audio Management Part Start
-
     public void playAudio(List<Was> wasList, MapMarker marker) {
-        System.out.println("A Was Item will be played now...");
         String addressToBeSearched = marker.toString();
         String address;
         for (int i = 0; i < wasList.size(); i++) {
@@ -219,14 +188,9 @@ public class MainActivityViewModel extends AndroidViewModel {
                 break;
             }
         }
-
     }
-
     public void playAudio(Was was) {
         playAudioHelper.startPlaying(context, was);
     }
-
     //Audio Management Part End
-
-
-}
+    }

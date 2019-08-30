@@ -40,7 +40,7 @@ public class MainButtonSetFragmentViewModel extends AndroidViewModel {
 
     public void startRecordingWasItem() {
         recordAudioHelper.startRecording();
-        currentLocation = wasRepository.getCurrentLocation();
+        currentLocation = wasRepository.getCurrentLocation().getValue();
     }
 
     public void addWasItemAfterRecording() {

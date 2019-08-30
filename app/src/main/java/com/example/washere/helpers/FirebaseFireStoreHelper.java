@@ -3,6 +3,7 @@ package com.example.washere.helpers;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.washere.models.Was;
@@ -11,8 +12,11 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -25,7 +29,33 @@ public class FirebaseFireStoreHelper {
     private Map<String, Object> wasObject = new HashMap<>();
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
     private ArrayList<Map> wasMap;
+    private CollectionReference collectionReference;
+    private FirebseStorageHelper firebseStorageHelper;
 
+    public FirebaseFireStoreHelper() {
+        firebseStorageHelper=new FirebseStorageHelper();
+        collectionReference=firebaseFirestore.collection("wasItems");
+
+        collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException e) {
+                if (e!=null){
+                    Log.e("OCUL - Firestore","Error: "+e.getMessage());
+                }
+                else{
+                    wasMap = new ArrayList<>();
+                    for (QueryDocumentSnapshot document : value) {
+                        Log.d("OCUL - Firestore", document.getId() + " => " + document.getData());
+                        wasMap.add(document.getData());
+                    }
+                    ArrayList<Was> wasList = createWasArrayFromHashMap(wasMap);
+                    firebseStorageHelper.addAudioFileToWasObject(wasList);
+                    WasRepository.getInstance().getWasList().postValue(wasList);
+                }
+
+            }
+        });
+    }
 
     //Take a Was Map And Send It To The Firestore
     public void addWasMapToFireStore(Was was) {
@@ -38,11 +68,11 @@ public class FirebaseFireStoreHelper {
         wasObject.put("uploadDate", was.getUploadDate());
         wasObject.put("uploadTime", was.getUploadTime());
 
-        firebaseFirestore.collection("wasItems").add(wasObject).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+        collectionReference=firebaseFirestore.collection("wasItems");
+        collectionReference.add(wasObject).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
             @Override
             public void onSuccess(DocumentReference documentReference) {
                 Log.i("Ocul", "Was Item successfully uploaded to Firestore with ID:" + documentReference.getId());
-                System.out.println(wasObject.get("downloadURL"));
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -53,6 +83,7 @@ public class FirebaseFireStoreHelper {
     }
 
     //Retrieve All The Was Maps From The Store
+    /*
     public void getAllWasObjectsFromFireStore() {
 
         final FirebseStorageHelper firebseStorageHelper = new FirebseStorageHelper();
@@ -73,7 +104,7 @@ public class FirebaseFireStoreHelper {
         });
 
     }
-
+*/
     //Create a Was Object Array From Was Hash Map
     public ArrayList<Was> createWasArrayFromHashMap(ArrayList<Map> wasMap) {
         ArrayList<Was> wasList = new ArrayList<>();

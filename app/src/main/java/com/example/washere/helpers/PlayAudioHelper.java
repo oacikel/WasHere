@@ -27,7 +27,6 @@ public class PlayAudioHelper {
 
     public void startPlaying(Context context,Was was) {
         mMediaPlayer = new MediaPlayer();
-        //mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 
         try {
             //mMediaPlayer.setDataSource(was.getAudioFile().getPath());
