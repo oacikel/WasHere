@@ -1,7 +1,5 @@
 package com.example.washere.repositories;
 
-import android.util.Log;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.MutableLiveData;
 
@@ -9,15 +7,12 @@ import com.example.washere.helpers.FirebaseFireStoreHelper;
 import com.example.washere.helpers.FirebseStorageHelper;
 import com.example.washere.models.Was;
 import com.here.android.mpa.cluster.ClusterLayer;
+import com.here.android.mpa.cluster.ClusterViewObject;
 import com.here.android.mpa.common.GeoCoordinate;
-import com.here.android.mpa.common.PositioningManager;
-import com.here.android.mpa.mapping.MapMarker;
-import com.here.android.mpa.mapping.MapObject;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -29,6 +24,8 @@ public class WasRepository extends AppCompatActivity {
     private MutableLiveData<List<Was>> wasList = new MutableLiveData<>();
     private MutableLiveData<GeoCoordinate> currentLocation=new MutableLiveData<>();
     private ClusterLayer existingClusterLayer;
+    private MutableLiveData <ClusterViewObject> clusterViewObject =new MutableLiveData<>();
+    private MutableLiveData<ArrayList<Was>> selectedClusterViewWasList=new MutableLiveData<>();
 
 
     private String userName = ("Ocul");
@@ -70,6 +67,10 @@ public class WasRepository extends AppCompatActivity {
         this.existingClusterLayer = existingClusterLayer;
     }
 
+    public MutableLiveData<ArrayList<Was>> getSelectedClusterViewWasList() {
+        return selectedClusterViewWasList;
+    }
+
     //Regarding Was Objects
     public MutableLiveData<List<Was>> getWasList() {
         return wasList;
@@ -78,6 +79,11 @@ public class WasRepository extends AppCompatActivity {
     public void continouslyUpdateWasObjects(){
         firebaseFireStoreHelper.updateWasObjects();
     }
+
+    public MutableLiveData<ClusterViewObject> getClusterViewObject() {
+        return clusterViewObject;
+    }
+
 
     //Regarding User
     public String getUserName() {

@@ -9,6 +9,7 @@ This class will serve to manipulate audio files.
 */
 
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
@@ -22,6 +23,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.washere.R;
+import com.example.washere.adapters.WasCardAdapter;
 import com.example.washere.helpers.PlayAudioHelper;
 import com.example.washere.models.Was;
 import com.example.washere.repositories.WasRepository;
@@ -53,10 +55,12 @@ public class MainActivityViewModel extends AndroidViewModel {
     private PlayAudioHelper playAudioHelper;
     private WasRepository wasRepository;
     private ClusterLayer clusterLayer;
+    private Application mainApplication;
     public void setUpdating(boolean updating) {
         isUpdating = updating;
     }
     private MutableLiveData<PositioningManager.LocationStatus> locationStatus=new MutableLiveData<>();
+    private MutableLiveData<ClusterViewObject> clusterViewObject =new MutableLiveData<>();
 
     public boolean isUpdating() {
         return isUpdating;
@@ -65,6 +69,7 @@ public class MainActivityViewModel extends AndroidViewModel {
     public MainActivityViewModel(@NonNull Application application) {
         super(application);
         context = application.getApplicationContext();
+        mainApplication=application;
     }
 
     //Map Management Part Start
@@ -104,7 +109,6 @@ public class MainActivityViewModel extends AndroidViewModel {
                 }
                 else if(locationStatus==PositioningManager.LocationStatus.AVAILABLE){
                     Log.w("OCUL - Position Fix" ,"Location Status is AVAILABLE");
-
                 }
             }
         };
@@ -121,18 +125,16 @@ public class MainActivityViewModel extends AndroidViewModel {
         wasRepository = WasRepository.getInstance();
         wasRepository.continouslyUpdateWasObjects();
         playAudioHelper = new PlayAudioHelper();
-
+        getClusterViewObject();
     }
-
 
     //Updates the Markerlist and adds Map Markers to Was Objects:
     public void updateMarkerList() {
+        Log.d("OCUL - Marker Cluster","Creating Cluster layer");
         if (markerList.size() != 0) {
             markerList.clear();
         }
-        System.out.println("Cluster layer item size: "+clusterLayer.getMarkers().size());
         clusterLayer.removeMarkers(clusterLayer.getMarkers());
-        System.out.println("Cluster layer item size: "+clusterLayer.getMarkers().size());
         for (int i = 0; i < wasRepository.getWasList().getValue().size(); i++) {
             Was was = wasList.getValue().get(i);
             MapMarker marker = new MapMarker();
@@ -151,7 +153,6 @@ public class MainActivityViewModel extends AndroidViewModel {
             was.setMapMarker(marker);
             clusterLayer.addMarker(marker);
             setExistingClusterLayer(clusterLayer);
-
         }
         System.out.println("OCUL - Updated cluster layer size is: "+clusterLayer.getMarkers().size());
         System.out.println("OCUL - ////////////////////");
@@ -174,22 +175,29 @@ public class MainActivityViewModel extends AndroidViewModel {
         WasRepository.getInstance().setExistingClusterLayer(clusterLayer);
     }
 
-    public ArrayList<Was> getWasObjectsInCluster(ClusterViewObject clusterViewObject, ArrayList<Was> wasList) {
-        Collection<MapMarker> markerList = clusterViewObject.getMarkers();
+    public MutableLiveData<ClusterViewObject> getClusterViewObject(){
+        return WasRepository.getInstance().getClusterViewObject();
+    }
+    public void setWasObjectsInCluster() {
+        Collection<MapMarker> markerList = getClusterViewObject().getValue().getMarkers();
         String adressToBeSearched;
         String adress;
         ArrayList<MapMarker> mapMarkerArrayList = new ArrayList<>(markerList);
         ArrayList<Was> wasListOfCluster = new ArrayList<>();
         for (int i = 0; i < mapMarkerArrayList.size(); i++) {
             adressToBeSearched = mapMarkerArrayList.get(i).toString();
-            for (int a = 0; a < wasList.size(); a++) {
-                adress = wasList.get(a).getMapMarker().toString();
+            for (int a = 0; a < wasList.getValue().size(); a++) {
+                adress = wasList.getValue().get(a).getMapMarker().toString();
                 if (adress.equals(adressToBeSearched)) {
-                    wasListOfCluster.add(wasList.get(a));
+                    wasListOfCluster.add(wasList.getValue().get(a));
                 }
             }
         }
-        return wasListOfCluster;
+        WasRepository.getInstance().getSelectedClusterViewWasList().setValue(wasListOfCluster);
+    }
+
+    public MutableLiveData<ArrayList<Was>> getSelectedClusterViewWasList() {
+        return WasRepository.getInstance().getSelectedClusterViewWasList();
     }
 
     //Audio Management Part Start

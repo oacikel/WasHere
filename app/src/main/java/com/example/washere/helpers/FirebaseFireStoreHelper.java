@@ -49,12 +49,7 @@ public class FirebaseFireStoreHelper {
                     for (QueryDocumentSnapshot document:value){
                         wasList.add(createWasFromHashmap(document.getData()));
                     }
-
-                    Log.d("OCUL - Firestore", "Final wasList Size:  " +wasList.size());
                     WasRepository.getInstance().getWasList().setValue(wasList);
-
-                    //firebseStorageHelper.addAudioFileToWasObject(wasList);
-
                 }
 
             }

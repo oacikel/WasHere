@@ -1,5 +1,5 @@
 package com.example.washere.views;
-import android.Manifest;
+
 import android.content.pm.PackageManager;
 import android.graphics.PointF;
 import android.os.Bundle;
@@ -74,8 +74,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onChanged(@Nullable GeoCoordinate geoCoordinate) {
 
                 map.setCenter(geoCoordinate, Map.Animation.LINEAR);
-                Log.i("OCUL - MainActivity","Changed Current position is: "+geoCoordinate.getLatitude()+"lat "+
-                        geoCoordinate.getLongitude()+" lng.");
+                Log.i("OCUL - MainActivity", "Changed Current position is: " + geoCoordinate.getLatitude() + "lat " +
+                        geoCoordinate.getLongitude() + " lng.");
             }
         });
 
@@ -83,12 +83,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mainActivityViewModel.getWasList().observe(this, new Observer<List<Was>>() {
             @Override
             public void onChanged(List<Was> was) {
-                Log.i("OCUL - MainActivity","Placing markers on map! ");
+                Log.i("OCUL - MainActivity", "Placing markers on map! ");
                 placeMarkersOnMap();
             }
         });
 
+        //Observe Changes In Selected Cluster View Objects:
 
+                mainActivityViewModel.getSelectedClusterViewWasList().observe(this, new Observer<ArrayList<Was>>() {
+                    @Override
+                    public void onChanged(ArrayList<Was> was) {
+                        mapMarkersInCluster=was;
+                        if (was!=null){
+                            recyclerViewWasCard.setVisibility(View.VISIBLE);
+                            buttonCloseList.setVisibility(View.VISIBLE);
+                            wasCardAdapter.setWasList(was);
+                        }
+                        else{
+                            recyclerViewWasCard.setVisibility(View.INVISIBLE);
+                            buttonCloseList.setVisibility(View.INVISIBLE);
+                        }
+
+                    }
+                });
     }
 
     @Override
@@ -108,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-         if (v == buttonCloseList) {
+        if (v == buttonCloseList) {
             recyclerViewWasCard.setVisibility(View.INVISIBLE);
             buttonCloseList.setVisibility(View.INVISIBLE);
         }
@@ -134,7 +151,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             map = supportMapFragment.getMap();
                             mainActivityViewModel.init();
                             mainActivityViewModel.onMapEngineInitialized();
-                           supportMapFragment.getPositionIndicator().setVisible(true);
+                            supportMapFragment.getPositionIndicator().setVisible(true);
                             map.setCenter(mainActivityViewModel.getCurrentLocation().getValue(), Map.Animation.NONE);
                             map.setZoomLevel(16);
                          /*   Log.i("OCUL","First Current position is: "+mainActivityViewModel.getCurrentLocation().getValue().getLatitude()+"lat "+
@@ -167,18 +184,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             MapProxyObject proxyObject = (MapProxyObject) viewObject;
 
                                             if (proxyObject.getType() == MapProxyObject.Type.CLUSTER_MARKER) {
-
                                                 ClusterViewObject clusterViewObject = (ClusterViewObject) proxyObject;
-                                                recyclerViewWasCard.setVisibility(View.VISIBLE);
-                                                buttonCloseList.setVisibility(View.VISIBLE);
-                                                mapMarkersInCluster = mainActivityViewModel.getWasObjectsInCluster(clusterViewObject,
-                                                        (ArrayList<Was>) mainActivityViewModel.getWasList().getValue());
-                                                wasCardAdapter.setWasList(mapMarkersInCluster);
+                                                mainActivityViewModel.getClusterViewObject().setValue(clusterViewObject);
+                                                mainActivityViewModel.setWasObjectsInCluster();
                                             }
                                         } else if (viewObject.getBaseType() == ViewObject.Type.USER_OBJECT) {
                                             MapObject mapObject = (MapObject) viewObject;
                                             if (mapObject.getType() == MapObject.Type.MARKER) {
                                                 mainActivityViewModel.playAudio(mainActivityViewModel.getWasList().getValue(), (MapMarker) mapObject);
+                                                System.out.println("ocul"+mapObject.getType().toString());
                                                 return false;
                                             }
                                         }
@@ -270,8 +284,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void placeMarkersOnMap() {
         //TODO: Bu kısım daha iyi handle edilmeli. Her refreshte markerlar silinip tekrardan eklenmemeli...
         if (map != null) {
-            if (mainActivityViewModel.getExistingClusterLayer()!=null) {
-                Log.i("OCUL - MainActivity","Cluster layer isn't empty. Will be cleared first");
+            if (mainActivityViewModel.getExistingClusterLayer() != null) {
                 map.removeClusterLayer(mainActivityViewModel.getExistingClusterLayer());
             }
             mainActivityViewModel.updateMarkerList();
