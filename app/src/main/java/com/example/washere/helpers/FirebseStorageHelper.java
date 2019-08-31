@@ -81,13 +81,13 @@ public class FirebseStorageHelper {
     //Retrieve data from the database
     public void addAudioFileToWasObject(final List<Was> wasList) {
         File localFile = null;
-        System.out.println("Ocul: WasList without audio file size is: "+wasList.size());
+        Log.d("OCUL - Storage Helper: ","WasList without audio file size is: "+wasList.size());
         try {
             localFile = File.createTempFile(audioChild, audioExtention);
 
         } catch (IOException e) {
             e.printStackTrace();
-            Log.e("OCUL", "Error creating file: " + e.getMessage() + "\nAudio will not be downloaded from storage");
+            Log.e("OCUL - Storage Helper: ", "Error creating file: " + e.getMessage() + "\nAudio will not be downloaded from storage");
         }
         for (int i =0; i<wasList.size();i++) {
             System.out.println(wasList.get(i).getDownloadUrl());

@@ -1,5 +1,5 @@
 package com.example.washere.views;
-
+import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.PointF;
 import android.os.Bundle;
@@ -78,14 +78,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         geoCoordinate.getLongitude()+" lng.");
             }
         });
-        //Observe Changes in Was Items Start
+
+        //Observe Changes in Was Items
         mainActivityViewModel.getWasList().observe(this, new Observer<List<Was>>() {
             @Override
             public void onChanged(List<Was> was) {
+                Log.i("OCUL - MainActivity","Placing markers on map! ");
                 placeMarkersOnMap();
             }
         });
-        //Observe Changes in Was Items End
+
 
     }
 
@@ -268,11 +270,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void placeMarkersOnMap() {
         //TODO: Bu kısım daha iyi handle edilmeli. Her refreshte markerlar silinip tekrardan eklenmemeli...
         if (map != null) {
-            if (mainActivityViewModel.getClusterLayer().getMarkers().size() != 0) {
-                map.removeClusterLayer(mainActivityViewModel.getClusterLayer());
+            if (mainActivityViewModel.getExistingClusterLayer()!=null) {
+                Log.i("OCUL - MainActivity","Cluster layer isn't empty. Will be cleared first");
+                map.removeClusterLayer(mainActivityViewModel.getExistingClusterLayer());
             }
             mainActivityViewModel.updateMarkerList();
-            map.addClusterLayer(mainActivityViewModel.getClusterLayer());
+            map.addClusterLayer(mainActivityViewModel.getExistingClusterLayer());
+
         }
     }
 

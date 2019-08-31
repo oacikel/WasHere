@@ -70,8 +70,4 @@ public class MainButtonSetFragmentViewModel extends AndroidViewModel {
     public MutableLiveData<String> getDownloadUrl(){
         return wasRepository.getFirebseStorageHelper().getDownloadUri();
     }
-
-    public void addMarkersOnMainActivity() {
-        activity.placeMarkersOnMap();
-    }
 }

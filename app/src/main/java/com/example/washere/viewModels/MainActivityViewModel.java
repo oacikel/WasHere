@@ -89,15 +89,22 @@ public class MainActivityViewModel extends AndroidViewModel {
             @Override
             public void onPositionUpdated(PositioningManager.LocationMethod locationMethod, GeoPosition geoPosition, boolean b) {
                 currentLocation.setValue(geoPosition.getCoordinate());
+                Log.w("OCUL - Position Updated" ,"The position is updated");
             }
 
             @Override
             public void onPositionFixChanged(PositioningManager.LocationMethod locationMethod, PositioningManager.LocationStatus locationStatus) {
                 if(locationStatus== PositioningManager.LocationStatus.OUT_OF_SERVICE){
                     positioningManager.start(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR);
+                    Log.w("OCUL - Position Fix" ,"Location Status is OUT OF SERVICE");
                 }
                 else if(locationStatus==PositioningManager.LocationStatus.TEMPORARILY_UNAVAILABLE){
                     positioningManager.start(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR);
+                    Log.w("OCUL - Position Fix" ,"Location Status is TEMPORARILY UNAVAILABLE");
+                }
+                else if(locationStatus==PositioningManager.LocationStatus.AVAILABLE){
+                    Log.w("OCUL - Position Fix" ,"Location Status is AVAILABLE");
+
                 }
             }
         };
@@ -112,13 +119,20 @@ public class MainActivityViewModel extends AndroidViewModel {
 
     public void init() {
         wasRepository = WasRepository.getInstance();
+        wasRepository.continouslyUpdateWasObjects();
         playAudioHelper = new PlayAudioHelper();
+
     }
 
+
+    //Updates the Markerlist and adds Map Markers to Was Objects:
     public void updateMarkerList() {
         if (markerList.size() != 0) {
             markerList.clear();
         }
+        System.out.println("Cluster layer item size: "+clusterLayer.getMarkers().size());
+        clusterLayer.removeMarkers(clusterLayer.getMarkers());
+        System.out.println("Cluster layer item size: "+clusterLayer.getMarkers().size());
         for (int i = 0; i < wasRepository.getWasList().getValue().size(); i++) {
             Was was = wasList.getValue().get(i);
             MapMarker marker = new MapMarker();
@@ -136,27 +150,28 @@ public class MainActivityViewModel extends AndroidViewModel {
             markerList.add(marker);
             was.setMapMarker(marker);
             clusterLayer.addMarker(marker);
+            setExistingClusterLayer(clusterLayer);
 
         }
+        System.out.println("OCUL - Updated cluster layer size is: "+clusterLayer.getMarkers().size());
+        System.out.println("OCUL - ////////////////////");
         setMarkerList(markerList);
-    }
-    //Map Management Part End
-
-    public WasRepository getWasRepository() {
-        return WasRepository.getInstance();
     }
 
     public void setMarkerList(List<MapObject> markerList) {
         this.markerList = markerList;
     }
-
     public MutableLiveData<List<Was>> getWasList() {
         wasList = WasRepository.getInstance().getWasList();
         return wasList;
     }
 
-    public ClusterLayer getClusterLayer() {
-        return clusterLayer;
+    public ClusterLayer getExistingClusterLayer(){
+        return WasRepository.getInstance().getExistingClusterLayer();
+    }
+
+    public void setExistingClusterLayer(ClusterLayer clusterLayer){
+        WasRepository.getInstance().setExistingClusterLayer(clusterLayer);
     }
 
     public ArrayList<Was> getWasObjectsInCluster(ClusterViewObject clusterViewObject, ArrayList<Was> wasList) {
