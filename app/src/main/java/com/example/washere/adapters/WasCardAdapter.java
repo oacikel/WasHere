@@ -45,8 +45,8 @@ public class WasCardAdapter extends RecyclerView.Adapter<WasCardAdapter.WasCardH
 
         //
         holder.textViewUploaderName.setText(currentWas.getUploaderName());
-        holder.textViewUploadTime.setText(currentWas.getUploadTime());
         holder.textViewUploadDate.setText(currentWas.getUploadDate());
+        holder.textViewTitle.setText(currentWas.getUploadTitle());
 
     }
 
@@ -61,9 +61,8 @@ public class WasCardAdapter extends RecyclerView.Adapter<WasCardAdapter.WasCardH
     }
 
     class WasCardHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private ImageView imageViewUserAvatar,imageViewDeleteWas;
-        private ProgressBar progressBarRating;
-        private TextView textViewUploaderName, textViewUploadDate, textViewUploadTime;
+        private ImageView imageViewUserAvatar;
+        private TextView textViewUploaderName, textViewUploadDate,textViewTitle;
         private CardView cardViewWasCard;
         private OnMarkerListener onMarkerListener;
 
@@ -81,12 +80,10 @@ public class WasCardAdapter extends RecyclerView.Adapter<WasCardAdapter.WasCardH
         }
 
         private void initViews() {
-            imageViewDeleteWas = itemView.findViewById(R.id.imageViewDeleteWas);
             imageViewUserAvatar = itemView.findViewById(R.id.imageViewUserAvatar);
-            progressBarRating = itemView.findViewById(R.id.progressBarRating);
-            textViewUploadTime = itemView.findViewById(R.id.textViewUploadTime);
-            textViewUploadDate = itemView.findViewById(R.id.textViewUploadDate);
+            textViewUploadDate = itemView.findViewById(R.id.textViewTimePassed);
             textViewUploaderName = itemView.findViewById(R.id.textViewUserName);
+            textViewTitle=itemView.findViewById(R.id.textViewTitle);
             cardViewWasCard = itemView.findViewById(R.id.cardViewWasCard);
         }
 

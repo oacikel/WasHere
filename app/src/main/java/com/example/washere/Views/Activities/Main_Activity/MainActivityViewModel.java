@@ -1,4 +1,4 @@
-package com.example.washere.viewModels;
+package com.example.washere.Views.Activities.Main_Activity;
 
 /*
 This class will serve to manipulate audio files.
@@ -9,7 +9,6 @@ This class will serve to manipulate audio files.
 */
 
 
-import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
@@ -19,13 +18,16 @@ import android.os.Environment;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.washere.R;
-import com.example.washere.adapters.WasCardAdapter;
+import com.example.washere.Views.Dialogs.Record_WAS_Dialog.RecordWasDialog;
 import com.example.washere.helpers.PlayAudioHelper;
 import com.example.washere.models.Was;
+import com.example.washere.models.eWasUploadState;
 import com.example.washere.repositories.WasRepository;
 import com.here.android.mpa.cluster.ClusterLayer;
 import com.here.android.mpa.cluster.ClusterViewObject;
@@ -56,11 +58,13 @@ public class MainActivityViewModel extends AndroidViewModel {
     private WasRepository wasRepository;
     private ClusterLayer clusterLayer;
     private Application mainApplication;
+
     public void setUpdating(boolean updating) {
         isUpdating = updating;
     }
-    private MutableLiveData<PositioningManager.LocationStatus> locationStatus=new MutableLiveData<>();
-    private MutableLiveData<ClusterViewObject> clusterViewObject =new MutableLiveData<>();
+
+    private MutableLiveData<PositioningManager.LocationStatus> locationStatus = new MutableLiveData<>();
+    private MutableLiveData<ClusterViewObject> clusterViewObject = new MutableLiveData<>();
 
     public boolean isUpdating() {
         return isUpdating;
@@ -69,7 +73,37 @@ public class MainActivityViewModel extends AndroidViewModel {
     public MainActivityViewModel(@NonNull Application application) {
         super(application);
         context = application.getApplicationContext();
-        mainApplication=application;
+        mainApplication = application;
+    }
+
+    //Location Status
+    public MutableLiveData<Integer> getLocationStatus() {
+        return WasRepository.getInstance().getLocationStatus();
+    }
+
+    public void updateLocationStatus(int status) {
+        WasRepository.getInstance().getLocationStatus().setValue(status);
+    }
+
+    //Was Recording / Playing State
+    public MutableLiveData<eWasUploadState> getWasRecordingState() {
+        return WasRepository.getInstance().getWasRecordingState();
+    }
+
+    public void updateWasRecordingState(eWasUploadState state) {
+        WasRepository.getInstance().setWasRecordingState(state);
+    }
+
+    //Was Recording Playing
+    public void initWasUploadDialog (FragmentTransaction fragmentTransaction,Fragment previousFragment){
+        RecordWasDialog recordWasDialog;
+
+        if (previousFragment != null) {
+            fragmentTransaction.remove(previousFragment);
+        }
+        fragmentTransaction.addToBackStack(null);
+        recordWasDialog = new RecordWasDialog();
+        recordWasDialog.show(fragmentTransaction, "WAS_DIALOG");
     }
 
     //Map Management Part Start
@@ -86,6 +120,7 @@ public class MainActivityViewModel extends AndroidViewModel {
 
         return com.here.android.mpa.common.MapSettings.setIsolatedDiskCacheRootPath(diskCacheRoot, intentName);
     }
+
     public void onMapEngineInitialized() {
         positioningManager = PositioningManager.getInstance();
         clusterLayer = new ClusterLayer();
@@ -94,26 +129,44 @@ public class MainActivityViewModel extends AndroidViewModel {
             @Override
             public void onPositionUpdated(PositioningManager.LocationMethod locationMethod, GeoPosition geoPosition, boolean b) {
                 currentLocation.setValue(geoPosition.getCoordinate());
-                Log.w("OCUL - Position Updated" ,"The position is updated");
+                Log.w("OCUL - Position Updated", "The position is updated");
             }
 
             @Override
             public void onPositionFixChanged(PositioningManager.LocationMethod locationMethod, PositioningManager.LocationStatus locationStatus) {
-                if(locationStatus== PositioningManager.LocationStatus.OUT_OF_SERVICE){
+                if (locationStatus == PositioningManager.LocationStatus.OUT_OF_SERVICE) {
                     positioningManager.start(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR);
-                    Log.w("OCUL - Position Fix" ,"Location Status is OUT OF SERVICE");
-                }
-                else if(locationStatus==PositioningManager.LocationStatus.TEMPORARILY_UNAVAILABLE){
+                    Log.w("OCUL - Position Fix", "Location Status is OUT OF SERVICE");
+                    updateLocationStatus(2);
+                } else if (locationStatus == PositioningManager.LocationStatus.TEMPORARILY_UNAVAILABLE) {
                     positioningManager.start(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR);
-                    Log.w("OCUL - Position Fix" ,"Location Status is TEMPORARILY UNAVAILABLE");
+                    Log.w("OCUL - Position Fix", "Location Status is TEMPORARILY UNAVAILABLE");
+                    updateLocationStatus(2);
+                } else if (locationStatus == PositioningManager.LocationStatus.AVAILABLE) {
+                    Log.w("OCUL - Position Fix", "Location Status is AVAILABLE");
+                    updateLocationStatus(1);
                 }
-                else if(locationStatus==PositioningManager.LocationStatus.AVAILABLE){
-                    Log.w("OCUL - Position Fix" ,"Location Status is AVAILABLE");
-                }
+                currentLocation.setValue(PositioningManager.getInstance().getPosition().getCoordinate());
             }
         };
         positioningManager.addListener(new WeakReference<>(positionListener));
         positioningManager.start(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR);
+
+        while (positioningManager.getLocationStatus(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR) == PositioningManager.LocationStatus.TEMPORARILY_UNAVAILABLE) {
+            Log.w("OCUL - While Loop", "Location Status is TEMPORARILY UNAVAILABLE");
+            positioningManager.start(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR);
+            updateLocationStatus(2);
+        }
+
+        if (positioningManager.getLocationStatus(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR) == PositioningManager.LocationStatus.OUT_OF_SERVICE) {
+            Log.w("OCUL - Positioning", "Location Status is OUT OF SERVICE");
+            positioningManager.start(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR);
+            updateLocationStatus(2);
+        } else if (positioningManager.getLocationStatus(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR) == PositioningManager.LocationStatus.AVAILABLE) {
+            Log.w("OCUL - Positioning", "Location Status is AVAILABLE.");
+            currentLocation.setValue(PositioningManager.getInstance().getPosition().getCoordinate());
+            updateLocationStatus(1);
+        }
     }
 
     public MutableLiveData<GeoCoordinate> getCurrentLocation() {
@@ -130,7 +183,7 @@ public class MainActivityViewModel extends AndroidViewModel {
 
     //Updates the Markerlist and adds Map Markers to Was Objects:
     public void updateMarkerList() {
-        Log.d("OCUL - Marker Cluster","Creating Cluster layer");
+        Log.d("OCUL - Marker Cluster", "Creating Cluster layer");
         if (markerList.size() != 0) {
             markerList.clear();
         }
@@ -154,7 +207,7 @@ public class MainActivityViewModel extends AndroidViewModel {
             clusterLayer.addMarker(marker);
             setExistingClusterLayer(clusterLayer);
         }
-        System.out.println("OCUL - Updated cluster layer size is: "+clusterLayer.getMarkers().size());
+        System.out.println("OCUL - Updated cluster layer size is: " + clusterLayer.getMarkers().size());
         System.out.println("OCUL - ////////////////////");
         setMarkerList(markerList);
     }
@@ -162,22 +215,24 @@ public class MainActivityViewModel extends AndroidViewModel {
     public void setMarkerList(List<MapObject> markerList) {
         this.markerList = markerList;
     }
+
     public MutableLiveData<List<Was>> getWasList() {
         wasList = WasRepository.getInstance().getWasList();
         return wasList;
     }
 
-    public ClusterLayer getExistingClusterLayer(){
+    public ClusterLayer getExistingClusterLayer() {
         return WasRepository.getInstance().getExistingClusterLayer();
     }
 
-    public void setExistingClusterLayer(ClusterLayer clusterLayer){
+    public void setExistingClusterLayer(ClusterLayer clusterLayer) {
         WasRepository.getInstance().setExistingClusterLayer(clusterLayer);
     }
 
-    public MutableLiveData<ClusterViewObject> getClusterViewObject(){
+    public MutableLiveData<ClusterViewObject> getClusterViewObject() {
         return WasRepository.getInstance().getClusterViewObject();
     }
+
     public void setWasObjectsInCluster() {
         Collection<MapMarker> markerList = getClusterViewObject().getValue().getMarkers();
         String adressToBeSearched;
@@ -212,8 +267,9 @@ public class MainActivityViewModel extends AndroidViewModel {
             }
         }
     }
+
     public void playAudio(Was was) {
         playAudioHelper.startPlaying(context, was);
     }
     //Audio Management Part End
-    }
+}

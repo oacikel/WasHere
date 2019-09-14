@@ -27,7 +27,7 @@
         tools:ignore="GoogleAppIndexingWarning">
 
 
-        <activity android:name=".views.MainActivity">
+        <activity android:name=".Views.Activities.Main_Activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -47,6 +47,9 @@
         <meta-data
             android:name="INTENT_NAME"
             android:value="{YOUR_INTENT_NAME}" />
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
 
         <service
             android:name="com.here.android.mpa.service.MapService"

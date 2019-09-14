@@ -1,11 +1,15 @@
 package com.example.washere.repositories;
 
+import android.media.MediaPlayer;
+import android.media.MediaRecorder;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.washere.helpers.FirebaseFireStoreHelper;
 import com.example.washere.helpers.FirebseStorageHelper;
 import com.example.washere.models.Was;
+import com.example.washere.models.eWasUploadState;
 import com.here.android.mpa.cluster.ClusterLayer;
 import com.here.android.mpa.cluster.ClusterViewObject;
 import com.here.android.mpa.common.GeoCoordinate;
@@ -18,23 +22,55 @@ import java.util.List;
 
 public class WasRepository extends AppCompatActivity {
 
+
     private static WasRepository instance;
+    private static MutableLiveData<eWasUploadState> wasRecordingState = new MutableLiveData<>();
+    private MutableLiveData<Integer> locationStatus = new MutableLiveData<>();
     private FirebseStorageHelper firebseStorageHelper = new FirebseStorageHelper();
     private FirebaseFireStoreHelper firebaseFireStoreHelper = new FirebaseFireStoreHelper();
     private MutableLiveData<List<Was>> wasList = new MutableLiveData<>();
-    private MutableLiveData<GeoCoordinate> currentLocation=new MutableLiveData<>();
+    private MutableLiveData<GeoCoordinate> currentLocation = new MutableLiveData<>();
     private ClusterLayer existingClusterLayer;
-    private MutableLiveData <ClusterViewObject> clusterViewObject =new MutableLiveData<>();
-    private MutableLiveData<ArrayList<Was>> selectedClusterViewWasList=new MutableLiveData<>();
+    private MutableLiveData<ClusterViewObject> clusterViewObject = new MutableLiveData<>();
+    private MutableLiveData<ArrayList<Was>> selectedClusterViewWasList = new MutableLiveData<>();
+    private MediaRecorder mediaRecorder;
+    private MediaPlayer mediaPlayer;
+    private GeoCoordinate uploadLocation;
+    private String uploadFilePath;
 
 
     private String userName = ("Ocul");
+    private String uploadTitle = ("Aklıma gelmişken...");
+    private static long MAX_WAS_LENGTH = 35000;
 
     public static WasRepository getInstance() {
         if (instance == null) {
             instance = new WasRepository();
         }
         return instance;
+    }
+
+    //States
+    //Recording/Playing State
+    public void setWasRecordingState(eWasUploadState state) {
+        wasRecordingState.setValue(state);
+    }
+
+    public MutableLiveData<eWasUploadState> getWasRecordingState() {
+        return wasRecordingState;
+    }
+
+    //Regarding Location Status
+    /*
+    1-Location Available
+    2-Location Not Available
+     */
+    public MutableLiveData<Integer> getLocationStatus() {
+        return locationStatus;
+    }
+
+    public void updateLocationStatus(int status) {
+        locationStatus.setValue(status);
     }
 
     //Regarding Was Object Upload / Download
@@ -76,7 +112,7 @@ public class WasRepository extends AppCompatActivity {
         return wasList;
     }
 
-    public void continouslyUpdateWasObjects(){
+    public void continouslyUpdateWasObjects() {
         firebaseFireStoreHelper.updateWasObjects();
     }
 
@@ -84,10 +120,48 @@ public class WasRepository extends AppCompatActivity {
         return clusterViewObject;
     }
 
+    public static long getMAX_WAS_LENGTH() {
+        return MAX_WAS_LENGTH;
+    }
 
     //Regarding User
     public String getUserName() {
         return userName;
+    }
+
+    //Uploading Was Objects:
+    //Regarding Recording
+
+    public MediaRecorder getMediaRecorder() {
+        return mediaRecorder;
+    }
+
+    public void setMediaRecorder(MediaRecorder mediaRecorder) {
+        this.mediaRecorder = mediaRecorder;
+    }
+
+    public MediaPlayer getMediaPlayer() {
+        return mediaPlayer;
+    }
+
+    public void setMediaPlayer(MediaPlayer mediaPlayer) {
+        this.mediaPlayer = mediaPlayer;
+    }
+
+    public String getUploadFilePath() {
+        return uploadFilePath;
+    }
+
+    public void setUploadFilePath(String uploadFilePath) {
+        this.uploadFilePath = uploadFilePath;
+    }
+
+    public GeoCoordinate getUploadLocation() {
+        return uploadLocation;
+    }
+
+    public void setUploadLocation(GeoCoordinate uploadLocation) {
+        this.uploadLocation = uploadLocation;
     }
 
     //Misc
@@ -105,7 +179,7 @@ public class WasRepository extends AppCompatActivity {
         return date;
     }
 
-    public String getTime(){
+    public String getTime() {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm");
         String time = simpleDateFormat.format(new Date());
 

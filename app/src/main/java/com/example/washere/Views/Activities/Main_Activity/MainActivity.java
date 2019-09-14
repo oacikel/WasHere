@@ -1,4 +1,4 @@
-package com.example.washere.views;
+package com.example.washere.Views.Activities.Main_Activity;
 
 import android.content.pm.PackageManager;
 import android.graphics.PointF;
@@ -11,16 +11,19 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.washere.R;
+import com.example.washere.Views.Fragments.Main_Button_Set_Fragment.MainButtonSetFragment;
 import com.example.washere.adapters.WasCardAdapter;
 import com.example.washere.helpers.PermissionHelper;
 import com.example.washere.models.Was;
-import com.example.washere.viewModels.MainActivityViewModel;
+import com.example.washere.models.eWasUploadState;
 import com.here.android.mpa.cluster.ClusterViewObject;
 import com.here.android.mpa.common.GeoCoordinate;
 import com.here.android.mpa.common.OnEngineInitListener;
@@ -49,6 +52,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     RecyclerView recyclerViewWasCard;
     WasCardAdapter wasCardAdapter;
     ArrayList<Was> mapMarkersInCluster;
+    FragmentTransaction fragmentTransaction;
+    Fragment previousFragment;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //Map initiation
         initiateMap(mainActivityViewModel.isSuccess());
 
-
+        //Observers
         //Observe Changes in Current Location
         mainActivityViewModel.getCurrentLocation().observe(this, new Observer<GeoCoordinate>() {
             @Override
@@ -76,6 +82,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 map.setCenter(geoCoordinate, Map.Animation.LINEAR);
                 Log.i("OCUL - MainActivity", "Changed Current position is: " + geoCoordinate.getLatitude() + "lat " +
                         geoCoordinate.getLongitude() + " lng.");
+            }
+        });
+
+        //Observe Changes in Main Activity
+        mainActivityViewModel.getWasRecordingState().observe(this, new Observer<eWasUploadState>() {
+            @Override
+            public void onChanged(eWasUploadState state) {
+                if (state != null) {
+                    Log.i("OCUL - MainActivity", "Upload State is: "+state.toString());
+                    if (state == eWasUploadState.READY_TO_RECORD) {
+                        if (fragmentTransaction==null){
+                            Log.i("OCUL - MainActivity", "Starting dialog fragment");
+                            fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                            previousFragment = getSupportFragmentManager().findFragmentByTag("WAS_DIALOG");
+                            mainActivityViewModel.initWasUploadDialog(fragmentTransaction,previousFragment);
+                        }
+                        else{
+                            Log.i("OCUL - MainActivity", "Record Dialog already visible");
+                        }
+                    }
+                }
             }
         });
 
@@ -90,22 +117,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //Observe Changes In Selected Cluster View Objects:
 
-                mainActivityViewModel.getSelectedClusterViewWasList().observe(this, new Observer<ArrayList<Was>>() {
-                    @Override
-                    public void onChanged(ArrayList<Was> was) {
-                        mapMarkersInCluster=was;
-                        if (was!=null){
-                            recyclerViewWasCard.setVisibility(View.VISIBLE);
-                            buttonCloseList.setVisibility(View.VISIBLE);
-                            wasCardAdapter.setWasList(was);
-                        }
-                        else{
-                            recyclerViewWasCard.setVisibility(View.INVISIBLE);
-                            buttonCloseList.setVisibility(View.INVISIBLE);
-                        }
+        mainActivityViewModel.getSelectedClusterViewWasList().observe(this, new Observer<ArrayList<Was>>() {
+            @Override
+            public void onChanged(ArrayList<Was> was) {
+                mapMarkersInCluster = was;
+                if (was != null) {
+                    recyclerViewWasCard.setVisibility(View.VISIBLE);
+                    buttonCloseList.setVisibility(View.VISIBLE);
+                    wasCardAdapter.setWasList(was);
+                } else {
+                    recyclerViewWasCard.setVisibility(View.INVISIBLE);
+                    buttonCloseList.setVisibility(View.INVISIBLE);
+                }
 
-                    }
-                });
+            }
+        });
     }
 
     @Override
@@ -192,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             MapObject mapObject = (MapObject) viewObject;
                                             if (mapObject.getType() == MapObject.Type.MARKER) {
                                                 mainActivityViewModel.playAudio(mainActivityViewModel.getWasList().getValue(), (MapMarker) mapObject);
-                                                System.out.println("ocul"+mapObject.getType().toString());
+                                                System.out.println("ocul" + mapObject.getType().toString());
                                                 return false;
                                             }
                                         }
@@ -266,7 +292,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void initViews() {
         recyclerViewWasCard = findViewById(R.id.recyclerViewWasCard);
         buttonCloseList = findViewById(R.id.buttonCloseList);
-        recyclerViewWasCard.setLayoutManager(new LinearLayoutManager(this));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        recyclerViewWasCard.setLayoutManager(layoutManager);
         recyclerViewWasCard.setHasFixedSize(true);
         wasCardAdapter = new WasCardAdapter(this);
         recyclerViewWasCard.setAdapter(wasCardAdapter);

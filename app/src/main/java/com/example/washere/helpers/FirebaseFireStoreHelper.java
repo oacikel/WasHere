@@ -66,6 +66,7 @@ public class FirebaseFireStoreHelper {
         wasObject.put("uploaderName", was.getUploaderName());
         wasObject.put("uploadDate", was.getUploadDate());
         wasObject.put("uploadTime", was.getUploadTime());
+        wasObject.put("uploadTitle",was.getUploadTitle());
 
         collectionReference=firebaseFirestore.collection("wasItems");
         collectionReference.add(wasObject).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -95,6 +96,7 @@ public class FirebaseFireStoreHelper {
                 (double) wasMap.get("locationLatitude"),
                 (double) wasMap.get("locationLongitude"),
                 (double) wasMap.get("locationAltitude"),
+                (String) wasMap.get("uploadTitle"),
                 (String) wasMap.get("downloadURL"),
                 (String) wasMap.get("uploaderName"),
                 (String) wasMap.get("uploadTime"),

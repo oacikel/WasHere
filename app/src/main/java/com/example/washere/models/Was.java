@@ -19,6 +19,7 @@ public class Was {
     private String uploaderName;
     private String uploadTime;
     private String uploadDate;
+    private String uploadTitle =("Aklıma gelmişken...");
 
 
     public Was(double locationLatitude, double locationLongitude, double locationAltitude, int markerDirectory) {
@@ -28,7 +29,7 @@ public class Was {
         this.markerDirectory = markerDirectory;
     }
 
-    public Was(double locationLatitude, double locationLongitude, double locationAltitude, String downloadUrl, String uploaderName, String uploadTime, String uploadDate) {
+    public Was(double locationLatitude, double locationLongitude, double locationAltitude, String uploadTitle, String downloadUrl, String uploaderName, String uploadTime, String uploadDate) {
         this.locationLatitude = locationLatitude;
         this.locationLongitude = locationLongitude;
         this.locationAltitude = locationAltitude;
@@ -36,6 +37,7 @@ public class Was {
         this.uploaderName = uploaderName;
         this.uploadTime = uploadTime;
         this.uploadDate = uploadDate;
+        this.uploadTitle = uploadTitle;
     }
 
     public String getDownloadUrl() {
@@ -87,9 +89,11 @@ public class Was {
     public void setLocationAltitude(double locationAltitude) {
         this.locationAltitude = locationAltitude;
     }
+
     public MapMarker getMapMarker() {
         return mapMarker;
     }
+
     public void setMapMarker(MapMarker mapMarker) {
         this.mapMarker = mapMarker;
     }
@@ -124,5 +128,13 @@ public class Was {
 
     public void setUploadDate(String uploadDate) {
         this.uploadDate = uploadDate;
+    }
+
+    public String getUploadTitle() {
+        return uploadTitle;
+    }
+
+    public void setUploadTitle(String uploadTitle) {
+        this.uploadTitle = uploadTitle;
     }
 }

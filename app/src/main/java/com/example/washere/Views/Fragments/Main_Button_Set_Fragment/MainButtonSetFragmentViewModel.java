@@ -1,4 +1,4 @@
-package com.example.washere.viewModels;
+package com.example.washere.Views.Fragments.Main_Button_Set_Fragment;
 
 import android.app.Application;
 
@@ -10,8 +10,9 @@ import com.example.washere.R;
 import com.example.washere.helpers.FirebseStorageHelper;
 import com.example.washere.helpers.RecordAudioHelper;
 import com.example.washere.models.Was;
+import com.example.washere.models.eWasUploadState;
 import com.example.washere.repositories.WasRepository;
-import com.example.washere.views.MainActivity;
+import com.example.washere.Views.Activities.Main_Activity.MainActivity;
 import com.here.android.mpa.common.GeoCoordinate;
 
 import java.util.List;
@@ -38,9 +39,32 @@ public class MainButtonSetFragmentViewModel extends AndroidViewModel {
         recordAudioHelper = new RecordAudioHelper(getApplication(), wasRepository);
     }
 
+    //Location Status
+    public MutableLiveData<Integer> getLocationStatus() {
+        return WasRepository.getInstance().getLocationStatus();
+    }
+    public void updateLocationStatus(int status){
+        WasRepository.getInstance().getLocationStatus().setValue(status);
+    }
+
+    //Was Recording /Playing Status
+    public MutableLiveData<eWasUploadState> getWasRecordingState() {
+        return WasRepository.getInstance().getWasRecordingState();
+    }
+
+    public void updateWasRecordingState(eWasUploadState state) {
+        WasRepository.getInstance().setWasRecordingState(state);
+    }
+
+
+    //Recording
+    public void prepareRecorder(){
+        recordAudioHelper.prepareRecorder();
+    }
+
     public void startRecordingWasItem() {
         recordAudioHelper.startRecording();
-        currentLocation = wasRepository.getCurrentLocation().getValue();
+        currentLocation = WasRepository.getInstance().getCurrentLocation().getValue();
     }
 
     public void addWasItemAfterRecording() {
@@ -55,7 +79,6 @@ public class MainButtonSetFragmentViewModel extends AndroidViewModel {
         was.setDownloadUrl(url); //Embed the download link of the recording to the was item
         wasRepository.addWasHashMapToFireStore(was); //Store the properties of the was object as a hashmap in the Firestore
     }
-
 
     public MutableLiveData<Boolean> getIsUpdated() {
         return isUpdated;

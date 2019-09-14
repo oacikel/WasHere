@@ -3,116 +3,107 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/cardViewWasCard"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_width="200dp"
+    android:layout_height="200dp"
     android:layout_marginLeft="3dp"
     android:layout_marginTop="3dp"
     android:layout_marginRight="3dp"
     android:orientation="vertical"
-    app:cardBackgroundColor="#4CAF50"
-    app:cardCornerRadius="10dp">
+    app:cardBackgroundColor="#E62C2C2C"
+    app:cardCornerRadius="2dp">
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:elevation="15dp"
-        android:paddingLeft="5dp"
-        android:paddingTop="10dp"
-        android:paddingRight="5dp"
-        android:paddingBottom="10dp">
-
-        <ImageView
-            android:id="@+id/imageViewDateIcon"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginStart="8dp"
-            android:tint="@android:color/white"
-            app:layout_constraintBottom_toBottomOf="@+id/imageViewUserAvatar"
-            app:layout_constraintStart_toEndOf="@+id/imageViewUserAvatar"
-            app:layout_constraintTop_toTopOf="@+id/imageViewUserAvatar"
-            app:layout_constraintVertical_bias="1.0"
-            app:srcCompat="@drawable/icon_date" />
-
-        <ImageView
-            android:id="@+id/imageViewDeleteWas"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:tint="@android:color/white"
-            android:visibility="invisible"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_max="wrap"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/icon_delete" />
-
-        <ProgressBar
-            android:id="@+id/progressBarRating"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:progress="40"
-            app:layout_constraintBottom_toBottomOf="@+id/textViewUserName"
-            app:layout_constraintEnd_toEndOf="@+id/textViewUploadTime"
-            app:layout_constraintStart_toEndOf="@+id/textViewUserName"
-            app:layout_constraintTop_toTopOf="@+id/textViewUserName" />
-
-        <TextView
-            android:id="@+id/textViewUserName"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="OcuL"
-            android:textColor="@android:color/white"
-            android:textSize="20sp"
-            app:layout_constraintStart_toEndOf="@+id/imageViewUserAvatar"
-            app:layout_constraintTop_toTopOf="@+id/imageViewUserAvatar" />
+        android:padding="2dp">
 
         <ImageView
             android:id="@+id/imageViewUserAvatar"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
             android:src="@drawable/place_holder_avatar"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/place_holder_avatar" />
 
         <TextView
-            android:id="@+id/textViewUploadDate"
-            android:layout_width="wrap_content"
+            android:id="@+id/textViewTitle"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="14 Nisan 2019"
-            android:textColor="@android:color/white"
-            android:textSize="18sp"
-            app:layout_constraintBottom_toBottomOf="@+id/imageViewDateIcon"
-            app:layout_constraintStart_toEndOf="@+id/imageViewDateIcon"
-            app:layout_constraintTop_toTopOf="@+id/imageViewDateIcon" />
+            android:fontFamily="@font/montserrat"
+
+            android:maxLines="1"
+            android:textColor="#F3F3F3"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toTopOf="@+id/textViewUserName"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageViewUserAvatar"
+            tools:text="Mustafa'nın Vedası" />
 
         <TextView
-            android:id="@+id/textViewUploadTime"
-            android:layout_width="wrap_content"
+            android:id="@+id/textViewUserName"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="13:30"
-            android:textColor="@android:color/white"
-            android:textSize="18sp"
-            app:layout_constraintBottom_toBottomOf="@+id/imageViewTimeIcon"
-            app:layout_constraintStart_toEndOf="@+id/imageViewTimeIcon"
-            app:layout_constraintTop_toTopOf="@+id/imageViewTimeIcon" />
+            android:fontFamily="@font/montserrat"
+            android:text="OcuL"
+            android:textColor="#686868"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/textViewTitle"
+            app:layout_constraintTop_toBottomOf="@+id/textViewTitle" />
+
+        <TextView
+            android:id="@+id/textViewTimePassed"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat"
+            android:text="3 weeks ago"
+            android:textAlignment="textEnd"
+            android:textColor="#686868"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@+id/textViewUserName"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/textViewUserName"
+            app:layout_constraintTop_toTopOf="@+id/textViewUserName" />
 
         <ImageView
-            android:id="@+id/imageViewTimeIcon"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginStart="8dp"
-            android:tint="@android:color/white"
-            app:layout_constraintBottom_toBottomOf="@+id/imageViewDateIcon"
-            app:layout_constraintStart_toEndOf="@+id/textViewUploadDate"
-            app:layout_constraintTop_toTopOf="@+id/imageViewDateIcon"
-            app:layout_constraintVertical_bias="0.0"
-            app:srcCompat="@drawable/icon_time" />
+            android:id="@+id/imageViewAddToFavourites"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:backgroundTint="#59C54747"
+            android:tint="#009C8E8E"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/imageViewUserAvatar"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/icon_favourite" />
+
+        <ImageView
+            android:id="@+id/imageViewLike"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="#59C54747"
+            android:tint="#009C8E8E"
+            app:layout_constraintEnd_toEndOf="@+id/imageViewAddToFavourites"
+            app:layout_constraintStart_toStartOf="@+id/imageViewAddToFavourites"
+            app:layout_constraintTop_toBottomOf="@+id/imageViewAddToFavourites"
+            app:srcCompat="@drawable/icon_like" />
+
+        <ImageView
+            android:id="@+id/imageViewShare"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="#59C54747"
+            android:tint="#009C8E8E"
+            app:layout_constraintEnd_toEndOf="@+id/imageViewLike"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/imageViewLike"
+            app:layout_constraintTop_toBottomOf="@+id/imageViewLike"
+            app:srcCompat="@drawable/icon_send" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
