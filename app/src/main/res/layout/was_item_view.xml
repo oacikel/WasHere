@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/cardViewWasCard"
-    android:layout_width="200dp"
-    android:layout_height="200dp"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:layout_marginLeft="3dp"
     android:layout_marginTop="3dp"
     android:layout_marginRight="3dp"
@@ -14,95 +14,96 @@
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:elevation="15dp"
-        android:padding="2dp">
+        android:padding="2dp"
+        app:layout_constraintBottom_toBottomOf="@+id/imageViewAddToFavourites"
+        app:layout_constraintTop_toBottomOf="@+id/imageViewAddToFavourites">
 
         <ImageView
             android:id="@+id/imageViewUserAvatar"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
             android:src="@drawable/place_holder_avatar"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/place_holder_avatar" />
 
         <TextView
             android:id="@+id/textViewTitle"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/montserrat"
 
+            android:layout_marginTop="4dp"
+            android:fontFamily="@font/montserrat"
             android:maxLines="1"
             android:textColor="#F3F3F3"
             android:textSize="16sp"
-            app:layout_constraintBottom_toTopOf="@+id/textViewUserName"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageViewUserAvatar"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/textViewUserName"
+            app:layout_constraintTop_toBottomOf="@+id/textViewUserName"
             tools:text="Mustafa'nın Vedası" />
 
         <TextView
             android:id="@+id/textViewUserName"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
             android:fontFamily="@font/montserrat"
             android:text="OcuL"
-            android:textColor="#686868"
+            android:textColor="#FFFFFF"
             android:textSize="14sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/textViewTitle"
-            app:layout_constraintTop_toBottomOf="@+id/textViewTitle" />
+            app:layout_constraintStart_toEndOf="@+id/imageViewUserAvatar"
+            app:layout_constraintTop_toTopOf="@+id/imageViewUserAvatar" />
 
         <TextView
             android:id="@+id/textViewTimePassed"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
             android:fontFamily="@font/montserrat"
             android:text="3 weeks ago"
             android:textAlignment="textEnd"
             android:textColor="#686868"
             android:textSize="14sp"
-            app:layout_constraintBottom_toBottomOf="@+id/textViewUserName"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/textViewUserName"
-            app:layout_constraintTop_toTopOf="@+id/textViewUserName" />
+            app:layout_constraintStart_toStartOf="@+id/textViewTitle"
+            app:layout_constraintTop_toBottomOf="@+id/textViewTitle" />
 
         <ImageView
             android:id="@+id/imageViewAddToFavourites"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:backgroundTint="#59C54747"
-            android:tint="#009C8E8E"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="96dp"
+            android:layout_marginEnd="4dp"
+            android:tint="#FFFFFF"
+            app:layout_constraintEnd_toStartOf="@+id/imageViewLike"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toEndOf="@+id/imageViewUserAvatar"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/imageViewUserAvatar"
             app:srcCompat="@drawable/icon_favourite" />
 
         <ImageView
             android:id="@+id/imageViewLike"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_marginTop="8dp"
-            android:backgroundTint="#59C54747"
-            android:tint="#009C8E8E"
-            app:layout_constraintEnd_toEndOf="@+id/imageViewAddToFavourites"
-            app:layout_constraintStart_toStartOf="@+id/imageViewAddToFavourites"
-            app:layout_constraintTop_toBottomOf="@+id/imageViewAddToFavourites"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginEnd="4dp"
+            android:tint="#FFFFFF"
+            app:layout_constraintBottom_toBottomOf="@+id/imageViewAddToFavourites"
+            app:layout_constraintEnd_toStartOf="@+id/imageViewShare"
+            app:layout_constraintTop_toTopOf="@+id/imageViewAddToFavourites"
             app:srcCompat="@drawable/icon_like" />
 
         <ImageView
             android:id="@+id/imageViewShare"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_marginTop="8dp"
-            android:backgroundTint="#59C54747"
-            android:tint="#009C8E8E"
-            app:layout_constraintEnd_toEndOf="@+id/imageViewLike"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@+id/imageViewLike"
-            app:layout_constraintTop_toBottomOf="@+id/imageViewLike"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:tint="#FFFFFF"
+            app:layout_constraintBottom_toBottomOf="@+id/imageViewLike"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/imageViewLike"
             app:srcCompat="@drawable/icon_send" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

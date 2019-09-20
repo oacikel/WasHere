@@ -24,6 +24,7 @@ import com.example.washere.adapters.WasCardAdapter;
 import com.example.washere.helpers.PermissionHelper;
 import com.example.washere.models.Was;
 import com.example.washere.models.eWasUploadState;
+import com.google.protobuf.StringValue;
 import com.here.android.mpa.cluster.ClusterViewObject;
 import com.here.android.mpa.common.GeoCoordinate;
 import com.here.android.mpa.common.OnEngineInitListener;
@@ -42,7 +43,7 @@ import static com.example.washere.helpers.PermissionHelper.getRequestCodeAskPerm
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, WasCardAdapter.OnMarkerListener {
 
-
+    private static String LOG_TAG=("OCUL- MainActivity");
     SupportMapFragment supportMapFragment;
     Map map;
     MainActivityViewModel mainActivityViewModel;
@@ -80,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onChanged(@Nullable GeoCoordinate geoCoordinate) {
 
                 map.setCenter(geoCoordinate, Map.Animation.LINEAR);
-                Log.i("OCUL - MainActivity", "Changed Current position is: " + geoCoordinate.getLatitude() + "lat " +
+                Log.i(LOG_TAG, "Changed Current position is: " + geoCoordinate.getLatitude() + "lat " +
                         geoCoordinate.getLongitude() + " lng.");
             }
         });
@@ -90,17 +91,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onChanged(eWasUploadState state) {
                 if (state != null) {
-                    Log.i("OCUL - MainActivity", "Upload State is: "+state.toString());
+                    Log.i(LOG_TAG, "Upload State is: "+state.toString());
                     if (state == eWasUploadState.READY_TO_RECORD) {
-                        if (fragmentTransaction==null){
-                            Log.i("OCUL - MainActivity", "Starting dialog fragment");
+                        if (!mainActivityViewModel.isDialogOn()){
+                            Log.i(LOG_TAG, "Starting dialog fragment");
                             fragmentTransaction = getSupportFragmentManager().beginTransaction();
                             previousFragment = getSupportFragmentManager().findFragmentByTag("WAS_DIALOG");
                             mainActivityViewModel.initWasUploadDialog(fragmentTransaction,previousFragment);
                         }
                         else{
-                            Log.i("OCUL - MainActivity", "Record Dialog already visible");
+                            Log.i(LOG_TAG, "Record Dialog already visible");
                         }
+                    }
+                    else if (state==eWasUploadState.CANCELED_ACTION_OR_UPLOAD_COMPLETE){
+                       mainActivityViewModel.dismissWasUploadDialog();
                     }
                 }
             }
@@ -110,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mainActivityViewModel.getWasList().observe(this, new Observer<List<Was>>() {
             @Override
             public void onChanged(List<Was> was) {
-                Log.i("OCUL - MainActivity", "Placing markers on map! ");
+
                 placeMarkersOnMap();
             }
         });
@@ -180,8 +184,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             supportMapFragment.getPositionIndicator().setVisible(true);
                             map.setCenter(mainActivityViewModel.getCurrentLocation().getValue(), Map.Animation.NONE);
                             map.setZoomLevel(16);
-                         /*   Log.i("OCUL","First Current position is: "+mainActivityViewModel.getCurrentLocation().getValue().getLatitude()+"lat "+
-                                    mainActivityViewModel.getCurrentLocation().getValue().getLongitude()+" lng."); */
                             supportMapFragment.getMapGesture().addOnGestureListener(new MapGesture.OnGestureListener() {
                                 @Override
                                 public void onPanStart() {
@@ -205,8 +207,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                                 @Override
                                 public boolean onMapObjectsSelected(List<ViewObject> list) {
+                                    //TODO Shitty solutions to shitty problems... Map sees multiple clusters objects stacked. Fix it correctly
+                                    boolean isClusterObject=false;
                                     for (ViewObject viewObject : list) {
+                                       // Log.i(LOG_TAG,"Clicked object base type is: "+viewObject.getBaseType().toString());
                                         if (viewObject.getBaseType() == ViewObject.Type.PROXY_OBJECT) {
+                                            isClusterObject=true;
+                                            Log.i(LOG_TAG,"PROXY OBJECT: Clicked object base type is: "+viewObject.getBaseType().toString());
                                             MapProxyObject proxyObject = (MapProxyObject) viewObject;
 
                                             if (proxyObject.getType() == MapProxyObject.Type.CLUSTER_MARKER) {
@@ -214,11 +221,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                                 mainActivityViewModel.getClusterViewObject().setValue(clusterViewObject);
                                                 mainActivityViewModel.setWasObjectsInCluster();
                                             }
-                                        } else if (viewObject.getBaseType() == ViewObject.Type.USER_OBJECT) {
+
+                                        } else if (viewObject.getBaseType() == ViewObject.Type.USER_OBJECT && !isClusterObject) {
+                                            Log.i(LOG_TAG,"USER OBJECT: Clicked object base type is: "+viewObject.getBaseType().toString());
                                             MapObject mapObject = (MapObject) viewObject;
                                             if (mapObject.getType() == MapObject.Type.MARKER) {
                                                 mainActivityViewModel.playAudio(mainActivityViewModel.getWasList().getValue(), (MapMarker) mapObject);
-                                                System.out.println("ocul" + mapObject.getType().toString());
+
                                                 return false;
                                             }
                                         }
@@ -310,14 +319,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void placeMarkersOnMap() {
         //TODO: Bu kısım daha iyi handle edilmeli. Her refreshte markerlar silinip tekrardan eklenmemeli...
+        Log.i(LOG_TAG,"Marker Clusters are being added to map");
         if (map != null) {
             if (mainActivityViewModel.getExistingClusterLayer() != null) {
                 map.removeClusterLayer(mainActivityViewModel.getExistingClusterLayer());
             }
             mainActivityViewModel.updateMarkerList();
             map.addClusterLayer(mainActivityViewModel.getExistingClusterLayer());
-
         }
+        Log.d(LOG_TAG,"Currently the layers on the map are: "+map.getVisibleLayers().toString());
     }
 
     @Override

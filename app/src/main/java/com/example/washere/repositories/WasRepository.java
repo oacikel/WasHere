@@ -37,10 +37,12 @@ public class WasRepository extends AppCompatActivity {
     private MediaPlayer mediaPlayer;
     private GeoCoordinate uploadLocation;
     private String uploadFilePath;
-
-
+    private String uploadDate;
+    private String uploadTime;
+    private File uploadFile;
+    private Was uploadWasWithNoUri;
     private String userName = ("Ocul");
-    private String uploadTitle = ("Aklıma gelmişken...");
+    private String uploadTitle;
     private static long MAX_WAS_LENGTH = 35000;
 
     public static WasRepository getInstance() {
@@ -74,6 +76,9 @@ public class WasRepository extends AppCompatActivity {
     }
 
     //Regarding Was Object Upload / Download
+    public MutableLiveData<String> getDownloadUrl(){
+        return getFirebseStorageHelper().getDownloadUri();
+    }
     public FirebseStorageHelper getFirebseStorageHelper() {
         return firebseStorageHelper;
     }
@@ -124,6 +129,22 @@ public class WasRepository extends AppCompatActivity {
         return MAX_WAS_LENGTH;
     }
 
+    public Was getUploadWasWithNoUri() {
+        return uploadWasWithNoUri;
+    }
+
+    public void setUploadWasWithNoUri(Was uploadWasWithNoUri) {
+        this.uploadWasWithNoUri = uploadWasWithNoUri;
+    }
+
+    public File getUploadFile() {
+        return uploadFile;
+    }
+
+    public void setUploadFile(File uploadFile) {
+        this.uploadFile = uploadFile;
+    }
+
     //Regarding User
     public String getUserName() {
         return userName;
@@ -162,6 +183,30 @@ public class WasRepository extends AppCompatActivity {
 
     public void setUploadLocation(GeoCoordinate uploadLocation) {
         this.uploadLocation = uploadLocation;
+    }
+
+    public String getUploadDate() {
+        return uploadDate;
+    }
+
+    public String getUploadTime() {
+        return uploadTime;
+    }
+
+    public void setUploadDate(String uploadDate) {
+        this.uploadDate = uploadDate;
+    }
+
+    public void setUploadTime(String uploadTime) {
+        this.uploadTime = uploadTime;
+    }
+
+    public String getUploadTitle() {
+        return uploadTitle;
+    }
+
+    public void setUploadTitle(String uploadTitle) {
+        this.uploadTitle = uploadTitle;
     }
 
     //Misc

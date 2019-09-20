@@ -25,7 +25,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.washere.R;
 import com.example.washere.Views.Dialogs.Record_WAS_Dialog.RecordWasDialog;
-import com.example.washere.helpers.PlayAudioHelper;
+import com.example.washere.helpers.AudioHelper;
 import com.example.washere.models.Was;
 import com.example.washere.models.eWasUploadState;
 import com.example.washere.repositories.WasRepository;
@@ -36,7 +36,6 @@ import com.here.android.mpa.common.GeoPosition;
 import com.here.android.mpa.common.Image;
 import com.here.android.mpa.common.PositioningManager;
 import com.here.android.mpa.mapping.MapMarker;
-import com.here.android.mpa.mapping.MapObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,26 +45,21 @@ import java.util.Collection;
 import java.util.List;
 
 public class MainActivityViewModel extends AndroidViewModel {
-
+    private static String LOG_TAG =("OCUL- MainActivityViewModel");
     private String intentName;
     private Context context;
     private MutableLiveData<GeoCoordinate> currentLocation = WasRepository.getInstance().getCurrentLocation();
     private PositioningManager positioningManager;
     private MutableLiveData<List<Was>> wasList;
     private boolean isUpdating = false;
-    private List<MapObject> markerList = new ArrayList<>();
-    private PlayAudioHelper playAudioHelper;
+    private AudioHelper audioHelper;
     private WasRepository wasRepository;
     private ClusterLayer clusterLayer;
-    private Application mainApplication;
-
+    private Collection<MapMarker>mapMarkers;
+    private RecordWasDialog recordWasDialog;
     public void setUpdating(boolean updating) {
         isUpdating = updating;
     }
-
-    private MutableLiveData<PositioningManager.LocationStatus> locationStatus = new MutableLiveData<>();
-    private MutableLiveData<ClusterViewObject> clusterViewObject = new MutableLiveData<>();
-
     public boolean isUpdating() {
         return isUpdating;
     }
@@ -73,7 +67,6 @@ public class MainActivityViewModel extends AndroidViewModel {
     public MainActivityViewModel(@NonNull Application application) {
         super(application);
         context = application.getApplicationContext();
-        mainApplication = application;
     }
 
     //Location Status
@@ -81,29 +74,39 @@ public class MainActivityViewModel extends AndroidViewModel {
         return WasRepository.getInstance().getLocationStatus();
     }
 
-    public void updateLocationStatus(int status) {
+    private void updateLocationStatus(int status) {
         WasRepository.getInstance().getLocationStatus().setValue(status);
     }
 
     //Was Recording / Playing State
-    public MutableLiveData<eWasUploadState> getWasRecordingState() {
+    MutableLiveData<eWasUploadState> getWasRecordingState() {
         return WasRepository.getInstance().getWasRecordingState();
     }
 
-    public void updateWasRecordingState(eWasUploadState state) {
-        WasRepository.getInstance().setWasRecordingState(state);
-    }
 
     //Was Recording Playing
-    public void initWasUploadDialog (FragmentTransaction fragmentTransaction,Fragment previousFragment){
-        RecordWasDialog recordWasDialog;
-
+    void initWasUploadDialog(FragmentTransaction fragmentTransaction, Fragment previousFragment) {
         if (previousFragment != null) {
             fragmentTransaction.remove(previousFragment);
         }
         fragmentTransaction.addToBackStack(null);
         recordWasDialog = new RecordWasDialog();
         recordWasDialog.show(fragmentTransaction, "WAS_DIALOG");
+    }
+
+    void dismissWasUploadDialog() {
+
+        if (recordWasDialog != null) {
+            recordWasDialog.dismiss();
+        }
+    }
+
+    boolean isDialogOn() {
+        boolean isDialogOn = false;
+        if (recordWasDialog != null) {
+            isDialogOn = recordWasDialog.isVisible();
+        }
+        return isDialogOn;
     }
 
     //Map Management Part Start
@@ -121,7 +124,7 @@ public class MainActivityViewModel extends AndroidViewModel {
         return com.here.android.mpa.common.MapSettings.setIsolatedDiskCacheRootPath(diskCacheRoot, intentName);
     }
 
-    public void onMapEngineInitialized() {
+    void onMapEngineInitialized() {
         positioningManager = PositioningManager.getInstance();
         clusterLayer = new ClusterLayer();
         PositioningManager.OnPositionChangedListener positionListener = new PositioningManager.OnPositionChangedListener() {
@@ -164,12 +167,18 @@ public class MainActivityViewModel extends AndroidViewModel {
             updateLocationStatus(2);
         } else if (positioningManager.getLocationStatus(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR) == PositioningManager.LocationStatus.AVAILABLE) {
             Log.w("OCUL - Positioning", "Location Status is AVAILABLE.");
-            currentLocation.setValue(PositioningManager.getInstance().getPosition().getCoordinate());
-            updateLocationStatus(1);
+            if (positioningManager.getPosition().getCoordinate().getLatitude() != -1.7976931348623157E308 && positioningManager.getPosition().getCoordinate().getLongitude() != -1.7976931348623157E308) {
+                currentLocation.setValue(PositioningManager.getInstance().getPosition().getCoordinate());
+                updateLocationStatus(1);
+            } else {
+                Log.w("OCUL - Positioning", "Wrong location pulled");
+                updateLocationStatus(2);
+
+            }
         }
     }
 
-    public MutableLiveData<GeoCoordinate> getCurrentLocation() {
+    MutableLiveData<GeoCoordinate> getCurrentLocation() {
         return WasRepository.getInstance().getCurrentLocation();
     }
 
@@ -177,18 +186,15 @@ public class MainActivityViewModel extends AndroidViewModel {
     public void init() {
         wasRepository = WasRepository.getInstance();
         wasRepository.continouslyUpdateWasObjects();
-        playAudioHelper = new PlayAudioHelper();
+        audioHelper = new AudioHelper();
         getClusterViewObject();
     }
 
     //Updates the Markerlist and adds Map Markers to Was Objects:
-    public void updateMarkerList() {
+    void updateMarkerList() {
+        clusterLayer=new ClusterLayer();
         Log.d("OCUL - Marker Cluster", "Creating Cluster layer");
-        if (markerList.size() != 0) {
-            markerList.clear();
-        }
-        clusterLayer.removeMarkers(clusterLayer.getMarkers());
-        for (int i = 0; i < wasRepository.getWasList().getValue().size(); i++) {
+        for (int i = 0; i < WasRepository.getInstance().getWasList().getValue().size(); i++) {
             Was was = wasList.getValue().get(i);
             MapMarker marker = new MapMarker();
             Image image = new Image();
@@ -202,48 +208,46 @@ public class MainActivityViewModel extends AndroidViewModel {
             marker.setCoordinate(coordinate);
             marker.setIcon(image);
             marker.setTitle(String.valueOf(i));
-            markerList.add(marker);
             was.setMapMarker(marker);
             clusterLayer.addMarker(marker);
-            setExistingClusterLayer(clusterLayer);
         }
+        mapMarkers=clusterLayer.getMarkers();
+        clusterLayer.removeMarkers(mapMarkers);
+        clusterLayer.addMarkers(mapMarkers);
+        setExistingClusterLayer(clusterLayer);
         System.out.println("OCUL - Updated cluster layer size is: " + clusterLayer.getMarkers().size());
         System.out.println("OCUL - ////////////////////");
-        setMarkerList(markerList);
     }
 
-    public void setMarkerList(List<MapObject> markerList) {
-        this.markerList = markerList;
-    }
-
-    public MutableLiveData<List<Was>> getWasList() {
+    MutableLiveData<List<Was>> getWasList() {
         wasList = WasRepository.getInstance().getWasList();
         return wasList;
     }
 
-    public ClusterLayer getExistingClusterLayer() {
+    ClusterLayer getExistingClusterLayer() {
+        Log.d(LOG_TAG,"Cluster Layer Updated");
         return WasRepository.getInstance().getExistingClusterLayer();
     }
 
-    public void setExistingClusterLayer(ClusterLayer clusterLayer) {
+    private void setExistingClusterLayer(ClusterLayer clusterLayer) {
         WasRepository.getInstance().setExistingClusterLayer(clusterLayer);
     }
 
-    public MutableLiveData<ClusterViewObject> getClusterViewObject() {
+    MutableLiveData<ClusterViewObject> getClusterViewObject() {
         return WasRepository.getInstance().getClusterViewObject();
     }
 
-    public void setWasObjectsInCluster() {
+    void setWasObjectsInCluster() {
         Collection<MapMarker> markerList = getClusterViewObject().getValue().getMarkers();
-        String adressToBeSearched;
-        String adress;
+        String addressToBeSearched;
+        String address;
         ArrayList<MapMarker> mapMarkerArrayList = new ArrayList<>(markerList);
         ArrayList<Was> wasListOfCluster = new ArrayList<>();
         for (int i = 0; i < mapMarkerArrayList.size(); i++) {
-            adressToBeSearched = mapMarkerArrayList.get(i).toString();
+            addressToBeSearched = mapMarkerArrayList.get(i).toString();
             for (int a = 0; a < wasList.getValue().size(); a++) {
-                adress = wasList.getValue().get(a).getMapMarker().toString();
-                if (adress.equals(adressToBeSearched)) {
+                address = wasList.getValue().get(a).getMapMarker().toString();
+                if (address.equals(addressToBeSearched)) {
                     wasListOfCluster.add(wasList.getValue().get(a));
                 }
             }
@@ -251,25 +255,27 @@ public class MainActivityViewModel extends AndroidViewModel {
         WasRepository.getInstance().getSelectedClusterViewWasList().setValue(wasListOfCluster);
     }
 
-    public MutableLiveData<ArrayList<Was>> getSelectedClusterViewWasList() {
+    MutableLiveData<ArrayList<Was>> getSelectedClusterViewWasList() {
         return WasRepository.getInstance().getSelectedClusterViewWasList();
     }
 
     //Audio Management Part Start
-    public void playAudio(List<Was> wasList, MapMarker marker) {
+    void playAudio(List<Was> wasList, MapMarker marker) {
         String addressToBeSearched = marker.toString();
         String address;
         for (int i = 0; i < wasList.size(); i++) {
             address = wasList.get(i).getMapMarker().toString();
             if (address.equals(addressToBeSearched)) {
-                playAudioHelper.startPlaying(context, wasList.get(i));
+                audioHelper.preparePlayerForSelectedWas(wasList.get(i));
+                audioHelper.startPlayingWasObject();
                 break;
             }
         }
     }
 
-    public void playAudio(Was was) {
-        playAudioHelper.startPlaying(context, was);
+    void playAudio(Was was) {
+        audioHelper.preparePlayerForSelectedWas(was);
+        audioHelper.startPlayingWasObject();
     }
     //Audio Management Part End
 }

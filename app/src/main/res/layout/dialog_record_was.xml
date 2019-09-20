@@ -40,9 +40,10 @@
         android:id="@+id/imageButtonDiscardRecording"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="#00FFFFFF"
+        android:scaleType="fitEnd"
         app:layout_constraintEnd_toEndOf="@+id/progressBarRemainingTime"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="#00FFFFFF"
         app:srcCompat="@android:drawable/ic_menu_close_clear_cancel" />
 
     <EditText
@@ -64,6 +65,7 @@
         android:layout_height="wrap_content"
         android:background="#00FFFFFF"
         android:scaleType="center"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/editTextWasTitle"
@@ -75,7 +77,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="#00FFFFFF"
-        android:scaleType="fitCenter"
+        android:scaleType="fitEnd"
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/editTextWasTitle"
         app:layout_constraintEnd_toEndOf="@+id/progressBarRemainingTime"

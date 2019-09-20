@@ -8,5 +8,6 @@ public enum eWasUploadState {
     READY_TO_PLAY,
     PLAYING,
     PAUSED,
-    FINISHED_PLAYING
+    FINISHED_PLAYING,
+    CANCELED_ACTION_OR_UPLOAD_COMPLETE,
 }

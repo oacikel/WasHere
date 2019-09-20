@@ -1,7 +1,6 @@
 package com.example.washere.Views.Dialogs.Record_WAS_Dialog;
 
 import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,12 +22,12 @@ import com.example.washere.models.eWasUploadState;
 import com.example.washere.repositories.WasRepository;
 
 public class RecordWasDialog extends DialogFragment implements View.OnClickListener, Animator.AnimatorListener, ValueAnimator.AnimatorUpdateListener {
-    private String TAG =("OCUL - Record Dialog");
-    RecordWasDialogViewModel recordWasDialogViewModel;
-    ImageButton imageButtonControlRecording, imageButtonSend, imageButtonDiscardRecording,imageButtonRetry;
-    ProgressBar progressBarRemainingTime;
-    TextView editTextWasTitle;
-    ValueAnimator animator;
+    private String TAG = ("OCUL - Record Dialog");
+    private RecordWasDialogViewModel recordWasDialogViewModel;
+    private ImageButton imageButtonControlRecording, imageButtonSend, imageButtonDiscardRecording, imageButtonRetry;
+    private ProgressBar progressBarRemainingTime;
+    private TextView editTextWasTitle;
+    private ValueAnimator animator;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -52,16 +51,18 @@ public class RecordWasDialog extends DialogFragment implements View.OnClickListe
             public void onChanged(eWasUploadState state) {
                 if (state != null) {
                     if (state == eWasUploadState.READY_TO_RECORD) {
+                        imageButtonSend.setVisibility(View.GONE);
                         imageButtonRetry.setVisibility(View.INVISIBLE);
                         imageButtonControlRecording.setImageResource(R.drawable.icon_record);
                         progressBarRemainingTime.setVisibility(View.INVISIBLE);
 
                     } else if (state == eWasUploadState.RECORDING) {
+                        imageButtonSend.setVisibility(View.GONE);
                         imageButtonRetry.setVisibility(View.INVISIBLE);
                         imageButtonControlRecording.setImageResource(R.drawable.icon_stop);
                         //Start Recording
                         recordWasDialogViewModel.recordAudio();
-                        recordWasDialogViewModel.setUploadLocation();
+                        recordWasDialogViewModel.setDateTimeLocation();
 
                         //Animate the progress bar
                         progressBarRemainingTime.setVisibility(View.VISIBLE);
@@ -73,17 +74,30 @@ public class RecordWasDialog extends DialogFragment implements View.OnClickListe
                     } else if (state == eWasUploadState.READY_TO_PLAY) {
                         imageButtonRetry.setVisibility(View.VISIBLE);
                         imageButtonControlRecording.setImageResource(R.drawable.icon_play);
+                        imageButtonSend.setVisibility(View.VISIBLE);
                     } else if (state == eWasUploadState.PLAYING) {
                         imageButtonRetry.setVisibility(View.VISIBLE);
                         imageButtonControlRecording.setImageResource(R.drawable.icon_pause);
+                        imageButtonSend.setVisibility(View.VISIBLE);
                     } else if (state == eWasUploadState.PAUSED) {
                         imageButtonRetry.setVisibility(View.VISIBLE);
                         imageButtonControlRecording.setImageResource(R.drawable.icon_play);
+                        imageButtonSend.setVisibility(View.VISIBLE);
                     } else if (state == eWasUploadState.FINISHED_PLAYING) {
                         imageButtonRetry.setVisibility(View.VISIBLE);
                         imageButtonControlRecording.setImageResource(R.drawable.icon_play);
+                        imageButtonSend.setVisibility(View.VISIBLE);
+
                     }
                 }
+            }
+        });
+
+        //Catch When Audio File is uploaded to Firebase
+        recordWasDialogViewModel.getDownloadUrl().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(String url) {
+                recordWasDialogViewModel.addWasHashMapToFireStore(url);
             }
         });
         return view;
@@ -99,7 +113,7 @@ public class RecordWasDialog extends DialogFragment implements View.OnClickListe
                 recordWasDialogViewModel.updateWasRecordingState(eWasUploadState.RECORDING);
 
             } else if (state == eWasUploadState.RECORDING) {
-                Log.d(TAG,"Stop recording button pressed");
+                Log.d(TAG, "Stop recording button pressed");
                 //Stop animating the Progress Bar
                 animator.cancel();
                 progressBarRemainingTime.setProgress(progressBarRemainingTime.getMax());
@@ -120,33 +134,39 @@ public class RecordWasDialog extends DialogFragment implements View.OnClickListe
 
             }
 
-        }
-        else if(view==imageButtonRetry){
+        } else if (view == imageButtonRetry) {
             recordWasDialogViewModel.prepareRecorder();
-        }
-        else if (view==imageButtonDiscardRecording){
+        } else if (view == imageButtonDiscardRecording) {
+            recordWasDialogViewModel.exit();
+        } else if (view == imageButtonSend) {
+            if (editTextWasTitle.getText().toString().isEmpty()) {
+                recordWasDialogViewModel.setUploadTitle(getString(R.string.empty_title));
+            } else {
+                recordWasDialogViewModel.setUploadTitle(editTextWasTitle.getText().toString());
+            }
+            recordWasDialogViewModel.createWas();
 
         }
 
     }
 
-    public void initViews(View view) {
+    private void initViews(View view) {
         imageButtonControlRecording = view.findViewById(R.id.imageButtonControlRecording);
         imageButtonSend = view.findViewById(R.id.imageButtonSend);
         imageButtonDiscardRecording = view.findViewById(R.id.imageButtonDiscardRecording);
-        imageButtonRetry=view.findViewById(R.id.imageButtonRetry);
+        imageButtonRetry = view.findViewById(R.id.imageButtonRetry);
         progressBarRemainingTime = view.findViewById(R.id.progressBarRemainingTime);
         editTextWasTitle = view.findViewById(R.id.editTextWasTitle);
     }
 
-    public void setOnClickListeners() {
+    private void setOnClickListeners() {
         imageButtonDiscardRecording.setOnClickListener(this);
         imageButtonSend.setOnClickListener(this);
         imageButtonControlRecording.setOnClickListener(this);
         imageButtonRetry.setOnClickListener(this);
     }
 
-    public void initOtherObjects() {
+    private void initOtherObjects() {
         recordWasDialogViewModel = ViewModelProviders.of(this).get(RecordWasDialogViewModel.class);
         animator = recordWasDialogViewModel.getAnimator();
         animator.addUpdateListener(this);
@@ -161,8 +181,8 @@ public class RecordWasDialog extends DialogFragment implements View.OnClickListe
 
     @Override
     public void onAnimationEnd(Animator animation) {
-        Log.d(TAG,"Animation ended");
-        //recordWasDialogViewModel.updateWasRecordingState(eWasUploadState.FINISHED_RECORDING);
+        Log.d(TAG, "Animation ended");
+        recordWasDialogViewModel.chgangeStateAfterAnimationEnd();
     }
 
     @Override

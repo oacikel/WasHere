@@ -19,14 +19,18 @@ public class Was {
     private String uploaderName;
     private String uploadTime;
     private String uploadDate;
-    private String uploadTitle =("Aklıma gelmişken...");
+    private String uploadTitle;
 
 
-    public Was(double locationLatitude, double locationLongitude, double locationAltitude, int markerDirectory) {
+    public Was(double locationLatitude, double locationLongitude, double locationAltitude, String uploadTitle, String uploaderName, String uploadTime, String uploadDate,File audioFile) {
         this.locationLatitude = locationLatitude;
         this.locationLongitude = locationLongitude;
         this.locationAltitude = locationAltitude;
-        this.markerDirectory = markerDirectory;
+        this.uploaderName = uploaderName;
+        this.uploadTime = uploadTime;
+        this.uploadDate = uploadDate;
+        this.uploadTitle = uploadTitle;
+        this.audioFile=audioFile;
     }
 
     public Was(double locationLatitude, double locationLongitude, double locationAltitude, String uploadTitle, String downloadUrl, String uploaderName, String uploadTime, String uploadDate) {

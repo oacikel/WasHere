@@ -4,15 +4,12 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.MutableLiveData;
 
 import com.example.washere.models.Was;
 import com.example.washere.repositories.WasRepository;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -20,17 +17,14 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import java.util.List;
 import java.util.Map;
 
 public class FirebaseFireStoreHelper {
     private Map<String, Object> wasObject = new HashMap<>();
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
-    private ArrayList<Map> wasMap;
     private CollectionReference collectionReference;
 
     public void updateWasObjects(){
@@ -43,7 +37,6 @@ public class FirebaseFireStoreHelper {
                 if (e!=null){
                     Log.e("OCUL - Firestore","Error: "+e.getMessage());
                 }
-
                 else{
                     wasList=new ArrayList<>();
                     for (QueryDocumentSnapshot document:value){
@@ -51,7 +44,6 @@ public class FirebaseFireStoreHelper {
                     }
                     WasRepository.getInstance().getWasList().setValue(wasList);
                 }
-
             }
         });
     }
