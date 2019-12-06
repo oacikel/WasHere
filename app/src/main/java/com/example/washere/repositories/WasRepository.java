@@ -7,12 +7,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.washere.helpers.FirebaseFireStoreHelper;
-import com.example.washere.helpers.FirebseStorageHelper;
 import com.example.washere.models.Was;
+import com.example.washere.models.eUploadingState;
 import com.example.washere.models.eWasUploadState;
 import com.here.android.mpa.cluster.ClusterLayer;
 import com.here.android.mpa.cluster.ClusterViewObject;
 import com.here.android.mpa.common.GeoCoordinate;
+import com.here.android.mpa.mapping.Map;
+import com.here.android.mpa.mapping.MapMarker;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -25,9 +27,8 @@ public class WasRepository extends AppCompatActivity {
 
     private static WasRepository instance;
     private static MutableLiveData<eWasUploadState> wasRecordingState = new MutableLiveData<>();
+    private MutableLiveData<eUploadingState>uploadingState=new MutableLiveData<>();
     private MutableLiveData<Integer> locationStatus = new MutableLiveData<>();
-    private FirebseStorageHelper firebseStorageHelper = new FirebseStorageHelper();
-    private FirebaseFireStoreHelper firebaseFireStoreHelper = new FirebaseFireStoreHelper();
     private MutableLiveData<List<Was>> wasList = new MutableLiveData<>();
     private MutableLiveData<GeoCoordinate> currentLocation = new MutableLiveData<>();
     private ClusterLayer existingClusterLayer;
@@ -41,8 +42,11 @@ public class WasRepository extends AppCompatActivity {
     private String uploadTime;
     private File uploadFile;
     private Was uploadWasWithNoUri;
-    private String userName = ("Ocul");
     private String uploadTitle;
+    private MapMarker markerSelected;
+    private String downloadUrl;
+    private Map map;
+    private ClusterLayer clusterLayer;
     private static long MAX_WAS_LENGTH = 35000;
 
     public static WasRepository getInstance() {
@@ -76,26 +80,44 @@ public class WasRepository extends AppCompatActivity {
     }
 
     //Regarding Was Object Upload / Download
-    public MutableLiveData<String> getDownloadUrl(){
-        return getFirebseStorageHelper().getDownloadUri();
-    }
-    public FirebseStorageHelper getFirebseStorageHelper() {
-        return firebseStorageHelper;
+
+
+    public MutableLiveData<eUploadingState> getUploadingState() {
+        return uploadingState;
     }
 
-    public FirebaseFireStoreHelper getFirebaseFireStoreHelper() {
-        return firebaseFireStoreHelper;
+    public void setUploadingState(MutableLiveData<eUploadingState> uploadingState) {
+        this.uploadingState = uploadingState;
     }
 
-    public void uploadFilesToFirebaseStorage(File file) {
-        firebseStorageHelper.uploadFilesToStorage(file);
+    public void setUpdateUploadingState(eUploadingState eUploadingState){
+        uploadingState.setValue(eUploadingState);
     }
 
-    public void addWasHashMapToFireStore(Was was) {
-        firebaseFireStoreHelper.addWasMapToFireStore(was);
+    public void postUpdateUploadingState(eUploadingState eUploadingState){
+        uploadingState.postValue(eUploadingState);
     }
+
+    public String getDownloadUrl() {
+        return downloadUrl;
+    }
+
+    public void setDownloadUrl(String downloadUrl) {
+        this.downloadUrl = downloadUrl;
+    }
+
 
     //Regarding Map Management
+
+
+    public Map getMap() {
+        return map;
+    }
+
+    public void setMap(Map map) {
+        this.map = map;
+    }
+
     public MutableLiveData<GeoCoordinate> getCurrentLocation() {
         return currentLocation;
     }
@@ -115,10 +137,6 @@ public class WasRepository extends AppCompatActivity {
     //Regarding Was Objects
     public MutableLiveData<List<Was>> getWasList() {
         return wasList;
-    }
-
-    public void continouslyUpdateWasObjects() {
-        firebaseFireStoreHelper.updateWasObjects();
     }
 
     public MutableLiveData<ClusterViewObject> getClusterViewObject() {
@@ -145,9 +163,20 @@ public class WasRepository extends AppCompatActivity {
         this.uploadFile = uploadFile;
     }
 
-    //Regarding User
-    public String getUserName() {
-        return userName;
+    public MapMarker getMarkerSelected() {
+        return markerSelected;
+    }
+
+    public void setMarkerSelected(MapMarker markerSelected) {
+        this.markerSelected = markerSelected;
+    }
+
+    public ClusterLayer getClusterLayer() {
+        return clusterLayer;
+    }
+
+    public void setClusterLayer(ClusterLayer clusterLayer) {
+        this.clusterLayer = clusterLayer;
     }
 
     //Uploading Was Objects:

@@ -1,11 +1,32 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">Was Here</string>
+
+    <string name="login_error_message">Failed to login.</string>
+    <string name="login_success_message">Login successful!</string>
+    <string name="register_error_message">Failed to create new account.</string>
+    <string name="register_success_message">Created a new account!</string>
+
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="login">Login</string>
+    <string name="sign_up">Create a New Account</string>
+    <string name="e_mail_hint">Please enter your e-mail</string>
+    <string name="password_hint">Please enter your password</string>
+    <string name="or">or</string>
+    <string name="google_account_login">Continue with your Google account</string>
+
+    <string name="create_new_account">create new account</string>
+    <string name="user_name_hint">Enter your user name</string>
+    <string name="create_password_hint">Please select a password</string>
+    <string name="again_password_hint">Please re-enter your password</string>
+
     <string name="update_marker_list">Update Markers</string>
     <string name="playSound">Play Sample Sound</string>
     <string name="recordSound">Record Something!</string>
     <string name="editTextWasTitle_hint">this one\'s called…</string>
     <string name="empty_title">no title…</string>
+    <string name="uploading">Uploading please wait…</string>
+    <string name="upload_successful">Upload successful!</string>
 
     <string name="file_directory_01">/storage/emulated/0/VoiceRecorder/my_sounds/tekerleme01.3gp</string>
     <string name="file_name_01">tekerleme01.3gp</string>
@@ -13,4 +34,5 @@
 
     <string name="audio_extension">mp3</string>
     <string name="audio_child">audio/</string>
+
 </resources>

@@ -2,14 +2,17 @@ package com.example.washere.Views.Dialogs.Record_WAS_Dialog;
 
 import android.animation.ValueAnimator;
 import android.app.Application;
+import android.os.Handler;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.washere.R;
 import com.example.washere.helpers.AudioHelper;
 import com.example.washere.helpers.WasUploadHelper;
-import com.example.washere.models.Was;
+import com.example.washere.models.eUploadingState;
 import com.example.washere.models.eWasUploadState;
 import com.example.washere.repositories.WasRepository;
 
@@ -29,11 +32,17 @@ public class RecordWasDialogViewModel extends AndroidViewModel {
     }
 
     MutableLiveData<eWasUploadState> getWasRecordingState() {
-        return WasRepository.getInstance().getWasRecordingState();
+        return wasRepository.getWasRecordingState();
     }
 
-    void updateWasRecordingState(eWasUploadState state) {
-        WasRepository.getInstance().setWasRecordingState(state);
+    void updateWasUploadState(eWasUploadState state) {
+        if (wasRepository.getWasRecordingState().getValue()!=state){
+           wasRepository.setWasRecordingState(state);
+        }
+    }
+
+    public MutableLiveData<eUploadingState> getUploadingState(){
+        return wasRepository.getUploadingState();
     }
 
     //Preparing and Uploading Was Items:
@@ -49,7 +58,7 @@ public class RecordWasDialogViewModel extends AndroidViewModel {
 
     //Call the setUploadLocation method after recordAudio to determine the upload location
     private void setUploadLocation() {
-        wasRepository.setUploadLocation(WasRepository.getInstance().getCurrentLocation().getValue());
+        wasRepository.setUploadLocation(wasRepository.getCurrentLocation().getValue());
     }
 
     //Set Upload Date and Time after recordAudio to determine upload Date and Time
@@ -71,9 +80,9 @@ public class RecordWasDialogViewModel extends AndroidViewModel {
         wasRepository.setUploadTitle(title);
     }
     //Finish recording after animation stop
-    void chgangeStateAfterAnimationEnd() {
+    void changeStateAfterAnimationEnd() {
         if (WasRepository.getInstance().getWasRecordingState().getValue() != eWasUploadState.FINISHED_RECORDING) {
-            updateWasRecordingState(eWasUploadState.FINISHED_RECORDING);
+            updateWasUploadState(eWasUploadState.FINISHED_RECORDING);
         }
     }
 
@@ -90,7 +99,6 @@ public class RecordWasDialogViewModel extends AndroidViewModel {
     //Ready To Play State:
     void playAudio() {
         audioHelper.startPlayingForPreview();
-        updateWasRecordingState(eWasUploadState.PLAYING);
     }
 
     //Revert
@@ -102,24 +110,25 @@ public class RecordWasDialogViewModel extends AndroidViewModel {
     //Exit
     public void exit() {
         audioHelper.stopMediaPlayer();
-        updateWasRecordingState(eWasUploadState.CANCELED_ACTION_OR_UPLOAD_COMPLETE);
     }
 
     //Creating a Was Object and Uploading it To Firebase
-    void createWas() {
+    void uploadWas() {
         wasUploadHelper.createWasWithNoUri();
-        wasUploadHelper.uploadWasToFireBase(wasRepository.getUploadFile());
+        wasUploadHelper.uploadFileToStorage(wasRepository.getUploadFile());
     }
 
-    //Retrieving Download Link
-    MutableLiveData<String> getDownloadUrl() {
-        return wasRepository.getDownloadUrl();
+    public void showUploadSuccessful(final TextView textView){
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run(){
+                textView.setText(R.string.upload_successful);
+            }
+        };
+
+        Handler handler = new Handler();
+        handler.postDelayed(runnable, 2000);
+
     }
 
-    //Add Was HashMap To FireStore
-    void addWasHashMapToFireStore(String url) {
-        Was wasToUpload = wasRepository.getUploadWasWithNoUri();
-        wasToUpload.setDownloadUrl(url); //Embed the download link of the recording to the was item
-        wasRepository.addWasHashMapToFireStore(wasToUpload); //Store the properties of the was object as a hashmap in the Firestore
-    }
 }

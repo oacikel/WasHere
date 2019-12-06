@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.washere.models.Was;
+import com.example.washere.models.eWasUploadState;
 import com.example.washere.repositories.WasRepository;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -26,6 +27,7 @@ public class FirebaseFireStoreHelper {
     private Map<String, Object> wasObject = new HashMap<>();
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
     private CollectionReference collectionReference;
+    private WasRepository wasRepository=WasRepository.getInstance();
 
     public void updateWasObjects(){
 
@@ -65,11 +67,14 @@ public class FirebaseFireStoreHelper {
             @Override
             public void onSuccess(DocumentReference documentReference) {
                 Log.i("Ocul", "Was Item successfully uploaded to Firestore with ID:" + documentReference.getId());
+                wasRepository.getWasRecordingState().postValue(eWasUploadState.UPLOAD_SUCCESSFUL);
+
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Log.e("Ocul", "Error uploading to Firesote: " + e.getMessage());
+                Log.e("Ocul", "Error uploading to Firesore: " + e.getMessage());
+                wasRepository.getWasRecordingState().postValue(eWasUploadState.UPLOAD_ERROR);
             }
         });
     }

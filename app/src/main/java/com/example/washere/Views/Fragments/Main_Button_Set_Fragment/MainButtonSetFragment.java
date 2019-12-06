@@ -1,22 +1,30 @@
 package com.example.washere.Views.Fragments.Main_Button_Set_Fragment;
+
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+
 import android.content.Context;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.RelativeLayout;
+
 import com.example.washere.R;
 
 public class MainButtonSetFragment extends Fragment implements View.OnClickListener {
 
     private Button buttonRecordAudio;
     private MainButtonSetFragmentViewModel mainButtonSetFragmentViewModel;
+
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -36,7 +44,7 @@ public class MainButtonSetFragment extends Fragment implements View.OnClickListe
         mainButtonSetFragmentViewModel = ViewModelProviders.of(this).get(MainButtonSetFragmentViewModel.class);
         mainButtonSetFragmentViewModel.init();
         //UI Items
-        buttonRecordAudio.setVisibility(View.INVISIBLE);
+        buttonRecordAudio.setVisibility(View.GONE);
 
         //Observers
 
@@ -48,7 +56,7 @@ public class MainButtonSetFragment extends Fragment implements View.OnClickListe
                     if (state == 1) {
                         buttonRecordAudio.setVisibility(View.VISIBLE);
                     } else if (state == 2) {
-                        buttonRecordAudio.setVisibility(View.INVISIBLE);
+                        buttonRecordAudio.setVisibility(View.GONE);
                     }
                 }
             }
@@ -71,6 +79,7 @@ public class MainButtonSetFragment extends Fragment implements View.OnClickListe
     private void setOnClickListeners() {
         buttonRecordAudio.setOnClickListener(this);
     }
+
     @Override
     public void onClick(View view) {
         if (view == buttonRecordAudio) {

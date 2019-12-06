@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.example.washere.models.Was;
 import com.example.washere.models.eWasUploadState;
+import com.example.washere.repositories.UserRepository;
 import com.example.washere.repositories.WasRepository;
 
 import java.io.File;
@@ -19,19 +20,22 @@ public class AudioHelper {
 
     private String fileName = null;
     private String filePath = null;
-    private static String DEFAULT_FILE_NAME=("was_recording");
+    private static String DEFAULT_FILE_NAME = ("was_recording");
     private WasRepository wasRepository;
-    private Application application;
     private File uploadFile;
+    private MediaPlayer mediaPlayer;
+    private MediaRecorder mediaRecorder;
+    private UserRepository userRepository=UserRepository.getInstance();
+
 
     public AudioHelper() {
-        wasRepository=WasRepository.getInstance();
+        wasRepository = WasRepository.getInstance();
     }
 
     //Audio Record Part
     public void prepareRecorder() {
         setFileNameAndPath();
-        MediaRecorder mediaRecorder = new MediaRecorder();
+        mediaRecorder = new MediaRecorder();
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
         mediaRecorder.setOutputFile(filePath);
@@ -39,8 +43,8 @@ public class AudioHelper {
         mediaRecorder.setAudioChannels(1);
         try {
             mediaRecorder.prepare();
-            WasRepository.getInstance().setMediaRecorder(mediaRecorder);
-            WasRepository.getInstance().getWasRecordingState().setValue(eWasUploadState.READY_TO_RECORD);
+            wasRepository.setMediaRecorder(mediaRecorder);
+            wasRepository.getWasRecordingState().setValue(eWasUploadState.READY_TO_RECORD);
         } catch (IOException e) {
             Log.e(LOG_TAG, "Mediarecorder couldn't be prepared: " + e.getMessage());
         }
@@ -59,15 +63,12 @@ public class AudioHelper {
         return uploadFile;
     }
 
-    private void setUploadFile(File uploadFile) {
-        this.uploadFile = uploadFile;
-    }
 
     private void setFileNameAndPath() {
 
         do {
-            fileName =DEFAULT_FILE_NAME
-                    + "_" + (wasRepository.getUserName() + "_" + wasRepository.getTimeStamp()) + ".mp3";
+            fileName = DEFAULT_FILE_NAME
+                    + "_" + (userRepository.getCurrentUser().getUserName() + "_" + wasRepository.getTimeStamp()) + ".mp3";
             filePath = Environment.getExternalStorageDirectory().getAbsolutePath();
             filePath += "/WasHere/" + fileName;
             uploadFile = new File(filePath);
@@ -79,27 +80,31 @@ public class AudioHelper {
             System.out.println("OCUL - Error in file creation: " + e.getMessage());
         }
         wasRepository.setUploadFilePath(filePath);
-        wasRepository.setUploadFile(new File(filePath));
+        wasRepository.setUploadFile(uploadFile);
+
 
 
     }
 
     public void startRecording() {
-        WasRepository.getInstance().getMediaRecorder().start();
+        if(wasRepository.getMediaRecorder()==null){
+            prepareRecorder();
+        }
+        wasRepository.getMediaRecorder().start();
     }
 
     public void stopRecording() {
-        MediaRecorder mediaRecorder = wasRepository.getMediaRecorder();
-        //wasRepository.setUploadFile(getUploadFile());
+        Log.d(LOG_TAG, "Stopping recording");
+        mediaRecorder = wasRepository.getMediaRecorder();
+        Log.d(LOG_TAG,"The uploaded file name is: "+wasRepository.getUploadFile().getName()+
+                            "\n The uploaded file exists (True/False): "+wasRepository.getUploadFile().exists()+
+                            "\n The uploaded file length is: "+wasRepository.getUploadFile().length());
         mediaRecorder.stop();
         mediaRecorder.release();
         wasRepository.setMediaRecorder(null);
-
     }
 
     public void preparePlayerForPreview() {
-        MediaPlayer mediaPlayer;
-        WasRepository wasRepository = WasRepository.getInstance();
         mediaPlayer = new MediaPlayer();
         WasRepository.getInstance().setMediaPlayer(mediaPlayer);
         try {
@@ -111,7 +116,7 @@ public class AudioHelper {
             mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
-                    WasRepository.getInstance().getWasRecordingState().setValue(eWasUploadState.READY_TO_PLAY);
+                    wasRepository.getWasRecordingState().setValue(eWasUploadState.READY_TO_PLAY);
                 }
             });
         } catch (Exception e) {
@@ -120,8 +125,6 @@ public class AudioHelper {
     }
 
     public void preparePlayerForSelectedWas(Was was) {
-        MediaPlayer mediaPlayer;
-        WasRepository wasRepository = WasRepository.getInstance();
         if (wasRepository.getMediaPlayer() == null) {
             mediaPlayer = new MediaPlayer();
             wasRepository.setMediaPlayer(mediaPlayer);
@@ -133,23 +136,26 @@ public class AudioHelper {
 
             mediaPlayer.setDataSource(was.getDownloadUrl());
             mediaPlayer.prepare();
+            Log.i(LOG_TAG,"Prepared media player successfully");
         } catch (Exception e) {
             Log.e(LOG_TAG, "Failed to prepare the Media Player for Was Object: " + e.getMessage());
         }
     }
 
     public void startPlayingForPreview() {
-        final MediaPlayer mediaPlayer;
+
         if (WasRepository.getInstance().getMediaPlayer() != null) {
             mediaPlayer = WasRepository.getInstance().getMediaPlayer();
-            mediaPlayer.stop();
-            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    stopMediaPlayer();
-                    preparePlayerForPreview();
-                }
-            });
+            if (mediaPlayer.isPlaying()) {
+                mediaPlayer.stop();
+                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mp) {
+                        stopMediaPlayer();
+                        preparePlayerForPreview();
+                    }
+                });
+            }
             mediaPlayer.start();
 
 
@@ -159,12 +165,10 @@ public class AudioHelper {
     }
 
     public void startPlayingWasObject() {
-        final MediaPlayer mediaPlayer;
-        if (WasRepository.getInstance().getMediaPlayer() != null) {
-            mediaPlayer = WasRepository.getInstance().getMediaPlayer();
+        if (wasRepository.getMediaPlayer() != null) {
+            mediaPlayer = wasRepository.getMediaPlayer();
             mediaPlayer.start();
-
-
+            Log.i(LOG_TAG,"Playing was item:");
         } else {
             Log.e(LOG_TAG, "Media Player does not exist in repository");
         }

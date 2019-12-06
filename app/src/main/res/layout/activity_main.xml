@@ -45,11 +45,10 @@
         android:id="@+id/buttonCloseList"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:layout_marginEnd="8dp"
         android:background="@android:color/transparent"
         android:src="@android:drawable/ic_menu_close_clear_cancel"
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/recyclerViewWasCard"
-        app:layout_constraintEnd_toEndOf="@+id/recyclerViewWasCard" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

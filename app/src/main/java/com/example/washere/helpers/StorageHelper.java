@@ -8,6 +8,8 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.washere.models.Was;
+import com.example.washere.models.eUploadingState;
+import com.example.washere.repositories.WasRepository;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FileDownloadTask;
@@ -19,36 +21,26 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-public class FirebseStorageHelper {
+public class StorageHelper {
+    private static String LOG_TAG = "OCUL_StorageHelper";
     private StorageReference storageReference = FirebaseStorage.getInstance().getReference();
-    private FirebaseStorage storage=FirebaseStorage.getInstance();
+    private FirebaseStorage storage = FirebaseStorage.getInstance();
     private StorageReference audioReference;
     private Uri uri;
     private MutableLiveData<Boolean> isUploaded = new MutableLiveData<>();
-    private MutableLiveData<String> downloadUri = new MutableLiveData<>();
+    private String downloadUri;
     private String uploadTime;
     private String uploadDate;
-
+    private WasRepository wasRepository= WasRepository.getInstance();
+    private FirebaseFireStoreHelper firebaseFireStoreHelper=new FirebaseFireStoreHelper();
     private static String audioExtention = ("mp3");
     private static String audioChild = ("audio/");
 
 
-    public FirebseStorageHelper() {
+    public StorageHelper() {
 
     }
 
-
-    public MutableLiveData<Boolean> isUploaded() {
-        return isUploaded;
-    }
-
-    public MutableLiveData<String> getDownloadUri() {
-        return downloadUri;
-    }
-
-    public void setDownloadUri(MutableLiveData<String> downloadUri) {
-        this.downloadUri = downloadUri;
-    }
 
     //Send data to the database
     public void uploadFilesToStorage(File file) {
@@ -57,22 +49,22 @@ public class FirebseStorageHelper {
         audioReference.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                System.out.println("File uploaded!");
+                Log.i(LOG_TAG, "File uploaded to STORAGE");
                 audioReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {
-                        String downloaURL=uri.toString();
-                        System.out.println("Download id is: "+downloaURL);
-                        downloadUri.postValue(downloaURL);
+                        wasRepository.setDownloadUrl(uri.toString());
+                        wasRepository.postUpdateUploadingState(eUploadingState.STORAGE_UPLOAD_COMPLETE);
+                        addWasHashMapToFireStore(downloadUri);
                     }
                 });
-
             }
 
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Log.e("Ocul", "Error Uploading file: " + e.getMessage());
+                wasRepository.postUpdateUploadingState(eUploadingState.ERROR);
+                Log.e(LOG_TAG, "Error Uploading file: " + e.getMessage());
 
             }
         });
@@ -81,15 +73,15 @@ public class FirebseStorageHelper {
     //Retrieve data from the database
     public void addAudioFileToWasObject(final List<Was> wasList) {
         File localFile = null;
-        Log.d("OCUL - Storage Helper: ","WasList without audio file size is: "+wasList.size());
+        Log.d(LOG_TAG, "WasList without audio file size is: " + wasList.size());
         try {
             localFile = File.createTempFile(audioChild, audioExtention);
 
         } catch (IOException e) {
             e.printStackTrace();
-            Log.e("OCUL - Storage Helper: ", "Error creating file: " + e.getMessage() + "\nAudio will not be downloaded from storage");
+            Log.e(LOG_TAG, "Error creating file: " + e.getMessage() + "\nAudio will not be downloaded from storage");
         }
-        for (int i =0; i<wasList.size();i++) {
+        for (int i = 0; i < wasList.size(); i++) {
             System.out.println(wasList.get(i).getDownloadUrl());
             audioReference = storage.getReferenceFromUrl(wasList.get(i).getDownloadUrl());
             if (localFile != null) {
@@ -98,18 +90,24 @@ public class FirebseStorageHelper {
                 audioReference.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                        Log.i("OCUL", "File downloaded successfully. Location:");
+                        Log.i(LOG_TAG, "File downloaded successfully. Location:");
                         wasList.get(finalI).setAudioFile(finalLocalFile);
 
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception exception) {
-                        Log.e("OCUL", "Error downloading file: " + exception.getMessage());
+                        Log.e(LOG_TAG, "Error downloading file: " + exception.getMessage());
                     }
                 });
             }
         }
+    }
+
+    void addWasHashMapToFireStore(String url) {
+        Was wasToUpload = wasRepository.getUploadWasWithNoUri();
+        wasToUpload.setDownloadUrl(url); //Embed the download link of the recording to the was item
+        firebaseFireStoreHelper.addWasMapToFireStore(wasToUpload);
     }
 
 

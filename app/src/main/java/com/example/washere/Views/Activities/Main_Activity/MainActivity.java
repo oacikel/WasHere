@@ -24,7 +24,7 @@ import com.example.washere.adapters.WasCardAdapter;
 import com.example.washere.helpers.PermissionHelper;
 import com.example.washere.models.Was;
 import com.example.washere.models.eWasUploadState;
-import com.google.protobuf.StringValue;
+import com.example.washere.repositories.WasRepository;
 import com.here.android.mpa.cluster.ClusterViewObject;
 import com.here.android.mpa.common.GeoCoordinate;
 import com.here.android.mpa.common.OnEngineInitListener;
@@ -43,7 +43,7 @@ import static com.example.washere.helpers.PermissionHelper.getRequestCodeAskPerm
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, WasCardAdapter.OnMarkerListener {
 
-    private static String LOG_TAG=("OCUL- MainActivity");
+    private static String LOG_TAG = ("OCUL- MainActivity");
     SupportMapFragment supportMapFragment;
     Map map;
     MainActivityViewModel mainActivityViewModel;
@@ -79,10 +79,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mainActivityViewModel.getCurrentLocation().observe(this, new Observer<GeoCoordinate>() {
             @Override
             public void onChanged(@Nullable GeoCoordinate geoCoordinate) {
+                if(geoCoordinate!=null){
+                    map=WasRepository.getInstance().getMap();
+                    map.setCenter(geoCoordinate, Map.Animation.LINEAR);
+                    Log.i(LOG_TAG, "Changed Current position is: " + geoCoordinate.getLatitude() + "lat " +
+                            geoCoordinate.getLongitude() + " lng.");
+                }
+                else{
+                    Log.w(LOG_TAG, "Position is null");
+                }
 
-                map.setCenter(geoCoordinate, Map.Animation.LINEAR);
-                Log.i(LOG_TAG, "Changed Current position is: " + geoCoordinate.getLatitude() + "lat " +
-                        geoCoordinate.getLongitude() + " lng.");
             }
         });
 
@@ -91,20 +97,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onChanged(eWasUploadState state) {
                 if (state != null) {
-                    Log.i(LOG_TAG, "Upload State is: "+state.toString());
+                    Log.i(LOG_TAG, "Upload State is: " + state.toString());
                     if (state == eWasUploadState.READY_TO_RECORD) {
-                        if (!mainActivityViewModel.isDialogOn()){
+                        if (!mainActivityViewModel.isDialogOn()) {
                             Log.i(LOG_TAG, "Starting dialog fragment");
                             fragmentTransaction = getSupportFragmentManager().beginTransaction();
                             previousFragment = getSupportFragmentManager().findFragmentByTag("WAS_DIALOG");
-                            mainActivityViewModel.initWasUploadDialog(fragmentTransaction,previousFragment);
-                        }
-                        else{
+                            mainActivityViewModel.initWasUploadDialog(fragmentTransaction, previousFragment);
+                        } else {
                             Log.i(LOG_TAG, "Record Dialog already visible");
                         }
-                    }
-                    else if (state==eWasUploadState.CANCELED_ACTION_OR_UPLOAD_COMPLETE){
-                       mainActivityViewModel.dismissWasUploadDialog();
+                    } else if (state == eWasUploadState.UPLOAD_CANCELED) {
+                        mainActivityViewModel.dismissWasUploadDialog();
                     }
                 }
             }
@@ -178,7 +182,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onEngineInitializationCompleted(Error error) {
                         if (error == Error.NONE) {
-                            map = supportMapFragment.getMap();
+                            WasRepository.getInstance().setMap(supportMapFragment.getMap());
+                            map=WasRepository.getInstance().getMap();
                             mainActivityViewModel.init();
                             mainActivityViewModel.onMapEngineInitialized();
                             supportMapFragment.getPositionIndicator().setVisible(true);
@@ -208,12 +213,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 @Override
                                 public boolean onMapObjectsSelected(List<ViewObject> list) {
                                     //TODO Shitty solutions to shitty problems... Map sees multiple clusters objects stacked. Fix it correctly
-                                    boolean isClusterObject=false;
+                                    boolean isClusterObject = false;
                                     for (ViewObject viewObject : list) {
-                                       // Log.i(LOG_TAG,"Clicked object base type is: "+viewObject.getBaseType().toString());
+                                        // Log.i(LOG_TAG,"Clicked object base type is: "+viewObject.getBaseType().toString());
                                         if (viewObject.getBaseType() == ViewObject.Type.PROXY_OBJECT) {
-                                            isClusterObject=true;
-                                            Log.i(LOG_TAG,"PROXY OBJECT: Clicked object base type is: "+viewObject.getBaseType().toString());
+                                            isClusterObject = true;
+                                            Log.i(LOG_TAG, "PROXY OBJECT: Clicked object base type is: " + viewObject.getBaseType().toString());
                                             MapProxyObject proxyObject = (MapProxyObject) viewObject;
 
                                             if (proxyObject.getType() == MapProxyObject.Type.CLUSTER_MARKER) {
@@ -223,11 +228,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             }
 
                                         } else if (viewObject.getBaseType() == ViewObject.Type.USER_OBJECT && !isClusterObject) {
-                                            Log.i(LOG_TAG,"USER OBJECT: Clicked object base type is: "+viewObject.getBaseType().toString());
+                                            Log.i(LOG_TAG, "USER OBJECT: Clicked object base type is: " + viewObject.getBaseType().toString());
                                             MapObject mapObject = (MapObject) viewObject;
                                             if (mapObject.getType() == MapObject.Type.MARKER) {
-                                                mainActivityViewModel.playAudio(mainActivityViewModel.getWasList().getValue(), (MapMarker) mapObject);
-
+                                                mainActivityViewModel.setSelectedMarker((MapMarker) mapObject);
+                                                mainActivityViewModel.setWasObjectFromSelectedMapMarker();
+                                                //mainActivityViewModel.playAudio(mainActivityViewModel.getWasList().getValue(), (MapMarker) mapObject);
                                                 return false;
                                             }
                                         }
@@ -319,7 +325,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void placeMarkersOnMap() {
         //TODO: Bu kısım daha iyi handle edilmeli. Her refreshte markerlar silinip tekrardan eklenmemeli...
-        Log.i(LOG_TAG,"Marker Clusters are being added to map");
+        Log.i(LOG_TAG, "Marker Clusters are being added to map");
         if (map != null) {
             if (mainActivityViewModel.getExistingClusterLayer() != null) {
                 map.removeClusterLayer(mainActivityViewModel.getExistingClusterLayer());
@@ -327,11 +333,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mainActivityViewModel.updateMarkerList();
             map.addClusterLayer(mainActivityViewModel.getExistingClusterLayer());
         }
-        Log.d(LOG_TAG,"Currently the layers on the map are: "+map.getVisibleLayers().toString());
     }
 
     @Override
     public void onWasCardClick(int position) {
+        Log.d(LOG_TAG,"Clicked on was card number"+ position);
         Was wasSelected = mapMarkersInCluster.get(position);
         mainActivityViewModel.playAudio(wasSelected);
     }

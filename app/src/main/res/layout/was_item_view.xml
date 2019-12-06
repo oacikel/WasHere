@@ -53,7 +53,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:fontFamily="@font/montserrat"
-            android:text="OcuL"
+            android:text="userName"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
             app:layout_constraintStart_toEndOf="@+id/imageViewUserAvatar"
