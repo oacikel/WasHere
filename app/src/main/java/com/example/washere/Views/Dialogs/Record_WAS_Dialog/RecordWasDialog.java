@@ -63,19 +63,21 @@ public class RecordWasDialog extends DialogFragment implements View.OnClickListe
                         recordWasDialogViewModel.setUploadTitle(editTextWasTitle.getText().toString());
                     }
                     textViewUploadingOrUploaded.setText(R.string.uploading);
-                    recordWasDialogViewModel.uploadWas();
                     constraintLayoutRecord.setVisibility(View.INVISIBLE);
                     relativeLayoutUploading.setVisibility(View.VISIBLE);
+                    recordWasDialogViewModel.uploadWasToStorage();
 
                 } else if(state==eUploadingState.STORAGE_UPLOAD_COMPLETE){
                     Log.i(LOG_TAG,"Upload to storeage complete");
-
+                    recordWasDialogViewModel.updateUploadingState(eUploadingState.UPLOADING_TO_DATABASE);
                 }else if(state==eUploadingState.UPLOADING_TO_DATABASE){
                     Log.i(LOG_TAG,"Uploading to database");
+                    recordWasDialogViewModel.uploadWasToDatabase();
 
                 }else if (state==eUploadingState.DATABASE_UPLOAD_COMPLETE){
                     Log.i(LOG_TAG,"Storage upload complete.");
-
+                    showUploadSuccessful();
+                    dismiss();
                 }else if(state==eUploadingState.ERROR){
                     Log.i(LOG_TAG,"Error uploading");
 
@@ -134,14 +136,7 @@ public class RecordWasDialog extends DialogFragment implements View.OnClickListe
                         imageButtonControlRecording.setImageResource(R.drawable.icon_play);
                         imageButtonSend.setVisibility(View.VISIBLE);
 
-                    } else if (state == eWasUploadState.UPLOADING) {
-
-                    } else if (state == eWasUploadState.UPLOAD_SUCCESSFUL) {
-                        Log.d(LOG_TAG,"This log is to check runnable execution time 01");
-                        showUploadSuccessful();
-                        Log.d(LOG_TAG,"This log is to check runnable execution time 02");
-                        dismiss();
-                    } else if (state == eWasUploadState.UPLOAD_CANCELED) {
+                    }  else if (state == eWasUploadState.UPLOAD_CANCELED) {
                         recordWasDialogViewModel.exit();
                         dismiss();
                     }
@@ -182,7 +177,7 @@ public class RecordWasDialog extends DialogFragment implements View.OnClickListe
         } else if (view == imageButtonDiscardRecording) {
             recordWasDialogViewModel.updateWasUploadState(eWasUploadState.UPLOAD_CANCELED);
         } else if (view == imageButtonSend) {
-            recordWasDialogViewModel.updateWasUploadState(eWasUploadState.UPLOADING);
+            recordWasDialogViewModel.updateUploadingState(eUploadingState.UPLOADING_TO_DATABASE);
         }
 
     }

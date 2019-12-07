@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.washere.models.Was;
+import com.example.washere.models.eUploadingState;
 import com.example.washere.models.eWasUploadState;
 import com.example.washere.repositories.WasRepository;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -23,7 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FirebaseFireStoreHelper {
+public class DatabaseHelper {
+    private static String LOG_TAG ="OCUL";
     private Map<String, Object> wasObject = new HashMap<>();
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
     private CollectionReference collectionReference;
@@ -51,32 +53,39 @@ public class FirebaseFireStoreHelper {
     }
 
     //Take a Was Map And Send It To The Firestore
-    public void addWasMapToFireStore(Was was) {
-        wasObject.put("downloadURL", was.getDownloadUrl());
-        wasObject.put("locationLatitude", was.getLocationLatitude());
-        wasObject.put("locationLongitude", was.getLocationLongitude());
-        wasObject.put("locationAltitude", was.getLocationAltitude());
-        wasObject.put("markerDirectory", was.getMarkerDirectory());
-        wasObject.put("uploaderName", was.getUploaderName());
-        wasObject.put("uploadDate", was.getUploadDate());
-        wasObject.put("uploadTime", was.getUploadTime());
-        wasObject.put("uploadTitle",was.getUploadTitle());
+    public void addWasToDatabase(Was was) {
+        if (was.getDownloadUrl()!=null){
+            wasObject.put("downloadURL", was.getDownloadUrl());
+            wasObject.put("locationLatitude", was.getLocationLatitude());
+            wasObject.put("locationLongitude", was.getLocationLongitude());
+            wasObject.put("locationAltitude", was.getLocationAltitude());
+            wasObject.put("markerDirectory", was.getMarkerDirectory());
+            wasObject.put("uploaderName", was.getUploaderName());
+            wasObject.put("uploadDate", was.getUploadDate());
+            wasObject.put("uploadTime", was.getUploadTime());
+            wasObject.put("uploadTitle",was.getUploadTitle());
 
-        collectionReference=firebaseFirestore.collection("wasItems");
-        collectionReference.add(wasObject).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-            @Override
-            public void onSuccess(DocumentReference documentReference) {
-                Log.i("Ocul", "Was Item successfully uploaded to Firestore with ID:" + documentReference.getId());
-                wasRepository.getWasRecordingState().postValue(eWasUploadState.UPLOAD_SUCCESSFUL);
+            collectionReference=firebaseFirestore.collection("wasItems");
+            collectionReference.add(wasObject).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                @Override
+                public void onSuccess(DocumentReference documentReference) {
+                    Log.i(LOG_TAG, "Was Item successfully uploaded to Database." + documentReference.getId());
+                    wasRepository.getWasRecordingState().postValue(eWasUploadState.UPLOAD_SUCCESSFUL);
+                    wasRepository.postUpdateUploadingState(eUploadingState.DATABASE_UPLOAD_COMPLETE);
 
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.e("Ocul", "Error uploading to Firesore: " + e.getMessage());
-                wasRepository.getWasRecordingState().postValue(eWasUploadState.UPLOAD_ERROR);
-            }
-        });
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.e(LOG_TAG, "Error uploading to database: " + e.getMessage());
+                    wasRepository.getWasRecordingState().postValue(eWasUploadState.UPLOAD_ERROR);
+                    wasRepository.postUpdateUploadingState(eUploadingState.ERROR);
+                }
+            });
+        } else{
+            Log.e(LOG_TAG,"Download URL is not set for Was");
+            wasRepository.postUpdateUploadingState(eUploadingState.ERROR);
+        }
     }
     //Create a Was Object Array From Was Hash Map
     public ArrayList<Was> createWasArrayFromHashMap(ArrayList<Map> wasMapList) {

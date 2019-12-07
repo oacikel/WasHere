@@ -26,7 +26,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.washere.R;
 import com.example.washere.Views.Dialogs.Record_WAS_Dialog.RecordWasDialog;
 import com.example.washere.helpers.AudioHelper;
-import com.example.washere.helpers.FirebaseFireStoreHelper;
+import com.example.washere.helpers.DatabaseHelper;
 import com.example.washere.models.Was;
 import com.example.washere.models.eWasUploadState;
 import com.example.washere.repositories.WasRepository;
@@ -58,7 +58,7 @@ public class MainActivityViewModel extends AndroidViewModel {
     private ClusterLayer clusterLayer;
     private Collection<MapMarker> mapMarkers;
     private RecordWasDialog recordWasDialog;
-    private FirebaseFireStoreHelper firebaseFireStoreHelper =new FirebaseFireStoreHelper();
+    private DatabaseHelper databaseHelper =new DatabaseHelper();
 
     public void setUpdating(boolean updating) {
         isUpdating = updating;
@@ -194,7 +194,7 @@ public class MainActivityViewModel extends AndroidViewModel {
 
     public void init() {
         wasRepository = WasRepository.getInstance();
-        firebaseFireStoreHelper.updateWasObjects();
+        databaseHelper.updateWasObjects();
         audioHelper = new AudioHelper();
         getClusterViewObject();
     }

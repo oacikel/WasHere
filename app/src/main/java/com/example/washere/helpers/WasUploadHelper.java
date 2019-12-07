@@ -14,11 +14,12 @@ public class WasUploadHelper {
     private String LOG_TAG = ("OCUL - WasUploadHelper");
     private WasRepository wasRepository=WasRepository.getInstance();
     private StorageHelper storageHelper =new StorageHelper();
+    private DatabaseHelper databaseHelper=new DatabaseHelper();
     private UserRepository userRepository=UserRepository.getInstance();
 
-    public void createWasWithNoUri() {
-        Was uploadWasWithNoUri;
-
+    public void createWasToUpload() {
+        Was wasToUpload;
+        // TODO: 2019-12-06 Was'ın parametrelerini ayrı ayrı tutmaktansa yeni parametre yaratıldıkça repositorydeki sabit bir was'a eklenmeli. (Tarih belli olduğunda was.setDate(---) gibi...
         if (wasRepository.getUploadLocation() != null && wasRepository.getUploadTime() != null && wasRepository.getUploadDate() != null && wasRepository.getUploadTitle() != null && wasRepository.getUploadFile() != null) {
             GeoCoordinate uploadLocation = wasRepository.getUploadLocation();
             String uploaderName = userRepository.getCurrentUser().getUserName();
@@ -26,24 +27,26 @@ public class WasUploadHelper {
             String uploadDate = wasRepository.getUploadDate();
             String uploadTitle = wasRepository.getUploadTitle();
             File uploadFile = wasRepository.getUploadFile();
-            uploadWasWithNoUri = new Was(uploadLocation.getLatitude(), uploadLocation.getLongitude(), uploadLocation.getAltitude(), uploadTitle, uploaderName, uploadTime, uploadDate, uploadFile);
-            wasRepository.setUploadWasWithNoUri(uploadWasWithNoUri);
+            wasToUpload = new Was(uploadLocation.getLatitude(), uploadLocation.getLongitude(), uploadLocation.getAltitude(), uploadTitle, uploaderName, uploadTime, uploadDate, uploadFile);
+            wasRepository.setWasToUpload(wasToUpload);
             Log.i(LOG_TAG, "A Was Object to upload is added to Repository.");
         } else {
             Log.e(LOG_TAG, "One or more of Was Constructor values is null");
         }
     }
-    public void uploadFileToStorage(File file) {
+    public void uploadFileToStorage(Was was) {
+        File file=was.getAudioFile();
         if (file != null) {
-            storageHelper.uploadFilesToStorage(file);
+            storageHelper.uploadFilesToStorage(was);
         } else {
             Log.e(LOG_TAG, "File is null");
         }
 
     }
 
-    public void uploadWasToDatabase(Was was){
 
+    public void uploadWasToDatabase(Was was){
+        databaseHelper.addWasToDatabase(was);
     }
 }
 

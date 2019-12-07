@@ -21,8 +21,10 @@ public class Was {
     private String uploadDate;
     private String uploadTitle;
 
+    public Was() {
+    }
 
-    public Was(double locationLatitude, double locationLongitude, double locationAltitude, String uploadTitle, String uploaderName, String uploadTime, String uploadDate,File audioFile) {
+    public Was(double locationLatitude, double locationLongitude, double locationAltitude, String uploadTitle, String uploaderName, String uploadTime, String uploadDate, File audioFile) {
         this.locationLatitude = locationLatitude;
         this.locationLongitude = locationLongitude;
         this.locationAltitude = locationAltitude;

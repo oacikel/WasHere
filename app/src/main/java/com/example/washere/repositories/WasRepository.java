@@ -6,7 +6,6 @@ import android.media.MediaRecorder;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.washere.helpers.FirebaseFireStoreHelper;
 import com.example.washere.models.Was;
 import com.example.washere.models.eUploadingState;
 import com.example.washere.models.eWasUploadState;
@@ -41,7 +40,7 @@ public class WasRepository extends AppCompatActivity {
     private String uploadDate;
     private String uploadTime;
     private File uploadFile;
-    private Was uploadWasWithNoUri;
+    private Was wasToUpload;
     private String uploadTitle;
     private MapMarker markerSelected;
     private String downloadUrl;
@@ -147,12 +146,12 @@ public class WasRepository extends AppCompatActivity {
         return MAX_WAS_LENGTH;
     }
 
-    public Was getUploadWasWithNoUri() {
-        return uploadWasWithNoUri;
+    public Was getWasToUpload() {
+        return wasToUpload;
     }
 
-    public void setUploadWasWithNoUri(Was uploadWasWithNoUri) {
-        this.uploadWasWithNoUri = uploadWasWithNoUri;
+    public void setWasToUpload(Was wasToUpload) {
+        this.wasToUpload = wasToUpload;
     }
 
     public File getUploadFile() {

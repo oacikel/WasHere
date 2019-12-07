@@ -1,6 +1,5 @@
 package com.example.washere.helpers;
 
-import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 
@@ -32,7 +31,7 @@ public class StorageHelper {
     private String uploadTime;
     private String uploadDate;
     private WasRepository wasRepository= WasRepository.getInstance();
-    private FirebaseFireStoreHelper firebaseFireStoreHelper=new FirebaseFireStoreHelper();
+    private DatabaseHelper databaseHelper =new DatabaseHelper();
     private static String audioExtention = ("mp3");
     private static String audioChild = ("audio/");
 
@@ -43,7 +42,8 @@ public class StorageHelper {
 
 
     //Send data to the database
-    public void uploadFilesToStorage(File file) {
+    public void uploadFilesToStorage(Was was) {
+        File file=was.getAudioFile();
         uri = Uri.fromFile(file);
         audioReference = storageReference.child(audioChild + file.getName());
         audioReference.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -53,9 +53,8 @@ public class StorageHelper {
                 audioReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {
-                        wasRepository.setDownloadUrl(uri.toString());
+                        wasRepository.getWasToUpload().setDownloadUrl(uri.toString());
                         wasRepository.postUpdateUploadingState(eUploadingState.STORAGE_UPLOAD_COMPLETE);
-                        addWasHashMapToFireStore(downloadUri);
                     }
                 });
             }
@@ -103,12 +102,4 @@ public class StorageHelper {
             }
         }
     }
-
-    void addWasHashMapToFireStore(String url) {
-        Was wasToUpload = wasRepository.getUploadWasWithNoUri();
-        wasToUpload.setDownloadUrl(url); //Embed the download link of the recording to the was item
-        firebaseFireStoreHelper.addWasMapToFireStore(wasToUpload);
-    }
-
-
 }

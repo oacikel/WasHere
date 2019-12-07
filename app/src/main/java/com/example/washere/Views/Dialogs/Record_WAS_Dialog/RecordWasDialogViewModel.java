@@ -41,6 +41,13 @@ public class RecordWasDialogViewModel extends AndroidViewModel {
         }
     }
 
+    void updateUploadingState(eUploadingState state) {
+        if (wasRepository.getUploadingState().getValue()!=state){
+            wasRepository.setUpdateUploadingState(state);
+        }
+    }
+
+
     public MutableLiveData<eUploadingState> getUploadingState(){
         return wasRepository.getUploadingState();
     }
@@ -113,9 +120,13 @@ public class RecordWasDialogViewModel extends AndroidViewModel {
     }
 
     //Creating a Was Object and Uploading it To Firebase
-    void uploadWas() {
-        wasUploadHelper.createWasWithNoUri();
-        wasUploadHelper.uploadFileToStorage(wasRepository.getUploadFile());
+    void uploadWasToStorage() {
+        wasUploadHelper.createWasToUpload();
+        wasUploadHelper.uploadFileToStorage(wasRepository.getWasToUpload());
+    }
+
+    void uploadWasToDatabase(){
+        wasUploadHelper.uploadWasToDatabase(wasRepository.getWasToUpload());
     }
 
     public void showUploadSuccessful(final TextView textView){
