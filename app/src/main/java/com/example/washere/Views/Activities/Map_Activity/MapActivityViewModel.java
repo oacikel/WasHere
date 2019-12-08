@@ -1,4 +1,4 @@
-package com.example.washere.Views.Activities.Main_Activity;
+package com.example.washere.Views.Activities.Map_Activity;
 
 /*
 This class will serve to manipulate audio files.
@@ -23,52 +23,48 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.washere.R;
 import com.example.washere.Views.Dialogs.Record_WAS_Dialog.RecordWasDialog;
+import com.example.washere.adapters.WasCardAdapter;
 import com.example.washere.helpers.AudioHelper;
 import com.example.washere.helpers.DatabaseHelper;
 import com.example.washere.models.Was;
-import com.example.washere.models.eWasUploadState;
+import com.example.washere.models.eDownloadingState;
+import com.example.washere.models.eRecordState;
 import com.example.washere.repositories.WasRepository;
 import com.here.android.mpa.cluster.ClusterLayer;
 import com.here.android.mpa.cluster.ClusterViewObject;
 import com.here.android.mpa.common.GeoCoordinate;
 import com.here.android.mpa.common.GeoPosition;
-import com.here.android.mpa.common.Image;
 import com.here.android.mpa.common.PositioningManager;
+import com.here.android.mpa.common.ViewObject;
 import com.here.android.mpa.mapping.MapMarker;
+import com.here.android.mpa.mapping.MapObject;
+import com.here.android.mpa.mapping.MapProxyObject;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
-public class MainActivityViewModel extends AndroidViewModel {
+public class MapActivityViewModel extends AndroidViewModel {
     private static String LOG_TAG = ("OCUL- MainActivityViewModel");
     private String intentName;
     private Context context;
     private MutableLiveData<GeoCoordinate> currentLocation = WasRepository.getInstance().getCurrentLocation();
     private PositioningManager positioningManager;
-    private MutableLiveData<List<Was>> wasList;
-    private boolean isUpdating = false;
-    private AudioHelper audioHelper;
-    private WasRepository wasRepository=WasRepository.getInstance();
+    private AudioHelper audioHelper = new AudioHelper();
+    private WasRepository wasRepository = WasRepository.getInstance();
     private ClusterLayer clusterLayer;
-    private Collection<MapMarker> mapMarkers;
     private RecordWasDialog recordWasDialog;
-    private DatabaseHelper databaseHelper =new DatabaseHelper();
+    private DatabaseHelper databaseHelper = new DatabaseHelper();
+    private MapProxyObject mapProxyObject;
+    private MapObject mapObject;
+    private ClusterViewObject clusterViewObject;
+    private ArrayList<MapMarker> selectedMarkerList;
+    private MapMarker selectedMarker;
+    private ArrayList<Was> selectedWasList;
+    private ArrayList<Was> fullWasList;
 
-    public void setUpdating(boolean updating) {
-        isUpdating = updating;
-    }
-
-    public boolean isUpdating() {
-        return isUpdating;
-    }
-
-    public MainActivityViewModel(@NonNull Application application) {
+    public MapActivityViewModel(@NonNull Application application) {
         super(application);
         context = application.getApplicationContext();
     }
@@ -79,11 +75,11 @@ public class MainActivityViewModel extends AndroidViewModel {
     }
 
     private void updateLocationStatus(int status) {
-       wasRepository.getLocationStatus().setValue(status);
+        wasRepository.getLocationStatus().setValue(status);
     }
 
     //Was Recording / Playing State
-    MutableLiveData<eWasUploadState> getWasRecordingState() {
+    MutableLiveData<eRecordState> getWasRecordingState() {
         return wasRepository.getWasRecordingState();
     }
 
@@ -98,12 +94,6 @@ public class MainActivityViewModel extends AndroidViewModel {
         recordWasDialog.show(fragmentTransaction, "WAS_DIALOG");
     }
 
-    void dismissWasUploadDialog() {
-
-        if (recordWasDialog != null) {
-            recordWasDialog.dismiss();
-        }
-    }
 
     boolean isDialogOn() {
         boolean isDialogOn = false;
@@ -128,30 +118,28 @@ public class MainActivityViewModel extends AndroidViewModel {
         return com.here.android.mpa.common.MapSettings.setIsolatedDiskCacheRootPath(diskCacheRoot, intentName);
     }
 
+
     void onMapEngineInitialized() {
         positioningManager = PositioningManager.getInstance();
-        clusterLayer = new ClusterLayer();
-        wasRepository.setClusterLayer(clusterLayer);
         PositioningManager.OnPositionChangedListener positionListener = new PositioningManager.OnPositionChangedListener() {
 
             @Override
             public void onPositionUpdated(PositioningManager.LocationMethod locationMethod, GeoPosition geoPosition, boolean b) {
                 currentLocation.setValue(geoPosition.getCoordinate());
-                Log.w("OCUL - Position Updated", "The position is updated");
             }
 
             @Override
             public void onPositionFixChanged(PositioningManager.LocationMethod locationMethod, PositioningManager.LocationStatus locationStatus) {
                 if (locationStatus == PositioningManager.LocationStatus.OUT_OF_SERVICE) {
                     positioningManager.start(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR);
-                    Log.w("OCUL - Position Fix", "Location Status is OUT OF SERVICE");
+                    Log.w(LOG_TAG, "Location Status is OUT OF SERVICE");
                     updateLocationStatus(2);
                 } else if (locationStatus == PositioningManager.LocationStatus.TEMPORARILY_UNAVAILABLE) {
                     positioningManager.start(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR);
-                    Log.w("OCUL - Position Fix", "Location Status is TEMPORARILY UNAVAILABLE");
+                    Log.w(LOG_TAG, "Location Status is TEMPORARILY UNAVAILABLE");
                     updateLocationStatus(2);
                 } else if (locationStatus == PositioningManager.LocationStatus.AVAILABLE) {
-                    Log.w("OCUL - Position Fix", "Location Status is AVAILABLE");
+                    Log.w(LOG_TAG, "Location Status is AVAILABLE");
                     updateLocationStatus(1);
                 }
                 currentLocation.setValue(PositioningManager.getInstance().getPosition().getCoordinate());
@@ -192,111 +180,86 @@ public class MainActivityViewModel extends AndroidViewModel {
     }
 
 
-    public void init() {
-        wasRepository = WasRepository.getInstance();
+    public void setWasObjectsAndMarkers() {
         databaseHelper.updateWasObjects();
-        audioHelper = new AudioHelper();
-        getClusterViewObject();
     }
 
-    //Updates the Markerlist and adds Map Markers to Was Objects:
-    void updateMarkerList() {
 
-        Log.d("OCUL - Marker Cluster", "Creating Cluster layer");
-        for (int i = 0; i < wasRepository.getWasList().getValue().size(); i++) {
-            Was was = wasRepository.getWasList().getValue().get(i);
-            MapMarker marker = new MapMarker();
-            Image image = new Image();
-            try {
-                image.setImageResource(R.drawable.place_holder_icon);
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.out.println("Error in setting image Resource: " + e.getMessage());
-            }
-            GeoCoordinate coordinate = new GeoCoordinate(was.getLocationLatitude(), was.getLocationLongitude());
-            marker.setCoordinate(coordinate);
-            marker.setIcon(image);
-            marker.setTitle(String.valueOf(i));
-            was.setMapMarker(marker);
-            wasRepository.getClusterLayer().addMarker(marker);
+    public MutableLiveData<eDownloadingState> getDownloadingState() {
+        return wasRepository.getDownloadingState();
+    }
+
+
+    public void placeMarkersOnMap() {
+        //wasRepository.getMap().removeClusterLayer(wasRepository.getClusterLayer());
+        if (wasRepository.getClusterLayer()!=null){
+            Log.i(LOG_TAG,"Setting up markers. Marker count in cluster is: "+wasRepository.getClusterLayer().getMarkers().size());
+            wasRepository.getMap().addClusterLayer(wasRepository.getClusterLayer());
         }
-        mapMarkers = wasRepository.getClusterLayer().getMarkers();
-        wasRepository.getClusterLayer().removeMarkers(mapMarkers);
-        wasRepository.getClusterLayer().addMarkers(mapMarkers);
-        setExistingClusterLayer(wasRepository.getClusterLayer());
+
     }
 
-    MutableLiveData<List<Was>> getWasList() {
-        wasList = wasRepository.getWasList();
-        return wasList;
-    }
+    public void updateSelectedWasList(ViewObject object) {
 
-    ClusterLayer getExistingClusterLayer() {
-        Log.d(LOG_TAG, "Cluster Layer Updated");
-        return wasRepository.getExistingClusterLayer();
-    }
+        selectedWasList = new ArrayList<>();
+        fullWasList = wasRepository.getWasList();
+        if (wasRepository.getSelectedWasList() == null) {
+            wasRepository.setSelectedWasList(new ArrayList<Was>());
+        }
+        if (object.getBaseType() == ViewObject.Type.PROXY_OBJECT) {
 
-    private void setExistingClusterLayer(ClusterLayer clusterLayer) {
-        wasRepository.setExistingClusterLayer(clusterLayer);
-    }
+            mapProxyObject = (MapProxyObject) object;
+            Log.i(LOG_TAG, "A Cluster Marker is selected");
+            if (mapProxyObject.getType() == MapProxyObject.Type.CLUSTER_MARKER) {
 
-    MutableLiveData<ClusterViewObject> getClusterViewObject() {
-        return wasRepository.getClusterViewObject();
-    }
+                clusterViewObject = (ClusterViewObject) mapProxyObject;
+                selectedMarkerList = new ArrayList<>(clusterViewObject.getMarkers());
+                for (int i = 0; i < selectedMarkerList.size(); i++) {
+                    for (int a = 0; a < wasRepository.getWasList().size(); a++) {
+                        if (selectedMarkerList.get(i).getTitle().equals(fullWasList.get(a).getUniqueId())) {
+                            selectedWasList.add(fullWasList.get(a));
+                        }
+                    }
+                }
+            }
 
-    void setWasObjectsInCluster() {
-        Collection<MapMarker> markerList = getClusterViewObject().getValue().getMarkers();
-        String addressToBeSearched;
-        String address;
-        ArrayList<MapMarker> mapMarkerArrayList = new ArrayList<>(markerList);
-        ArrayList<Was> wasListOfCluster = new ArrayList<>();
-        for (int i = 0; i < mapMarkerArrayList.size(); i++) {
-            addressToBeSearched = mapMarkerArrayList.get(i).toString();
-            for (int a = 0; a < wasList.getValue().size(); a++) {
-                address = wasList.getValue().get(a).getMapMarker().toString();
-                if (address.equals(addressToBeSearched)) {
-                    wasListOfCluster.add(wasList.getValue().get(a));
+        } else if (object.getBaseType() == ViewObject.Type.USER_OBJECT) {
+            mapObject = (MapObject) object;
+
+            if (mapObject.getType() == MapObject.Type.MARKER) {
+                Log.i(LOG_TAG, "A single Map Marker is selected");
+                selectedMarker = (MapMarker) mapObject;
+                for (int i = 0; i < fullWasList.size(); i++) {
+                    if (selectedMarker.getTitle().equals(fullWasList.get(i).getUniqueId())) {
+                        selectedWasList.add(fullWasList.get(i));
+                    }
                 }
             }
         }
-        wasRepository.getSelectedClusterViewWasList().setValue(wasListOfCluster);
+        wasRepository.setSelectedWasList(selectedWasList);
+
     }
 
-    void setSelectedMarker(MapMarker marker) {
-        wasRepository.setMarkerSelected(marker);
-    }
-
-    void setWasObjectFromSelectedMapMarker() {
-        MapMarker selectedMarker = wasRepository.getMarkerSelected();
-        ArrayList<MapMarker> mapMarkerArrayList = new ArrayList<>();
-        mapMarkerArrayList.add(selectedMarker);
-        ArrayList<Was> wasListOfCluster = new ArrayList<>();
-        wasListOfCluster.add(wasList.getValue().get(0));
-        WasRepository.getInstance().getSelectedClusterViewWasList().setValue(wasListOfCluster);
-    }
-
-    MutableLiveData<ArrayList<Was>> getSelectedClusterViewWasList() {
-        return WasRepository.getInstance().getSelectedClusterViewWasList();
-    }
-
-    //Audio Management Part Start
-    void playAudio(List<Was> wasList, MapMarker marker) {
-        String addressToBeSearched = marker.toString();
-        String address;
-        for (int i = 0; i < wasList.size(); i++) {
-            address = wasList.get(i).getMapMarker().toString();
-            if (address.equals(addressToBeSearched)) {
-                audioHelper.preparePlayerForSelectedWas(wasList.get(i));
-                audioHelper.startPlayingWasObject();
-                break;
-            }
+    public void fillWasCardAdapter(WasCardAdapter adapter) {
+        if (wasRepository.getSelectedWasList() != null) {
+            adapter.setWasList(wasRepository.getSelectedWasList());
+        } else {
+            Log.e(LOG_TAG, "Selected was list is null");
         }
     }
 
+    //Audio Management Part Start
+
     void playAudio(Was was) {
-        Log.d(LOG_TAG,"Preparing player");
+        Log.d(LOG_TAG, "Preparing player");
         audioHelper.preparePlayerForSelectedWas(was);
         audioHelper.startPlayingWasObject();
+    }
+
+    public void playSelectedAudio(int position) {
+        if (wasRepository.getSelectedWasList().get(position) != null) {
+            playAudio(wasRepository.getSelectedWasList().get(position));
+        }
     }
     //Audio Management Part End
 }

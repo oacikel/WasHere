@@ -1,13 +1,12 @@
 package com.example.washere.helpers;
 
-import android.app.Application;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Environment;
 import android.util.Log;
 
 import com.example.washere.models.Was;
-import com.example.washere.models.eWasUploadState;
+import com.example.washere.models.eRecordState;
 import com.example.washere.repositories.UserRepository;
 import com.example.washere.repositories.WasRepository;
 
@@ -44,7 +43,7 @@ public class AudioHelper {
         try {
             mediaRecorder.prepare();
             wasRepository.setMediaRecorder(mediaRecorder);
-            wasRepository.getWasRecordingState().setValue(eWasUploadState.READY_TO_RECORD);
+            wasRepository.getWasRecordingState().setValue(eRecordState.READY_TO_RECORD);
         } catch (IOException e) {
             Log.e(LOG_TAG, "Mediarecorder couldn't be prepared: " + e.getMessage());
         }
@@ -116,7 +115,7 @@ public class AudioHelper {
             mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
-                    wasRepository.getWasRecordingState().setValue(eWasUploadState.READY_TO_PLAY);
+                    wasRepository.getWasRecordingState().setValue(eRecordState.READY_TO_PLAY);
                 }
             });
         } catch (Exception e) {

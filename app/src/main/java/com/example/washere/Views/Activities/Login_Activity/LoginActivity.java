@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,8 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.washere.R;
-import com.example.washere.Views.Activities.Main_Activity.MainActivity;
-import com.example.washere.Views.Activities.Main_Activity.MainActivityViewModel;
+import com.example.washere.Views.Activities.Map_Activity.MapActivity;
 import com.example.washere.Views.Activities.New_User_Activity.NewUserActivity;
 import com.example.washere.models.eLoginState;
 
@@ -93,7 +91,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     public void startMainActivity() {
-        intent = new Intent(this, MainActivity.class);
+        intent = new Intent(this, MapActivity.class);
         this.startActivity(intent);
     }
 

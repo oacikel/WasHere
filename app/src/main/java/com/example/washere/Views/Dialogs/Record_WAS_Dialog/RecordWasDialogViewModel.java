@@ -13,7 +13,7 @@ import com.example.washere.R;
 import com.example.washere.helpers.AudioHelper;
 import com.example.washere.helpers.WasUploadHelper;
 import com.example.washere.models.eUploadingState;
-import com.example.washere.models.eWasUploadState;
+import com.example.washere.models.eRecordState;
 import com.example.washere.repositories.WasRepository;
 
 public class RecordWasDialogViewModel extends AndroidViewModel {
@@ -31,11 +31,11 @@ public class RecordWasDialogViewModel extends AndroidViewModel {
         wasUploadHelper = new WasUploadHelper();
     }
 
-    MutableLiveData<eWasUploadState> getWasRecordingState() {
+    MutableLiveData<eRecordState> getWasRecordingState() {
         return wasRepository.getWasRecordingState();
     }
 
-    void updateWasUploadState(eWasUploadState state) {
+    void updateWasUploadState(eRecordState state) {
         if (wasRepository.getWasRecordingState().getValue()!=state){
            wasRepository.setWasRecordingState(state);
         }
@@ -88,8 +88,8 @@ public class RecordWasDialogViewModel extends AndroidViewModel {
     }
     //Finish recording after animation stop
     void changeStateAfterAnimationEnd() {
-        if (WasRepository.getInstance().getWasRecordingState().getValue() != eWasUploadState.FINISHED_RECORDING) {
-            updateWasUploadState(eWasUploadState.FINISHED_RECORDING);
+        if (WasRepository.getInstance().getWasRecordingState().getValue() != eRecordState.FINISHED_RECORDING) {
+            updateWasUploadState(eRecordState.FINISHED_RECORDING);
         }
     }
 

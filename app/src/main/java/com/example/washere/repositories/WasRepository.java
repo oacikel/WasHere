@@ -7,32 +7,36 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.washere.models.Was;
+import com.example.washere.models.eDownloadingState;
 import com.example.washere.models.eUploadingState;
-import com.example.washere.models.eWasUploadState;
+import com.example.washere.models.eRecordState;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.here.android.mpa.cluster.ClusterLayer;
 import com.here.android.mpa.cluster.ClusterViewObject;
 import com.here.android.mpa.common.GeoCoordinate;
 import com.here.android.mpa.mapping.Map;
 import com.here.android.mpa.mapping.MapMarker;
+import com.here.android.mpa.mapping.SupportMapFragment;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public class WasRepository extends AppCompatActivity {
 
-
+    private boolean wasListenerInvokedOnce;
     private static WasRepository instance;
-    private static MutableLiveData<eWasUploadState> wasRecordingState = new MutableLiveData<>();
-    private MutableLiveData<eUploadingState>uploadingState=new MutableLiveData<>();
+    private static MutableLiveData<eRecordState> wasRecordingState = new MutableLiveData<>();
+    private MutableLiveData<eUploadingState> uploadingState = new MutableLiveData<>();
+    private MutableLiveData<eDownloadingState> downloadingState = new MutableLiveData<>();
     private MutableLiveData<Integer> locationStatus = new MutableLiveData<>();
-    private MutableLiveData<List<Was>> wasList = new MutableLiveData<>();
+    private ArrayList<Was> wasList;
     private MutableLiveData<GeoCoordinate> currentLocation = new MutableLiveData<>();
     private ClusterLayer existingClusterLayer;
     private MutableLiveData<ClusterViewObject> clusterViewObject = new MutableLiveData<>();
-    private MutableLiveData<ArrayList<Was>> selectedClusterViewWasList = new MutableLiveData<>();
     private MediaRecorder mediaRecorder;
     private MediaPlayer mediaPlayer;
     private GeoCoordinate uploadLocation;
@@ -43,10 +47,15 @@ public class WasRepository extends AppCompatActivity {
     private Was wasToUpload;
     private String uploadTitle;
     private MapMarker markerSelected;
+    private ArrayList<Was> selectedWasList;
     private String downloadUrl;
     private Map map;
     private ClusterLayer clusterLayer;
     private static long MAX_WAS_LENGTH = 35000;
+    private CollectionReference wasItemsReference;
+    private SupportMapFragment supportMapFragment;
+    private EventListener<QuerySnapshot> wasChangeListener;
+    private CollectionReference wasCollectionReference;
 
     public static WasRepository getInstance() {
         if (instance == null) {
@@ -57,11 +66,11 @@ public class WasRepository extends AppCompatActivity {
 
     //States
     //Recording/Playing State
-    public void setWasRecordingState(eWasUploadState state) {
+    public void setWasRecordingState(eRecordState state) {
         wasRecordingState.setValue(state);
     }
 
-    public MutableLiveData<eWasUploadState> getWasRecordingState() {
+    public MutableLiveData<eRecordState> getWasRecordingState() {
         return wasRecordingState;
     }
 
@@ -89,12 +98,31 @@ public class WasRepository extends AppCompatActivity {
         this.uploadingState = uploadingState;
     }
 
-    public void setUpdateUploadingState(eUploadingState eUploadingState){
+    public void setUpdateUploadingState(eUploadingState eUploadingState) {
         uploadingState.setValue(eUploadingState);
     }
 
-    public void postUpdateUploadingState(eUploadingState eUploadingState){
+    public void postUpdateUploadingState(eUploadingState eUploadingState) {
         uploadingState.postValue(eUploadingState);
+    }
+
+    //Downloading State
+
+
+    public MutableLiveData<eDownloadingState> getDownloadingState() {
+        return downloadingState;
+    }
+
+    public void setDownloadingState(MutableLiveData<eDownloadingState> downloadingState) {
+        this.downloadingState = downloadingState;
+    }
+
+    public void setUpdateDownloadingState(eDownloadingState state) {
+        downloadingState.setValue(state);
+    }
+
+    public void postUpdateDownloadingState(eDownloadingState state) {
+        downloadingState.postValue(state);
     }
 
     public String getDownloadUrl() {
@@ -105,6 +133,21 @@ public class WasRepository extends AppCompatActivity {
         this.downloadUrl = downloadUrl;
     }
 
+    public EventListener<QuerySnapshot> getWasChangeListener() {
+        return wasChangeListener;
+    }
+
+    public void setWasChangeListener(EventListener<QuerySnapshot> wasChangeListener) {
+        this.wasChangeListener = wasChangeListener;
+    }
+
+    public CollectionReference getWasCollectionReference() {
+        return wasCollectionReference;
+    }
+
+    public void setWasCollectionReference(CollectionReference wasCollectionReference) {
+        this.wasCollectionReference = wasCollectionReference;
+    }
 
     //Regarding Map Management
 
@@ -115,6 +158,14 @@ public class WasRepository extends AppCompatActivity {
 
     public void setMap(Map map) {
         this.map = map;
+    }
+
+    public SupportMapFragment getSupportMapFragment() {
+        return supportMapFragment;
+    }
+
+    public void setSupportMapFragment(SupportMapFragment supportMapFragment) {
+        this.supportMapFragment = supportMapFragment;
     }
 
     public MutableLiveData<GeoCoordinate> getCurrentLocation() {
@@ -129,13 +180,15 @@ public class WasRepository extends AppCompatActivity {
         this.existingClusterLayer = existingClusterLayer;
     }
 
-    public MutableLiveData<ArrayList<Was>> getSelectedClusterViewWasList() {
-        return selectedClusterViewWasList;
+    //Regarding Was Objects
+
+
+    public ArrayList<Was> getWasList() {
+        return wasList;
     }
 
-    //Regarding Was Objects
-    public MutableLiveData<List<Was>> getWasList() {
-        return wasList;
+    public void setWasList(ArrayList<Was> wasList) {
+        this.wasList = wasList;
     }
 
     public MutableLiveData<ClusterViewObject> getClusterViewObject() {
@@ -176,6 +229,27 @@ public class WasRepository extends AppCompatActivity {
 
     public void setClusterLayer(ClusterLayer clusterLayer) {
         this.clusterLayer = clusterLayer;
+    }
+
+    public ArrayList<Was> getSelectedWasList() {
+        return selectedWasList;
+    }
+
+    public void setSelectedWasList(ArrayList<Was> selectedWasList) {
+        this.selectedWasList = selectedWasList;
+    }
+
+    public void clearWasItems(){
+        wasList=null;
+        clusterLayer=null;
+    }
+
+    public CollectionReference getWasItemsReference() {
+        return wasItemsReference;
+    }
+
+    public void setWasItemsReference(CollectionReference wasItemsReference) {
+        this.wasItemsReference = wasItemsReference;
     }
 
     //Uploading Was Objects:
@@ -259,5 +333,11 @@ public class WasRepository extends AppCompatActivity {
         return time;
     }
 
+    public boolean isWasListenerInvokedOnce() {
+        return wasListenerInvokedOnce;
+    }
 
+    public void setWasListenerInvokedOnce(boolean wasListenerInvokedOnce) {
+        this.wasListenerInvokedOnce = wasListenerInvokedOnce;
+    }
 }

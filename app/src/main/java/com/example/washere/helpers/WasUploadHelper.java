@@ -41,7 +41,6 @@ public class WasUploadHelper {
         } else {
             Log.e(LOG_TAG, "File is null");
         }
-
     }
 
 

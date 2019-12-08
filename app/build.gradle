@@ -50,4 +50,5 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
     //Authentication
     implementation 'com.google.firebase:firebase-auth:19.1.0'
+    implementation 'com.google.android.material:material:1.0.0'
 }

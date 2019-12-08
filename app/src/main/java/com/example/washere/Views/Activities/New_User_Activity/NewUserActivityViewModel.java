@@ -1,16 +1,12 @@
 package com.example.washere.Views.Activities.New_User_Activity;
 
-import android.app.Activity;
 import android.app.Application;
-import android.content.Intent;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.washere.Views.Activities.Login_Activity.LoginActivity;
-import com.example.washere.Views.Activities.Main_Activity.MainActivity;
 import com.example.washere.models.User;
 import com.example.washere.repositories.UserRepository;
 import com.google.android.gms.tasks.OnCompleteListener;

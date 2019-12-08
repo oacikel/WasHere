@@ -1,17 +1,12 @@
 package com.example.washere.Views.Activities.Login_Activity;
 
-import android.app.Activity;
 import android.app.Application;
-import android.content.Intent;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.washere.Views.Activities.Main_Activity.MainActivity;
-import com.example.washere.Views.Activities.New_User_Activity.NewUserActivity;
 import com.example.washere.models.User;
 import com.example.washere.models.eLoginState;
 import com.example.washere.repositories.UserRepository;

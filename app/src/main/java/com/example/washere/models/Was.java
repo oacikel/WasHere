@@ -1,5 +1,6 @@
 package com.example.washere.models;
 
+import android.media.Image;
 import android.net.Uri;
 
 import com.here.android.mpa.mapping.MapMarker;
@@ -20,6 +21,7 @@ public class Was {
     private String uploadTime;
     private String uploadDate;
     private String uploadTitle;
+    private String uniqueId;
 
     public Was() {
     }
@@ -143,4 +145,13 @@ public class Was {
     public void setUploadTitle(String uploadTitle) {
         this.uploadTitle = uploadTitle;
     }
+
+    public String getUniqueId() {
+        return uniqueId;
+    }
+
+    public void setUniqueId(String uniqueId) {
+        this.uniqueId = uniqueId;
+    }
+
 }

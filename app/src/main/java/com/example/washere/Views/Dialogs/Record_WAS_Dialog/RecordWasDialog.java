@@ -22,7 +22,7 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.example.washere.R;
 import com.example.washere.models.eUploadingState;
-import com.example.washere.models.eWasUploadState;
+import com.example.washere.models.eRecordState;
 import com.example.washere.repositories.WasRepository;
 
 public class RecordWasDialog extends DialogFragment implements View.OnClickListener, Animator.AnimatorListener, ValueAnimator.AnimatorUpdateListener {
@@ -48,6 +48,7 @@ public class RecordWasDialog extends DialogFragment implements View.OnClickListe
         initViews(view);
         initOtherObjects();
         setOnClickListeners();
+        recordWasDialogViewModel.updateUploadingState(eUploadingState.NO_ACTION);
 
 
         //Observers
@@ -79,17 +80,21 @@ public class RecordWasDialog extends DialogFragment implements View.OnClickListe
                     showUploadSuccessful();
                     dismiss();
                 }else if(state==eUploadingState.ERROR){
-                    Log.i(LOG_TAG,"Error uploading");
+                    Log.e(LOG_TAG,"Error uploading");
 
+                }else if(state==eUploadingState.UPLOAD_CANCELED){
+                    Log.w(LOG_TAG,"Upload canceled");
+                    recordWasDialogViewModel.exit();
+                    dismiss();
                 }
             }
         });
         //Observe Was Recording / Playing state
-        recordWasDialogViewModel.getWasRecordingState().observe(this, new Observer<eWasUploadState>() {
+        recordWasDialogViewModel.getWasRecordingState().observe(this, new Observer<eRecordState>() {
             @Override
-            public void onChanged(eWasUploadState state) {
+            public void onChanged(eRecordState state) {
                 if (state != null) {
-                    if (state == eWasUploadState.READY_TO_RECORD) {
+                    if (state == eRecordState.READY_TO_RECORD) {
                         constraintLayoutRecord.setVisibility(View.VISIBLE);
                         relativeLayoutUploading.setVisibility(View.INVISIBLE);
                         imageButtonSend.setVisibility(View.GONE);
@@ -97,7 +102,7 @@ public class RecordWasDialog extends DialogFragment implements View.OnClickListe
                         imageButtonControlRecording.setImageResource(R.drawable.icon_record);
                         progressBarRemainingTime.setVisibility(View.INVISIBLE);
 
-                    } else if (state == eWasUploadState.RECORDING) {
+                    } else if (state == eRecordState.RECORDING) {
                         imageButtonSend.setVisibility(View.GONE);
                         imageButtonRetry.setVisibility(View.INVISIBLE);
                         imageButtonControlRecording.setImageResource(R.drawable.icon_stop);
@@ -109,7 +114,7 @@ public class RecordWasDialog extends DialogFragment implements View.OnClickListe
                         progressBarRemainingTime.setVisibility(View.VISIBLE);
                         animator.start();
 
-                    } else if (state == eWasUploadState.FINISHED_RECORDING) {
+                    } else if (state == eRecordState.FINISHED_RECORDING) {
                         Log.d(LOG_TAG, "Stop recording button pressed");
                         //Stop animating the Progress Bar
                         animator.cancel();
@@ -118,27 +123,24 @@ public class RecordWasDialog extends DialogFragment implements View.OnClickListe
                         recordWasDialogViewModel.stopRecording();
                         //Prepare the recorder audio file to listen
                         recordWasDialogViewModel.prepareMediaPlayer();
-                    } else if (state == eWasUploadState.READY_TO_PLAY) {
+                    } else if (state == eRecordState.READY_TO_PLAY) {
                         imageButtonRetry.setVisibility(View.VISIBLE);
                         imageButtonControlRecording.setImageResource(R.drawable.icon_play);
                         imageButtonSend.setVisibility(View.VISIBLE);
-                    } else if (state == eWasUploadState.PLAYING) {
+                    } else if (state == eRecordState.PLAYING) {
                         imageButtonRetry.setVisibility(View.VISIBLE);
                         imageButtonControlRecording.setImageResource(R.drawable.icon_pause);
                         recordWasDialogViewModel.playAudio();
                         imageButtonSend.setVisibility(View.VISIBLE);
-                    } else if (state == eWasUploadState.PAUSED) {
+                    } else if (state == eRecordState.PAUSED) {
                         imageButtonRetry.setVisibility(View.VISIBLE);
                         imageButtonControlRecording.setImageResource(R.drawable.icon_play);
                         imageButtonSend.setVisibility(View.VISIBLE);
-                    } else if (state == eWasUploadState.FINISHED_PLAYING) {
+                    } else if (state == eRecordState.FINISHED_PLAYING) {
                         imageButtonRetry.setVisibility(View.VISIBLE);
                         imageButtonControlRecording.setImageResource(R.drawable.icon_play);
                         imageButtonSend.setVisibility(View.VISIBLE);
 
-                    }  else if (state == eWasUploadState.UPLOAD_CANCELED) {
-                        recordWasDialogViewModel.exit();
-                        dismiss();
                     }
                 }
             }
@@ -150,34 +152,35 @@ public class RecordWasDialog extends DialogFragment implements View.OnClickListe
     @Override
     public void onClick(View view) {
         if (view == imageButtonControlRecording) {
-            eWasUploadState state = WasRepository.getInstance().getWasRecordingState().getValue();
+            eRecordState state = WasRepository.getInstance().getWasRecordingState().getValue();
 
-            if (state == eWasUploadState.READY_TO_RECORD) {
+            if (state == eRecordState.READY_TO_RECORD) {
                 //Change state to RECORDING
-                recordWasDialogViewModel.updateWasUploadState(eWasUploadState.RECORDING);
+                recordWasDialogViewModel.updateWasUploadState(eRecordState.RECORDING);
 
-            } else if (state == eWasUploadState.RECORDING) {
+            } else if (state == eRecordState.RECORDING) {
 
-                recordWasDialogViewModel.updateWasUploadState(eWasUploadState.FINISHED_RECORDING);
+                recordWasDialogViewModel.updateWasUploadState(eRecordState.FINISHED_RECORDING);
 
 
-            } else if (state == eWasUploadState.FINISHED_RECORDING) {
-            } else if (state == eWasUploadState.READY_TO_PLAY) {
-                recordWasDialogViewModel.updateWasUploadState(eWasUploadState.PLAYING);
-            } else if (state == eWasUploadState.PLAYING) {
+            } else if (state == eRecordState.FINISHED_RECORDING) {
+            } else if (state == eRecordState.READY_TO_PLAY) {
+                recordWasDialogViewModel.updateWasUploadState(eRecordState.PLAYING);
+            } else if (state == eRecordState.PLAYING) {
 
-            } else if (state == eWasUploadState.PAUSED) {
+            } else if (state == eRecordState.PAUSED) {
 
-            } else if (state == eWasUploadState.FINISHED_PLAYING) {
+            } else if (state == eRecordState.FINISHED_PLAYING) {
 
             }
 
         } else if (view == imageButtonRetry) {
             recordWasDialogViewModel.prepareRecorder();
         } else if (view == imageButtonDiscardRecording) {
-            recordWasDialogViewModel.updateWasUploadState(eWasUploadState.UPLOAD_CANCELED);
+            recordWasDialogViewModel.updateUploadingState(eUploadingState.UPLOAD_CANCELED);
+
         } else if (view == imageButtonSend) {
-            recordWasDialogViewModel.updateUploadingState(eUploadingState.UPLOADING_TO_DATABASE);
+            recordWasDialogViewModel.updateUploadingState(eUploadingState.UPLOADING_TO_STORAGE);
         }
 
     }
