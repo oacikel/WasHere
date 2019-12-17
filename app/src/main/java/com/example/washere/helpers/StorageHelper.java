@@ -30,8 +30,7 @@ public class StorageHelper {
     private String downloadUri;
     private String uploadTime;
     private String uploadDate;
-    private WasRepository wasRepository= WasRepository.getInstance();
-    private DatabaseHelper databaseHelper =new DatabaseHelper();
+    private WasRepository wasRepository = WasRepository.getInstance();
     private static String audioExtention = ("mp3");
     private static String audioChild = ("audio/");
 
@@ -43,7 +42,7 @@ public class StorageHelper {
 
     //Send data to the database
     public void uploadFilesToStorage(Was was) {
-        File file=was.getAudioFile();
+        File file = was.getAudioFile();
         uri = Uri.fromFile(file);
         audioReference = storageReference.child(audioChild + file.getName());
         audioReference.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -64,7 +63,6 @@ public class StorageHelper {
             public void onFailure(@NonNull Exception e) {
                 wasRepository.postUpdateUploadingState(eUploadingState.ERROR);
                 Log.e(LOG_TAG, "Error Uploading file: " + e.getMessage());
-
             }
         });
     }
