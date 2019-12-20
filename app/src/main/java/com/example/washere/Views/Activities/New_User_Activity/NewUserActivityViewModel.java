@@ -66,7 +66,7 @@ public class NewUserActivityViewModel extends AndroidViewModel {
                                                 Log.d(LOG_TAG, "User profile updated.");
                                                 createCurrentUser();
                                                 setIsNewUserCreated(true);
-                                                message=("Welcome abroad "+firebaseAuth.getCurrentUser().getDisplayName()+" !");
+                                                message=("Welcome aboard "+firebaseAuth.getCurrentUser().getDisplayName()+" !");
                                             } else {
                                                 Log.e(LOG_TAG, "User profile failed to update.");
                                                 setIsNewUserCreated(false);

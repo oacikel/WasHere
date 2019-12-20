@@ -8,8 +8,8 @@
     <string name="register_success_message">Created a new account!</string>
 
     <string name="forgot_password">Forgot Password?</string>
-    <string name="login">Login</string>
-    <string name="sign_up">Create a New Account</string>
+    <string name="login">Sign In</string>
+    <string name="sign_up">I am a new user</string>
     <string name="e_mail_hint">Please enter your e-mail</string>
     <string name="password_hint">Please enter your password</string>
     <string name="or">or</string>
