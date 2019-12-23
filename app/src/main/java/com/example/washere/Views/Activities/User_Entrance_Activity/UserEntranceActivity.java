@@ -59,6 +59,8 @@ public class UserEntranceActivity extends AppCompatActivity implements TabLayout
         viewPagerLoginOrRegister.setAdapter(pagerAdapter);
         viewPagerLoginOrRegister.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayoutLoginOrRegister));
         tabLayoutLoginOrRegister.setupWithViewPager(viewPagerLoginOrRegister);
+        tabLayoutLoginOrRegister.getTabAt(0).setText(R.string.create_new_account);
+        tabLayoutLoginOrRegister.getTabAt(1).setText(R.string.login);
 
     }
 

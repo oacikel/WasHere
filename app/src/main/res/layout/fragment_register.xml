@@ -3,120 +3,150 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#B52E2E2E"
+    android:layout_height="wrap_content"
+    android:backgroundTintMode="add"
+    android:paddingStart="@dimen/margin_paddings_tiny"
+    android:paddingEnd="@dimen/margin_paddings_tiny"
     tools:context=".Views.Activities.New_User_Activity.NewUserActivity">
 
-    <TextView
-        android:id="@+id/textViewCreateAccount"
-        android:layout_width="wrap_content"
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textFieldInputLayoutCreateUserName"
+        style="@style/NoAllCapsTextApperance"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="welcome"
-        android:textSize="24sp"
+        android:layout_marginTop="16dp"
+        android:textColorHint="@color/primaryHintColor"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toBottomOf="@+id/editTextSelectUserName"
-        app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@android:drawable/btn_star_big_on" />
 
-    <EditText
-        android:id="@+id/editTextSelectUserName"
-        android:layout_width="0dp"
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/textFieldCreateUserName"
+            style="@style/NoAllCapsTextApperance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:alpha="80"
+            android:drawableStart="@drawable/icon_new_user"
+            android:drawablePadding="@dimen/margin_paddings_tiny"
+            android:fontFamily="@font/raleway_semibold"
+            android:hint="@string/user_name_hint"
+            android:singleLine="true"
+            android:textColor="@color/secondaryTextColor"
+            android:textColorHighlight="@color/secondaryColor"
+            android:textColorHint="@color/primaryHintColor"
+            android:textColorLink="@color/primaryColor"
+            android:textCursorDrawable="@color/primaryColor" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textFieldInputLayoutCreateEMail"
+        style="@style/NoAllCapsTextApperance"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="16dp"
-        android:ems="10"
-        android:hint="@string/user_name_hint"
-        android:inputType="textPersonName"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="@color/secondaryColor"
+        android:textColorHint="@color/primaryHintColor"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/imageView"
-        app:layout_constraintTop_toBottomOf="@+id/textViewCreateAccount" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textFieldInputLayoutCreateUserName">
 
-    <EditText
-        android:id="@+id/editTextSelectEMail"
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/textFieldCreateEMail"
+            style="@style/NoAllCapsTextApperance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:alpha="80"
+            android:drawableStart="@drawable/icon_email"
+            android:drawablePadding="@dimen/margin_paddings_tiny"
+            android:fontFamily="@font/raleway_semibold"
+            android:hint="@string/e_mail_hint"
+            android:inputType="textEmailAddress"
+            android:singleLine="true"
+            android:textColor="@color/secondaryTextColor"
+            android:textColorHighlight="@color/secondaryColor"
+            android:textColorHint="@color/primaryHintColor"
+            android:textColorLink="@color/primaryColor"
+            android:textCursorDrawable="@color/primaryColor" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textFieldInputLayoutCreatePassword"
+        style="@style/NoAllCapsTextApperance"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:textColorHint="@color/primaryHintColor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textFieldInputLayoutCreateEMail">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/textFieldCreatePassword"
+            style="@style/NoAllCapsTextApperance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:alpha="80"
+            android:drawableStart="@drawable/icon_password"
+            android:drawablePadding="@dimen/margin_paddings_tiny"
+            android:fontFamily="@font/raleway_semibold"
+            android:hint="@string/create_password_hint"
+            android:inputType="textPassword"
+            android:singleLine="true"
+            android:textColor="@color/secondaryTextColor"
+            android:textColorHighlight="@color/secondaryColor"
+            android:textColorHint="@color/primaryHintColor"
+            android:textColorLink="@color/primaryColor"
+            android:textCursorDrawable="@color/primaryColor" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textFieldInputLayoutRepeatPassword"
+        style="@style/NoAllCapsTextApperance"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:ems="10"
-        android:hint="@string/e_mail_hint"
-        android:inputType="textEmailAddress"
-        app:layout_constraintEnd_toEndOf="@+id/editTextSelectUserName"
-        app:layout_constraintStart_toStartOf="@+id/editTextSelectUserName"
-        app:layout_constraintTop_toBottomOf="@+id/editTextSelectUserName" />
-
-    <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toBottomOf="@+id/editTextSelectEMail"
+        android:textColorHint="@color/primaryHintColor"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@android:drawable/sym_action_email" />
+        app:layout_constraintTop_toBottomOf="@+id/textFieldInputLayoutCreatePassword">
 
-    <ImageView
-        android:id="@+id/imageView3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toBottomOf="@+id/editTextSelectPassword"
-        app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@android:drawable/ic_lock_idle_lock" />
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/textFieldReEnterPassword"
+            style="@style/NoAllCapsTextApperance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:alpha="80"
+            android:drawableStart="@drawable/icon_password"
+            android:drawablePadding="@dimen/margin_paddings_tiny"
+            android:fontFamily="@font/raleway_semibold"
+            android:hint="@string/again_password_hint"
+            android:inputType="textPassword"
+            android:singleLine="true"
+            android:textColor="@color/secondaryTextColor"
+            android:textColorHighlight="@color/secondaryColor"
+            android:textColorHint="@color/primaryHintColor"
+            android:textColorLink="@color/primaryColor"
+            android:textCursorDrawable="@color/primaryColor" />
+    </com.google.android.material.textfield.TextInputLayout>
 
-    <EditText
-        android:id="@+id/editTextSelectPassword"
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/material_button"
+        style="@style/NoAllCapsTextApperance"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:ems="10"
-        android:hint="@string/create_password_hint"
-        android:inputType="textPassword"
-        app:layout_constraintEnd_toEndOf="@+id/editTextSelectEMail"
-        app:layout_constraintStart_toStartOf="@+id/editTextSelectEMail"
-        app:layout_constraintTop_toBottomOf="@+id/editTextSelectEMail" />
-
-    <ImageView
-        android:id="@+id/imageView4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toBottomOf="@+id/editTextReEnterPassword"
-        app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@android:drawable/ic_lock_idle_lock" />
-
-    <EditText
-        android:id="@+id/editTextReEnterPassword"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:ems="10"
-        android:hint="@string/again_password_hint"
-        android:inputType="textPassword"
-        app:layout_constraintEnd_toEndOf="@+id/editTextSelectPassword"
-        app:layout_constraintStart_toStartOf="@+id/editTextSelectPassword"
-        app:layout_constraintTop_toBottomOf="@+id/editTextSelectPassword" />
-
-    <Button
-        android:id="@+id/buttonCreateNewAccount"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="16dp"
+        android:fontFamily="@font/raleway_medium"
         android:text="@string/create_new_account"
+        android:textAllCaps="false"
+        android:textColor="@color/secondaryTextColor"
+        android:textColorHint="@color/primaryHintColor"
+        app:backgroundTint="@color/primaryColor"
+        app:cornerRadius="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextReEnterPassword" />
+        app:layout_constraintTop_toBottomOf="@+id/textFieldInputLayoutRepeatPassword" />
 </androidx.constraintlayout.widget.ConstraintLayout>

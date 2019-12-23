@@ -1,12 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:backgroundTintMode="add"
+    android:paddingStart="@dimen/margin_paddings_tiny"
+    android:paddingEnd="@dimen/margin_paddings_tiny"
+    tools:context=".Views.Activities.New_User_Activity.NewUserActivity">
 
-    <ImageView
-        android:id="@+id/imageView5"
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textFieldInputLayoutEnterEMail"
+        style="@style/NoAllCapsTextApperance"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:srcCompat="@android:drawable/btn_dialog" />
-</LinearLayout>
+        android:layout_marginTop="16dp"
+        android:backgroundTint="@color/secondaryColor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/textFieldEnterEMail"
+            style="@style/NoAllCapsTextApperance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:alpha="80"
+            android:drawableStart="@drawable/icon_email"
+            android:drawablePadding="@dimen/margin_paddings_tiny"
+            android:fontFamily="@font/raleway_semibold"
+            android:hint="@string/e_mail_hint"
+            android:inputType="textEmailAddress"
+            android:singleLine="true"
+            android:textColor="@color/secondaryTextColor"
+            android:textColorHighlight="@color/secondaryColor"
+            android:textColorHint="@color/primaryHintColor"
+            android:textColorLink="@color/primaryColor"
+            android:textCursorDrawable="@color/primaryColor" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textFieldInputLayoutEnterPassword"
+        style="@style/NoAllCapsTextApperance"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textFieldInputLayoutEnterEMail">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/textFieldEnterPassword"
+            style="@style/NoAllCapsTextApperance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:alpha="80"
+            android:drawableStart="@drawable/icon_password"
+            android:drawablePadding="@dimen/margin_paddings_tiny"
+            android:fontFamily="@font/raleway_semibold"
+            android:hint="@string/create_password_hint"
+            android:inputType="textPassword"
+            android:singleLine="true"
+            android:textColor="@color/secondaryTextColor"
+            android:textColorHighlight="@color/secondaryColor"
+            android:textColorHint="@color/primaryHintColor"
+            android:textColorLink="@color/primaryColor"
+            android:textCursorDrawable="@color/primaryColor" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/material_button_login"
+        style="@style/NoAllCapsTextApperance"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:fontFamily="@font/raleway_medium"
+        android:text="@string/login"
+        android:textAllCaps="false"
+        android:textColor="@color/secondaryTextColor"
+        app:backgroundTint="@color/secondaryColor"
+        app:cornerRadius="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textFieldInputLayoutEnterPassword" />
+</androidx.constraintlayout.widget.ConstraintLayout>

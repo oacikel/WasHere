@@ -9,16 +9,16 @@
 
     <string name="forgot_password">Forgot Password?</string>
     <string name="login">Sign In</string>
-    <string name="sign_up">I am a new user</string>
-    <string name="e_mail_hint">Please enter your e-mail</string>
+    <string name="sign_up">New User</string>
+    <string name="e_mail_hint">e-mail</string>
     <string name="password_hint">Please enter your password</string>
     <string name="or">or</string>
     <string name="google_account_login">Continue with your Google account</string>
 
-    <string name="create_new_account">create new account</string>
-    <string name="user_name_hint">Enter your user name</string>
-    <string name="create_password_hint">Please select a password</string>
-    <string name="again_password_hint">Please re-enter your password</string>
+    <string name="create_new_account">Sign Up</string>
+    <string name="user_name_hint">user name</string>
+    <string name="create_password_hint">password</string>
+    <string name="again_password_hint">re-enter password</string>
 
     <string name="update_marker_list">Update Markers</string>
     <string name="playSound">Play Sample Sound</string>

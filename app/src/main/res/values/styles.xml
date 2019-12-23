@@ -23,4 +23,11 @@
         <item name="android:fontFamily">sans-serif-light</item>
     </style>
 
+    <style name="NoAllCapsTextApperance" parent="TextAppearance.Design.Tab">
+        <item name="textAllCaps">false</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:fontFamily">@font/raleway_semibold</item>
+
+    </style>
+
 </resources>
