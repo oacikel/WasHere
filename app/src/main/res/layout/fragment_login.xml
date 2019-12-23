@@ -25,7 +25,7 @@
         >
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/textFieldEnterEMail"
+            android:id="@+id/textInputEditTextEnterEMail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:drawableStart="@drawable/icon_email"
@@ -59,7 +59,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textFieldInputLayoutEnterEMail">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/textFieldEnterPassword"
+            android:id="@+id/textInputEditTextEnterPassword"
 
             android:alpha="80"
             android:theme="@style/HintTextApperance"
@@ -84,7 +84,7 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/material_button_login"
+        android:id="@+id/materialButtonLogin"
         style="@style/NoAllCapsTextApperance"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -98,7 +98,7 @@
         app:cornerRadius="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/checkBox" />
+        app:layout_constraintTop_toBottomOf="@+id/checkBoxRememberMe" />
 
     <TextView
         android:id="@+id/textViewForgotPassword"
@@ -106,12 +106,12 @@
         android:layout_height="wrap_content"
         android:text="@string/forgot_password"
         android:textColor="@color/primaryHintColor"
-        app:layout_constraintBottom_toBottomOf="@+id/checkBox"
+        app:layout_constraintBottom_toBottomOf="@+id/checkBoxRememberMe"
         app:layout_constraintEnd_toEndOf="@+id/textFieldInputLayoutEnterPassword"
-        app:layout_constraintTop_toTopOf="@+id/checkBox" />
+        app:layout_constraintTop_toTopOf="@+id/checkBoxRememberMe" />
 
     <CheckBox
-        android:id="@+id/checkBox"
+        android:id="@+id/checkBoxRememberMe"
         style="@style/NoAllCapsTextApperance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
