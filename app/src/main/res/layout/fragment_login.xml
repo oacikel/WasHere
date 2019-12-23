@@ -12,37 +12,45 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textFieldInputLayoutEnterEMail"
-        style="@style/NoAllCapsTextApperance"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:backgroundTint="@color/secondaryColor"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+
+        style="@style/NoAllCapsTextApperance"
+        android:textColorHint="@color/primaryHintColor"
+        app:hintTextAppearance="@style/HintTextApperance"
+        >
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/textFieldEnterEMail"
-            style="@style/NoAllCapsTextApperance"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:alpha="80"
             android:drawableStart="@drawable/icon_email"
-            android:drawablePadding="@dimen/margin_paddings_tiny"
-            android:fontFamily="@font/raleway_semibold"
             android:hint="@string/e_mail_hint"
             android:inputType="textEmailAddress"
+
+            android:alpha="80"
+            android:theme="@style/HintTextApperance"
+            android:backgroundTint="@color/primaryLightColor"
+            android:drawablePadding="@dimen/margin_paddings_tiny"
+            android:fontFamily="@font/raleway_semibold"
             android:singleLine="true"
-            android:textColor="@color/secondaryTextColor"
+            android:textColor="@color/primaryTextColor"
             android:textColorHighlight="@color/secondaryColor"
             android:textColorHint="@color/primaryHintColor"
             android:textColorLink="@color/primaryColor"
-            android:textCursorDrawable="@color/primaryColor" />
+            android:textCursorDrawable="@color/primaryColor"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
+
         android:id="@+id/textFieldInputLayoutEnterPassword"
         style="@style/NoAllCapsTextApperance"
+        android:textColorHint="@color/primaryHintColor"
+        app:hintTextAppearance="@style/HintTextApperance"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -52,21 +60,27 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/textFieldEnterPassword"
-            style="@style/NoAllCapsTextApperance"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+
             android:alpha="80"
-            android:drawableStart="@drawable/icon_password"
+            android:theme="@style/HintTextApperance"
+            android:backgroundTint="@color/primaryLightColor"
+            android:drawableStart="@drawable/icon_new_user"
             android:drawablePadding="@dimen/margin_paddings_tiny"
             android:fontFamily="@font/raleway_semibold"
-            android:hint="@string/create_password_hint"
-            android:inputType="textPassword"
             android:singleLine="true"
-            android:textColor="@color/secondaryTextColor"
+            android:textColor="@color/primaryTextColor"
             android:textColorHighlight="@color/secondaryColor"
             android:textColorHint="@color/primaryHintColor"
             android:textColorLink="@color/primaryColor"
-            android:textCursorDrawable="@color/primaryColor" />
+            android:textCursorDrawable="@color/primaryColor"
+
+            style="@style/NoAllCapsTextApperance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:hint="@string/create_password_hint"
+            android:inputType="textPassword"
+            />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.button.MaterialButton
@@ -75,15 +89,38 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
         android:fontFamily="@font/raleway_medium"
         android:text="@string/login"
         android:textAllCaps="false"
         android:textColor="@color/secondaryTextColor"
-        app:backgroundTint="@color/secondaryColor"
+        android:textColorHint="@color/primaryHintColor"
+        app:backgroundTint="@color/primaryColor"
         app:cornerRadius="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textFieldInputLayoutEnterPassword" />
+        app:layout_constraintTop_toBottomOf="@+id/checkBox" />
+
+    <TextView
+        android:id="@+id/textViewForgotPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/forgot_password"
+        android:textColor="@color/primaryHintColor"
+        app:layout_constraintBottom_toBottomOf="@+id/checkBox"
+        app:layout_constraintEnd_toEndOf="@+id/textFieldInputLayoutEnterPassword"
+        app:layout_constraintTop_toTopOf="@+id/checkBox" />
+
+    <CheckBox
+        android:id="@+id/checkBox"
+        style="@style/NoAllCapsTextApperance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:fontFamily="@font/raleway_semibold"
+        android:text="@string/remember_me"
+        android:textColor="@color/primaryHintColor"
+        app:layout_constraintStart_toStartOf="@+id/textFieldInputLayoutEnterPassword"
+        app:layout_constraintTop_toBottomOf="@+id/textFieldInputLayoutEnterPassword"
+        android:buttonTint="@color/primaryColor"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

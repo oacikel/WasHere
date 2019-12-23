@@ -12,28 +12,33 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textFieldInputLayoutCreateUserName"
-        style="@style/NoAllCapsTextApperance"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:textColorHint="@color/primaryHintColor"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+
+        style="@style/NoAllCapsTextApperance"
+        android:textColorHint="@color/primaryHintColor"
+        app:hintTextAppearance="@style/HintTextApperance"
+       >
 
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/textFieldCreateUserName"
-            style="@style/NoAllCapsTextApperance"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:hint="@string/user_name_hint"
+
             android:alpha="80"
+            android:theme="@style/HintTextApperance"
+            android:backgroundTint="@color/primaryLightColor"
             android:drawableStart="@drawable/icon_new_user"
             android:drawablePadding="@dimen/margin_paddings_tiny"
             android:fontFamily="@font/raleway_semibold"
-            android:hint="@string/user_name_hint"
             android:singleLine="true"
-            android:textColor="@color/secondaryTextColor"
+            android:textColor="@color/primaryTextColor"
             android:textColorHighlight="@color/secondaryColor"
             android:textColorHint="@color/primaryHintColor"
             android:textColorLink="@color/primaryColor"
@@ -51,6 +56,7 @@
         android:textColorHint="@color/primaryHintColor"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:hintTextAppearance="@style/HintTextApperance"
         app:layout_constraintTop_toBottomOf="@+id/textFieldInputLayoutCreateUserName">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -58,14 +64,16 @@
             style="@style/NoAllCapsTextApperance"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:alpha="80"
-            android:drawableStart="@drawable/icon_email"
-            android:drawablePadding="@dimen/margin_paddings_tiny"
-            android:fontFamily="@font/raleway_semibold"
             android:hint="@string/e_mail_hint"
             android:inputType="textEmailAddress"
             android:singleLine="true"
-            android:textColor="@color/secondaryTextColor"
+            android:alpha="80"
+            android:theme="@style/HintTextApperance"
+            android:backgroundTint="@color/primaryLightColor"
+            android:drawableStart="@drawable/icon_email"
+            android:drawablePadding="@dimen/margin_paddings_tiny"
+            android:fontFamily="@font/raleway_semibold"
+            android:textColor="@color/primaryTextColor"
             android:textColorHighlight="@color/secondaryColor"
             android:textColorHint="@color/primaryHintColor"
             android:textColorLink="@color/primaryColor"
@@ -81,6 +89,7 @@
         android:textColorHint="@color/primaryHintColor"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:hintTextAppearance="@style/HintTextApperance"
         app:layout_constraintTop_toBottomOf="@+id/textFieldInputLayoutCreateEMail">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -88,14 +97,18 @@
             style="@style/NoAllCapsTextApperance"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:hintTextAppearance="@style/HintTextApperance"
+
             android:alpha="80"
+            android:backgroundTint="@color/primaryLightColor"
             android:drawableStart="@drawable/icon_password"
             android:drawablePadding="@dimen/margin_paddings_tiny"
             android:fontFamily="@font/raleway_semibold"
             android:hint="@string/create_password_hint"
             android:inputType="textPassword"
             android:singleLine="true"
-            android:textColor="@color/secondaryTextColor"
+            android:textColor="@color/primaryTextColor"
+            android:theme="@style/HintTextApperance"
             android:textColorHighlight="@color/secondaryColor"
             android:textColorHint="@color/primaryHintColor"
             android:textColorLink="@color/primaryColor"
@@ -104,11 +117,14 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textFieldInputLayoutRepeatPassword"
+
         style="@style/NoAllCapsTextApperance"
+        android:textColorHint="@color/primaryHintColor"
+        app:hintTextAppearance="@style/HintTextApperance"
+
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:textColorHint="@color/primaryHintColor"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textFieldInputLayoutCreatePassword">
@@ -119,16 +135,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:alpha="80"
+            android:backgroundTint="@color/primaryLightColor"
             android:drawableStart="@drawable/icon_password"
             android:drawablePadding="@dimen/margin_paddings_tiny"
             android:fontFamily="@font/raleway_semibold"
             android:hint="@string/again_password_hint"
             android:inputType="textPassword"
             android:singleLine="true"
-            android:textColor="@color/secondaryTextColor"
+            android:textColor="@color/primaryTextColor"
             android:textColorHighlight="@color/secondaryColor"
             android:textColorHint="@color/primaryHintColor"
             android:textColorLink="@color/primaryColor"
+            android:theme="@style/HintTextApperance"
             android:textCursorDrawable="@color/primaryColor" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -136,11 +154,12 @@
     <com.google.android.material.button.MaterialButton
         android:id="@+id/material_button"
         style="@style/NoAllCapsTextApperance"
+        android:text="@string/create_new_account"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+
         android:fontFamily="@font/raleway_medium"
-        android:text="@string/create_new_account"
         android:textAllCaps="false"
         android:textColor="@color/secondaryTextColor"
         android:textColorHint="@color/primaryHintColor"

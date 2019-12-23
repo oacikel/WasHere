@@ -5,14 +5,15 @@
     android:id="@+id/constraintLayoutBackground"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/place_holder_background"
-    android:backgroundTintMode="screen">
+    android:background="@color/secondaryLightColor"
+    android:backgroundTint="@color/secondaryLightColor"
+    android:backgroundTintMode="add">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayoutLoginOrRegister"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:elevation="@dimen/elevation_highest"
+        android:background="@color/secondaryLightColor"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.6"
@@ -21,9 +22,10 @@
 
         <ImageView
             android:id="@+id/imageView6"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginTop="8dp"
+            android:elevation="@dimen/elevation_highest"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -33,14 +35,16 @@
             android:id="@+id/tabLayoutLoginOrRegister"
             style="@style/NoAllCapsTextApperance"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="#00FFFFFF"
+            android:layout_height="150dp"
+            android:background="@color/secondaryLightColor"
             android:elevation="@dimen/elevation_medium"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageView6"
+            app:layout_constraintTop_toTopOf="parent"
             app:tabIndicatorColor="@color/primaryColor"
+            app:tabPaddingEnd="0dp"
+            app:tabPaddingStart="0dp"
+            app:tabPaddingTop="120dp"
             app:tabTextAppearance="@style/NoAllCapsTextApperance"
             app:tabTextColor="@color/primaryTextColor">
 

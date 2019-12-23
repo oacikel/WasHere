@@ -7,7 +7,8 @@
     <string name="register_error_message">Failed to create new account.</string>
     <string name="register_success_message">Created a new account!</string>
 
-    <string name="forgot_password">Forgot Password?</string>
+    <string name="forgot_password">Forgot password ?</string>
+    <string name="remember_me">remember me</string>
     <string name="login">Sign In</string>
     <string name="sign_up">New User</string>
     <string name="e_mail_hint">e-mail</string>
