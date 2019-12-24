@@ -3,8 +3,6 @@ package com.example.washere.Views.Activities.New_User_Activity;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
-
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -13,7 +11,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.washere.R;
-import com.example.washere.Views.Activities.Login_Activity.LoginActivity;
 
 public class NewUserActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -81,7 +78,6 @@ public class NewUserActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     public void startLoginActivity() {
-        intent = new Intent(this, LoginActivity.class);
         this.startActivity(intent);
     }
 

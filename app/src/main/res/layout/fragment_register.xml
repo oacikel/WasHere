@@ -26,7 +26,7 @@
 
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/textFieldCreateUserName"
+            android:id="@+id/textInputEditTextCreateUserName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/user_name_hint"
@@ -60,7 +60,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textFieldInputLayoutCreateUserName">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/textFieldCreateEMail"
+            android:id="@+id/textInputEditTextCreateEMail"
             style="@style/NoAllCapsTextApperance"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -93,12 +93,11 @@
         app:layout_constraintTop_toBottomOf="@+id/textFieldInputLayoutCreateEMail">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/textFieldCreatePassword"
+            android:id="@+id/textInputEditTextCreatePassword"
             style="@style/NoAllCapsTextApperance"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:hintTextAppearance="@style/HintTextApperance"
-
             android:alpha="80"
             android:backgroundTint="@color/primaryLightColor"
             android:drawableStart="@drawable/icon_password"
@@ -130,7 +129,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textFieldInputLayoutCreatePassword">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/textFieldReEnterPassword"
+            android:id="@+id/textInputEditTextReEnterPassword"
             style="@style/NoAllCapsTextApperance"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -152,7 +151,7 @@
 
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/material_button"
+        android:id="@+id/materialButtonSignUp"
         style="@style/NoAllCapsTextApperance"
         android:text="@string/create_new_account"
         android:layout_width="0dp"
