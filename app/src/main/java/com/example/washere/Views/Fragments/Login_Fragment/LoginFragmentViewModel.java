@@ -1,12 +1,15 @@
 package com.example.washere.Views.Fragments.Login_Fragment;
 
 import android.app.Application;
+import android.content.Context;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.washere.models.CONSTANTS;
 import com.example.washere.models.User;
 import com.example.washere.models.eLoginState;
 import com.example.washere.repositories.UserRepository;
@@ -22,9 +25,11 @@ public class LoginFragmentViewModel extends AndroidViewModel {
     private UserRepository userRepository;
     private String message;
     private static String LOG_TAG = ("OCUL- LoginFragmentVM");
+    private Context context;
 
     public LoginFragmentViewModel(@NonNull Application application) {
         super(application);
+        context=application.getApplicationContext();
     }
 
     public void init() {
@@ -77,5 +82,18 @@ public class LoginFragmentViewModel extends AndroidViewModel {
         user.setFirebaseUser(firebaseUser);
         user.setUserName(firebaseUser.getDisplayName());
         userRepository.setCurrentUser(user);
+    }
+
+    public void autoLoginIfPossible() {
+        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(CONSTANTS.IS_AUTO_LOGIN_SELECTED, false)) {
+            if (userRepository.getFirebaseAuth().getCurrentUser()!=null){
+                setLoginState(eLoginState.LOGIN_SUCCESS);
+            }
+        }
+
+    }
+
+    public void setAutoLoginSelected(boolean isSelected){
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(CONSTANTS.IS_AUTO_LOGIN_SELECTED, isSelected).apply();
     }
 }

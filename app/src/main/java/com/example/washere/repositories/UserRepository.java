@@ -12,7 +12,7 @@ import static com.squareup.okhttp.internal.Internal.instance;
 public class UserRepository {
     private static UserRepository instance;
     private static User currentUser;
-    private FirebaseAuth firebaseAuth;
+    private FirebaseAuth firebaseAuth =FirebaseAuth.getInstance();
     private MutableLiveData<eLoginState> loginState = new MutableLiveData<>();
     private MutableLiveData<Boolean> isNewUserCreated = new MutableLiveData<>();
     private String message;

@@ -38,6 +38,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initOtherObjects();
+        loginFragmentViewModel.init();
+        loginFragmentViewModel.autoLoginIfPossible();
     }
 
     @Override
@@ -45,8 +48,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         View view = inflater.inflate(R.layout.fragment_login, container, false);
         initViews(view);
         setOnClickListeners();
-        initOtherObjects();
-        loginFragmentViewModel.init();
+
+
 
         loginFragmentViewModel.getLoginState().observe(this, new Observer<eLoginState>() {
             @Override
@@ -70,6 +73,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         if (v == materialButtonLogin) {
             if (!textInputEditTextEnterEMail.getText().toString().equals("") && !textInputEditTextEnterPassword.getText().toString().equals("")) {
+                if (checkBoxRememberMe.isChecked()){
+                    loginFragmentViewModel.setAutoLoginSelected(true);
+                }
                 String eMail = textInputEditTextEnterEMail.getText().toString();
                 String password = textInputEditTextEnterPassword.getText().toString();
                 loginFragmentViewModel.signInUser(eMail, password);
