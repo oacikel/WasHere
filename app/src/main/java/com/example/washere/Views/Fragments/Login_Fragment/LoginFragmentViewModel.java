@@ -87,6 +87,7 @@ public class LoginFragmentViewModel extends AndroidViewModel {
     public void autoLoginIfPossible() {
         if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(CONSTANTS.IS_AUTO_LOGIN_SELECTED, false)) {
             if (userRepository.getFirebaseAuth().getCurrentUser()!=null){
+                createCurrentUser();
                 setLoginState(eLoginState.LOGIN_SUCCESS);
             }
         }

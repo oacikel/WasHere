@@ -24,10 +24,15 @@
     <string name="update_marker_list">Update Markers</string>
     <string name="playSound">Play Sample Sound</string>
     <string name="recordSound">Record Something!</string>
-    <string name="editTextWasTitle_hint">this one\'s called…</string>
+    <string name="editTextWasTitle_hint">title</string>
     <string name="empty_title">no title…</string>
     <string name="uploading">Uploading please wait…</string>
     <string name="upload_successful">Upload successful!</string>
+
+
+    <string name="discard_recording">Cancel</string>
+    <string name="retake_recording">Retry</string>
+    <string name="send_recording">Send</string>
 
     <string name="file_directory_01">/storage/emulated/0/VoiceRecorder/my_sounds/tekerleme01.3gp</string>
     <string name="file_name_01">tekerleme01.3gp</string>

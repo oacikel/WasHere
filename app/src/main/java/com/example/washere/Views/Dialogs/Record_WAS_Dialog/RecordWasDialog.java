@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -24,16 +23,21 @@ import com.example.washere.R;
 import com.example.washere.models.eUploadingState;
 import com.example.washere.models.eRecordState;
 import com.example.washere.repositories.WasRepository;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.textfield.TextInputEditText;
 
 public class RecordWasDialog extends DialogFragment implements View.OnClickListener, Animator.AnimatorListener, ValueAnimator.AnimatorUpdateListener {
     private String LOG_TAG = ("OCUL - Record Dialog");
     private RecordWasDialogViewModel recordWasDialogViewModel;
-    private ImageButton imageButtonControlRecording, imageButtonSend, imageButtonDiscardRecording, imageButtonRetry;
+    private MaterialButton materialButtonSend, materialButtonDiscardRecording, materialButtonRetry;
     private ProgressBar progressBarRemainingTime;
+    private FloatingActionButton floatingActionButtonControlRecording;
+    private TextInputEditText textInputEditTextTitle;
     private TextView editTextWasTitle, textViewUploadingOrUploaded;
     private ValueAnimator animator;
     private ConstraintLayout constraintLayoutRecord;
-    private RelativeLayout relativeLayoutUploading;
+    private ConstraintLayout constraintLayoutUploading;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -43,7 +47,7 @@ public class RecordWasDialog extends DialogFragment implements View.OnClickListe
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.dialog_record_was, container, false);
+        final View view = inflater.inflate(R.layout.dialog_new_post, container, false);
         setCancelable(true);
         initViews(view);
         initOtherObjects();
@@ -65,7 +69,7 @@ public class RecordWasDialog extends DialogFragment implements View.OnClickListe
                     }
                     textViewUploadingOrUploaded.setText(R.string.uploading);
                     constraintLayoutRecord.setVisibility(View.INVISIBLE);
-                    relativeLayoutUploading.setVisibility(View.VISIBLE);
+                    constraintLayoutUploading.setVisibility(View.VISIBLE);
                     recordWasDialogViewModel.uploadWasToStorage();
 
                 } else if(state==eUploadingState.STORAGE_UPLOAD_COMPLETE){
@@ -96,16 +100,16 @@ public class RecordWasDialog extends DialogFragment implements View.OnClickListe
                 if (state != null) {
                     if (state == eRecordState.READY_TO_RECORD) {
                         constraintLayoutRecord.setVisibility(View.VISIBLE);
-                        relativeLayoutUploading.setVisibility(View.INVISIBLE);
-                        imageButtonSend.setVisibility(View.GONE);
-                        imageButtonRetry.setVisibility(View.INVISIBLE);
-                        imageButtonControlRecording.setImageResource(R.drawable.icon_record);
+                        constraintLayoutUploading.setVisibility(View.INVISIBLE);
+                        materialButtonSend.setVisibility(View.GONE);
+                        materialButtonRetry.setVisibility(View.INVISIBLE);
+                        floatingActionButtonControlRecording.setImageResource(R.drawable.icon_record);
                         progressBarRemainingTime.setVisibility(View.INVISIBLE);
 
                     } else if (state == eRecordState.RECORDING) {
-                        imageButtonSend.setVisibility(View.GONE);
-                        imageButtonRetry.setVisibility(View.INVISIBLE);
-                        imageButtonControlRecording.setImageResource(R.drawable.icon_stop);
+                        materialButtonSend.setVisibility(View.GONE);
+                        materialButtonRetry.setVisibility(View.GONE);
+                        floatingActionButtonControlRecording.setImageResource(R.drawable.icon_stop);
                         //Start Recording
                         recordWasDialogViewModel.recordAudio();
                         recordWasDialogViewModel.setDateTimeLocation();
@@ -124,22 +128,22 @@ public class RecordWasDialog extends DialogFragment implements View.OnClickListe
                         //Prepare the recorder audio file to listen
                         recordWasDialogViewModel.prepareMediaPlayer();
                     } else if (state == eRecordState.READY_TO_PLAY) {
-                        imageButtonRetry.setVisibility(View.VISIBLE);
-                        imageButtonControlRecording.setImageResource(R.drawable.icon_play);
-                        imageButtonSend.setVisibility(View.VISIBLE);
+                        materialButtonRetry.setVisibility(View.VISIBLE);
+                        floatingActionButtonControlRecording.setImageResource(R.drawable.icon_play);
+                        materialButtonSend.setVisibility(View.VISIBLE);
                     } else if (state == eRecordState.PLAYING) {
-                        imageButtonRetry.setVisibility(View.VISIBLE);
-                        imageButtonControlRecording.setImageResource(R.drawable.icon_pause);
+                        materialButtonRetry.setVisibility(View.VISIBLE);
+                        floatingActionButtonControlRecording.setImageResource(R.drawable.icon_pause);
                         recordWasDialogViewModel.playAudio();
-                        imageButtonSend.setVisibility(View.VISIBLE);
+                        materialButtonSend.setVisibility(View.VISIBLE);
                     } else if (state == eRecordState.PAUSED) {
-                        imageButtonRetry.setVisibility(View.VISIBLE);
-                        imageButtonControlRecording.setImageResource(R.drawable.icon_play);
-                        imageButtonSend.setVisibility(View.VISIBLE);
+                        materialButtonRetry.setVisibility(View.VISIBLE);
+                        floatingActionButtonControlRecording.setImageResource(R.drawable.icon_play);
+                        materialButtonSend.setVisibility(View.VISIBLE);
                     } else if (state == eRecordState.FINISHED_PLAYING) {
-                        imageButtonRetry.setVisibility(View.VISIBLE);
-                        imageButtonControlRecording.setImageResource(R.drawable.icon_play);
-                        imageButtonSend.setVisibility(View.VISIBLE);
+                        materialButtonRetry.setVisibility(View.VISIBLE);
+                        floatingActionButtonControlRecording.setImageResource(R.drawable.icon_play);
+                        materialButtonSend.setVisibility(View.VISIBLE);
 
                     }
                 }
@@ -151,7 +155,7 @@ public class RecordWasDialog extends DialogFragment implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
-        if (view == imageButtonControlRecording) {
+        if (view == floatingActionButtonControlRecording) {
             eRecordState state = WasRepository.getInstance().getWasRecordingState().getValue();
 
             if (state == eRecordState.READY_TO_RECORD) {
@@ -174,34 +178,34 @@ public class RecordWasDialog extends DialogFragment implements View.OnClickListe
 
             }
 
-        } else if (view == imageButtonRetry) {
+        } else if (view == materialButtonRetry) {
             recordWasDialogViewModel.prepareRecorder();
-        } else if (view == imageButtonDiscardRecording) {
+        } else if (view == materialButtonDiscardRecording) {
             recordWasDialogViewModel.updateUploadingState(eUploadingState.UPLOAD_CANCELED);
 
-        } else if (view == imageButtonSend) {
+        } else if (view == materialButtonSend) {
             recordWasDialogViewModel.updateUploadingState(eUploadingState.UPLOADING_TO_STORAGE);
         }
 
     }
 
     private void initViews(View view) {
-        imageButtonControlRecording = view.findViewById(R.id.imageButtonControlRecording);
-        imageButtonSend = view.findViewById(R.id.imageButtonSend);
-        imageButtonDiscardRecording = view.findViewById(R.id.imageButtonDiscardRecording);
-        imageButtonRetry = view.findViewById(R.id.imageButtonRetry);
+        floatingActionButtonControlRecording = view.findViewById(R.id.floatingActionButtonControlRecording);
+        materialButtonSend = view.findViewById(R.id.materialButtonSend);
+        materialButtonDiscardRecording = view.findViewById(R.id.materialButtonDiscardRecording);
+        materialButtonRetry = view.findViewById(R.id.materialButtonRetry);
         progressBarRemainingTime = view.findViewById(R.id.progressBarRemainingTime);
-        editTextWasTitle = view.findViewById(R.id.editTextWasTitle);
-        relativeLayoutUploading = view.findViewById(R.id.relativeLayoutUploading);
+        editTextWasTitle = view.findViewById(R.id.textInputEditTextTitle);
+        constraintLayoutUploading = view.findViewById(R.id.constraintLayoutUploading);
         constraintLayoutRecord = view.findViewById(R.id.constraintLayoutRecord);
         textViewUploadingOrUploaded = view.findViewById(R.id.textViewUploadingOrUploaded);
     }
 
     private void setOnClickListeners() {
-        imageButtonDiscardRecording.setOnClickListener(this);
-        imageButtonSend.setOnClickListener(this);
-        imageButtonControlRecording.setOnClickListener(this);
-        imageButtonRetry.setOnClickListener(this);
+        materialButtonDiscardRecording.setOnClickListener(this);
+        materialButtonSend.setOnClickListener(this);
+        floatingActionButtonControlRecording.setOnClickListener(this);
+        materialButtonRetry.setOnClickListener(this);
     }
 
     private void initOtherObjects() {

@@ -7,6 +7,7 @@ import androidx.lifecycle.AndroidViewModel;
 
 public class UserEntranceActivityViewModel extends AndroidViewModel {
     private static String LOG_TAG = "OCUL - UserEntranceActivityVM";
+
     public UserEntranceActivityViewModel(@NonNull Application application) {
         super(application);
     }

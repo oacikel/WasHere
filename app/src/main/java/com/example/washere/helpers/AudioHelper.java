@@ -66,8 +66,11 @@ public class AudioHelper {
     private void setFileNameAndPath() {
 
         do {
+
             fileName = DEFAULT_FILE_NAME
                     + "_" + (userRepository.getCurrentUser().getUserName() + "_" + wasRepository.getTimeStamp() + ".mp4");
+
+
             filePath = Environment.getExternalStorageDirectory().getAbsolutePath();
             filePath += "/WasHere/" + fileName;
             uploadFile = new File(filePath);
