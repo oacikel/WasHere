@@ -12,8 +12,6 @@
     <color name="primaryTextColor">#282828</color>
     <color name="primaryHintColor">#646464</color>
     <color name="secondaryTextColor">#ffffff</color>
-    <color name="colorBackGroundTransparent">#CCFFFFFF</color>
-    <color name="colorBackGroundTransparentDark">#CC000000</color>
 
 
 </resources>

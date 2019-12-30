@@ -2,26 +2,16 @@
 <resources>
 
     //Elevation
-    <dimen name="elevation_low">2dp</dimen>
     <dimen name="elevation_medium">6dp</dimen>
     <dimen name="elevation_high">12dp</dimen>
     <dimen name="elevation_highest">24dp</dimen>
     //Margins / Paddings
     <dimen name="margin_paddings_tiny">8dp</dimen>
-    <dimen name="margin_paddings_small">16dp</dimen>
-    <dimen name="margin_paddings_big">24dp</dimen>
     //Seperation
 
     //Radius
-    <dimen name="small_radius">4dp</dimen>
     //Text Size
-    <dimen name="small_text_size">12.12sp</dimen>
-    <dimen name="medium_text_size">16.0sp</dimen>
     //Icon Size
-    <dimen name="small_icon_size">24dp</dimen>
-
-
-
 
 
 </resources>
