@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.washere">
+    package="ocul.longestlovestoryever.washere">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -23,7 +23,7 @@
         android:theme="@style/Theme.MaterialComponents.NoActionBar"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
-            android:name=".Views.Activities.User_Entrance_Activity.UserEntranceActivity"
+            android:name="ocul.longestlovestoryever.washere.Views.Activities.User_Entrance_Activity.UserEntranceActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -32,19 +32,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".Views.Activities.Login_Activity.LoginActivity"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait">
-        </activity>
 
         <activity
-            android:name=".Views.Activities.New_User_Activity.NewUserActivity"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait"></activity>
-
-        <activity
-            android:name=".Views.Activities.Map_Activity.MapActivity"
+            android:name="ocul.longestlovestoryever.washere.Views.Activities.Map_Activity.MapActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait">
         </activity>
@@ -57,7 +47,8 @@
             android:value="u0QjYxj86q2K0SYUxc4wPA" />
         <meta-data
             android:name="com.here.android.maps.license.key"
-            android:value="EnlsPltq5PLTjsvrCiuFNiU+RBx1J4X2ccgba2iy24BI+ZXURfC03e7cw3S4QX6zqi4THaer6dxMVP9zSi1yFbmCZ8SJc2xdCJuQCyyqbkYLoPUyU2MP5LWkYSX7wZvYCr+KJelgoYenYip6NXuXfTqho2OG2ucxnPy9E8wf02hDVQTbUQDVMyB1vf7mYUdvhs2naVl5qlWdNjGkmhinHYxjMPkbRL2FKorh6hLwujJhjQ5BwUJIHYZvoWRrmZ5xaz1zvwU1gstwEIyUR7MbHSrzZcHcu3W4X4HQLd3kqATntcLGZPlcD3XDsJzWs7RP3kHLw3EyiBEDmu3hVDgL6wJTUPKFI40OCZFnE0ZPYqOg8tRghR6U9I2iZxM7/1CoVu4kHcWyI4e6IRI5uDnUwD1iv1u05prDedeoAvuqiDA+DxgI/B2VxiuUMVIweaddLvliJAC0Px0CzKKXUvXptAwkHNlomLRFHOimbPiSs+7mdoRzmxqGIxZGfH6Ik79U1lC0zugtqt69X9lALlxiGAZFcGRoEWAj/hkKXvZGjR3kRoipHh+22ORtdrGMyDf+/ugFTJlt0ZZgJx2ouvyCLTjTNACd/aGqTgNm/+8iMqInkcgz4oGmiEiBVD3AIgPz2igJmf9GY9cTWZgAGdLWmEgIhYVjgnE+Xa9DubdwK3c=" />
+
+            android:value="c9xWTDGAxoDOgVsVGt+gJR9bY3Je0Qr242rivRQ1C9RsZMaxEQ0Gqo1Fn7mDycQlg6Nor6kTdA0Xo+vyTZCqm9kYg7DlIe/v6N3zPrm/nKH00E+PfpMdNJxY7UvGLKIQXoUSRr7jlT0/Et6C4MnmKvmgsHHaCioi4ql1BvAOWvMbh8IScMKK9efvLbOHzkkKXs/Zqb0v1gW/hU9bQbWereCE9WzWv4nGfXDlKW9TrwvMjf0oH0ymMcIh3KavsMi/6D7qCh/9frXSyK57Td0mJIujda0xdHJrE7v6J/wpJenLGO+wHGOqRoQp62ye4KDjH5kN21D5cpX1heXVyRnrjVzLerx6Ta92jGFpO3brWMO4jKLKvwlUxDDlRDoTy+wKaPVdDfQCbv6sjuRQcT98q8/1L6K6NcbJk0cokEtnbRPNG3xa+dSwVF7IvyKkCia+RuEWYYFiLND4wn4v9yjQrdQqXTCdNx2jeeg8Qr0j3MNuRlOe1w+F/9VchRM+ALLPcoFGzHDOHErUhjraBS/N8cPPJFQWeB3WwSP5lfiHd/rj2KSkoIfeKQteQhxzbzOHMwmgfHZqsQgFEAWa+XdWEa5gfL9V24ZTfOYMle3dz9PUGN0dwCsG+ueXZMaNE1tA+4mggvGaTu6wrnn5UZpRXw8A0Cu7Pk8iLFbJsIsT1BI=" />
         <meta-data
             android:name="INTENT_NAME"
             android:value="{YOUR_INTENT_NAME}" />
