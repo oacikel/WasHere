@@ -56,6 +56,7 @@ public class WasRepository extends AppCompatActivity {
     private SupportMapFragment supportMapFragment;
     private EventListener<QuerySnapshot> wasChangeListener;
     private CollectionReference wasCollectionReference;
+    private GeoCoordinate lastKnownLocation;
 
     public static WasRepository getInstance() {
         if (instance == null) {
