@@ -38,10 +38,6 @@ public class RegisterFragmentViewModel extends AndroidViewModel {
 
     }
 
-    public MutableLiveData<Boolean> isNewUserCreated() {
-        return userRepository.getIsNewUserCreated();
-    }
-
     public String getMessage() {
         return message;
     }

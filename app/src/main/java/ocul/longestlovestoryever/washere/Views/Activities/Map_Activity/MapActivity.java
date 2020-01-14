@@ -31,6 +31,8 @@ import com.here.android.mpa.common.OnEngineInitListener;
 import com.here.android.mpa.common.ViewObject;
 import com.here.android.mpa.mapping.Map;
 import com.here.android.mpa.mapping.MapGesture;
+import com.here.android.mpa.mapping.MapState;
+import com.here.android.mpa.mapping.OnMapRenderListener;
 import com.here.android.mpa.mapping.SupportMapFragment;
 
 import java.util.List;
@@ -75,7 +77,8 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
             public void onChanged(@Nullable GeoCoordinate geoCoordinate) {
                 if (geoCoordinate != null) {
                     map = WasRepository.getInstance().getMap();
-                    map.setCenter(geoCoordinate, Map.Animation.LINEAR);
+                    map.setCenter(geoCoordinate, Map.Animation.BOW);
+                    Log.w(LOG_TAG, "Changed position");
                 } else {
                     Log.w(LOG_TAG, "Position is null");
                 }
@@ -171,18 +174,11 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
                             Log.i(LOG_TAG,"Map Engine initialized");
                             if (WasRepository.getInstance().getMap()==null){
                                 WasRepository.getInstance().setMap(supportMapFragment.getMap());
+                                WasRepository.getInstance().setSupportMapFragment(supportMapFragment);
                                 Log.i(LOG_TAG,"Map is null");
                             }
                             map = WasRepository.getInstance().getMap();
-
                             mapActivityViewModel.setWasObjectsAndMarkers();
-                            mapActivityViewModel.onMapEngineInitialized();
-                            supportMapFragment.getPositionIndicator().setVisible(true);
-                            map.setCenter(mapActivityViewModel.getCurrentLocation().getValue(), Map.Animation.NONE);
-                            map.setZoomLevel(16);
-                            WasRepository.getInstance().setMap(map);
-                            mapActivityViewModel.placeMarkersOnMap();
-
                             supportMapFragment.getMapGesture().addOnGestureListener(new MapGesture.OnGestureListener() {
                                 @Override
                                 public void onPanStart() {
@@ -266,11 +262,16 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
                                     return false;
                                 }
                             }, 0, false);
-
+                            mapActivityViewModel.onMapEngineInitialized();
+                            supportMapFragment.getPositionIndicator().setVisible(true);
+                            WasRepository.getInstance().setMap(map);
+                            mapActivityViewModel.placeMarkersOnMap();
+                            map.setZoomLevel(16);
+                            mapActivityViewModel.setMapCenterToLastKnownLocation(map);
                         } else {
                             Toast.makeText(getApplicationContext(), "ERROR: Cannot initialize Map with error " + error,
                                     Toast.LENGTH_LONG).show();
-                            System.out.println("ERROR: Cannot initialize Map with error " + error);
+                            Log.e(LOG_TAG,"Cannot initialize Map with error " + error);
                         }
 
                     }
@@ -306,5 +307,11 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
     public void onWasCardClick(int position) {
         Log.d(LOG_TAG, "Clicked on was card number" + position);
         mapActivityViewModel.playSelectedAudio(position);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mapActivityViewModel.saveLastKnownLocation();
     }
 }

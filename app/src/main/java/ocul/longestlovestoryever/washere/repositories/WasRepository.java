@@ -341,4 +341,12 @@ public class WasRepository extends AppCompatActivity {
     public void setWasListenerInvokedOnce(boolean wasListenerInvokedOnce) {
         this.wasListenerInvokedOnce = wasListenerInvokedOnce;
     }
+
+    public GeoCoordinate getLastKnownLocation() {
+        return lastKnownLocation;
+    }
+
+    public void setLastKnownLocation(GeoCoordinate lastKnownLocation) {
+        this.lastKnownLocation = lastKnownLocation;
+    }
 }
