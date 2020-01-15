@@ -28,6 +28,7 @@ import ocul.longestlovestoryever.washere.repositories.WasRepository;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.here.android.mpa.common.GeoCoordinate;
 import com.here.android.mpa.common.OnEngineInitListener;
+import com.here.android.mpa.common.PositioningManager;
 import com.here.android.mpa.common.ViewObject;
 import com.here.android.mpa.mapping.Map;
 import com.here.android.mpa.mapping.MapGesture;
@@ -45,7 +46,6 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
     MapActivityViewModel mapActivityViewModel;
     PermissionHelper permissionHelper;
     MainButtonSetFragment mainButtonSetFragment;
-    ImageButton buttonCloseList;
     RecyclerView recyclerViewWasCard;
     WasCardAdapter wasCardAdapter;
     FragmentTransaction fragmentTransaction;
@@ -149,10 +149,6 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
 
     @Override
     public void onClick(View v) {
-        if (v == buttonCloseList) {
-            recyclerViewWasCard.setVisibility(View.GONE);
-            buttonCloseList.setVisibility(View.GONE);
-        }
 
     }
 
@@ -206,13 +202,13 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
                                         mapActivityViewModel.updateSelectedWasList(viewObject);
                                         mapActivityViewModel.fillWasCardAdapter(wasCardAdapter);
                                         recyclerViewWasCard.setVisibility(View.VISIBLE);
-                                        buttonCloseList.setVisibility(View.VISIBLE);
                                     }
                                     return false;
                                 }
 
                                 @Override
                                 public boolean onTapEvent(PointF pointF) {
+                                    recyclerViewWasCard.setVisibility(View.GONE);
                                     return false;
                                 }
 
@@ -268,6 +264,7 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
                             mapActivityViewModel.placeMarkersOnMap();
                             map.setZoomLevel(16);
                             mapActivityViewModel.setMapCenterToLastKnownLocation(map);
+                            map.setCenter(PositioningManager.getInstance().getPosition().getCoordinate(), Map.Animation.BOW);
                         } else {
                             Toast.makeText(getApplicationContext(), "ERROR: Cannot initialize Map with error " + error,
                                     Toast.LENGTH_LONG).show();
@@ -284,17 +281,14 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
 
     public void initViews() {
         recyclerViewWasCard = findViewById(R.id.recyclerViewWasCard);
-        buttonCloseList = findViewById(R.id.buttonCloseList);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         recyclerViewWasCard.setLayoutManager(layoutManager);
         recyclerViewWasCard.setHasFixedSize(true);
         wasCardAdapter = new WasCardAdapter(this);
         recyclerViewWasCard.setAdapter(wasCardAdapter);
-        floatingActionButtonNewWas=findViewById(R.id.floatingActionButtonNewWas);
     }
 
     public void setOnClickListeners() {
-        buttonCloseList.setOnClickListener(this);
         floatingActionButtonNewWas.setOnClickListener(this);
     }
 
