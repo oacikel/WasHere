@@ -32,8 +32,6 @@ import com.here.android.mpa.common.PositioningManager;
 import com.here.android.mpa.common.ViewObject;
 import com.here.android.mpa.mapping.Map;
 import com.here.android.mpa.mapping.MapGesture;
-import com.here.android.mpa.mapping.MapState;
-import com.here.android.mpa.mapping.OnMapRenderListener;
 import com.here.android.mpa.mapping.SupportMapFragment;
 
 import java.util.List;
@@ -50,7 +48,6 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
     WasCardAdapter wasCardAdapter;
     FragmentTransaction fragmentTransaction;
     Fragment previousFragment;
-    FloatingActionButton floatingActionButtonNewWas;
 
 
     @Override
@@ -289,7 +286,6 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
     }
 
     public void setOnClickListeners() {
-        floatingActionButtonNewWas.setOnClickListener(this);
     }
 
     public void initiateMainButtonsFragment() {

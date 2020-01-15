@@ -21,7 +21,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewWasCard"
         android:layout_width="0dp"
-        android:layout_height="300dp"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/frameLatourButtonSet"
@@ -40,15 +40,5 @@
         app:layout_constraintStart_toStartOf="parent">
 
     </FrameLayout>
-
-    <ImageButton
-        android:id="@+id/buttonCloseList"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:background="@android:color/transparent"
-        android:src="@android:drawable/ic_menu_close_clear_cancel"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/recyclerViewWasCard"
-        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
