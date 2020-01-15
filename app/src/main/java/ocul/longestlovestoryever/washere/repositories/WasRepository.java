@@ -8,8 +8,10 @@ import androidx.lifecycle.MutableLiveData;
 
 import ocul.longestlovestoryever.washere.models.Was;
 import ocul.longestlovestoryever.washere.models.eDownloadingState;
+import ocul.longestlovestoryever.washere.models.eFollowState;
 import ocul.longestlovestoryever.washere.models.eUploadingState;
 import ocul.longestlovestoryever.washere.models.eRecordState;
+
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -33,6 +35,7 @@ public class WasRepository extends AppCompatActivity {
     private MutableLiveData<eUploadingState> uploadingState = new MutableLiveData<>();
     private MutableLiveData<eDownloadingState> downloadingState = new MutableLiveData<>();
     private MutableLiveData<Integer> locationStatus = new MutableLiveData<>();
+    private MutableLiveData<eFollowState> followState = new MutableLiveData<>();
     private ArrayList<Was> wasList;
     private MutableLiveData<GeoCoordinate> currentLocation = new MutableLiveData<>();
     private ClusterLayer existingClusterLayer;
@@ -153,6 +156,14 @@ public class WasRepository extends AppCompatActivity {
     //Regarding Map Management
 
 
+    public MutableLiveData<eFollowState> getFollowState() {
+        return followState;
+    }
+
+    public void setUpdateFollowState(eFollowState state) {
+        followState.setValue(state);
+    }
+
     public Map getMap() {
         return map;
     }
@@ -240,9 +251,9 @@ public class WasRepository extends AppCompatActivity {
         this.selectedWasList = selectedWasList;
     }
 
-    public void clearWasItems(){
-        wasList=null;
-        clusterLayer=null;
+    public void clearWasItems() {
+        wasList = null;
+        clusterLayer = null;
     }
 
     public CollectionReference getWasItemsReference() {

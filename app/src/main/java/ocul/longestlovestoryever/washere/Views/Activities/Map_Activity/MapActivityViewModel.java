@@ -31,6 +31,7 @@ import ocul.longestlovestoryever.washere.helpers.DatabaseHelper;
 import ocul.longestlovestoryever.washere.models.CONSTANTS;
 import ocul.longestlovestoryever.washere.models.Was;
 import ocul.longestlovestoryever.washere.models.eDownloadingState;
+import ocul.longestlovestoryever.washere.models.eFollowState;
 import ocul.longestlovestoryever.washere.models.eLoginState;
 import ocul.longestlovestoryever.washere.models.eRecordState;
 import ocul.longestlovestoryever.washere.repositories.WasRepository;
@@ -123,6 +124,13 @@ public class MapActivityViewModel extends AndroidViewModel {
         return com.here.android.mpa.common.MapSettings.setIsolatedDiskCacheRootPath(diskCacheRoot, intentName);
     }
 
+    public void updateFollowState(eFollowState state) {
+        wasRepository.setUpdateFollowState(state);
+    }
+
+    public MutableLiveData<eFollowState> getFollowState() {
+        return wasRepository.getFollowState();
+    }
 
     void onMapEngineInitialized() {
         positioningManager = PositioningManager.getInstance();
@@ -281,17 +289,8 @@ public class MapActivityViewModel extends AndroidViewModel {
         if (wasRepository.getCurrentLocation().getValue() != null) {
             PreferenceManager.getDefaultSharedPreferences(context).edit().putLong(CONSTANTS.LAST_KNOWN_LAT, Double.doubleToRawLongBits(wasRepository.getCurrentLocation().getValue().getLatitude())).apply();
             PreferenceManager.getDefaultSharedPreferences(context).edit().putLong(CONSTANTS.LAST_KNOWN_LNG, Double.doubleToRawLongBits(wasRepository.getCurrentLocation().getValue().getLongitude())).apply();
-
-            Log.i(LOG_TAG, "Last known location is saved to shared preferences");
-
         }
-        Log.d(LOG_TAG, "Lat from last known position method: " + positioningManager.getLastKnownPosition().getCoordinate().getLatitude());
-        Log.d(LOG_TAG, "Lat from positioning manager: " + positioningManager.getPosition().getCoordinate().getLatitude());
-
-        Log.d(LOG_TAG, "Lng from last known position method: " + positioningManager.getLastKnownPosition().getCoordinate().getLongitude());
-        Log.d(LOG_TAG, "Lng from positioning manager: " + positioningManager.getPosition().getCoordinate().getLongitude());
     }
-
 
     public void setMapCenterToLastKnownLocation(Map map) {
         GeoCoordinate lastKnownLocation = null;
@@ -301,31 +300,15 @@ public class MapActivityViewModel extends AndroidViewModel {
             lastKnownLocation = new GeoCoordinate(lastKnownLat, lastKnownLng);
         }
         if (lastKnownLocation != null) {
-            wasRepository.getSupportMapFragment().getMap().setCenter(lastKnownLocation, Map.Animation.BOW);
-            Log.i(LOG_TAG, "Map centered to the last known location from shared preferences.");
-            Log.d(LOG_TAG, "Lat from shared preferences: " + Double.longBitsToDouble(PreferenceManager.getDefaultSharedPreferences(context).getLong(CONSTANTS.LAST_KNOWN_LAT, 0)));
-            Log.d(LOG_TAG, "Lng from shared preferences: " + Double.longBitsToDouble(PreferenceManager.getDefaultSharedPreferences(context).getLong(CONSTANTS.LAST_KNOWN_LNG, 0)));
-
+            wasRepository.getSupportMapFragment().getMap().setCenter(lastKnownLocation, Map.Animation.LINEAR);
         } else {
-            map.setCenter(positioningManager.getLastKnownPosition().getCoordinate(), Map.Animation.BOW);
-            Log.w(LOG_TAG, "Last known location is not available.");
+            map.setCenter(positioningManager.getLastKnownPosition().getCoordinate(), Map.Animation.LINEAR);
         }
-        Log.d(LOG_TAG, "Lat from last known position method: " + positioningManager.getLastKnownPosition().getCoordinate().getLatitude());
-        Log.d(LOG_TAG, "Lat from positioning manager: " + positioningManager.getPosition().getCoordinate().getLatitude());
-        if (wasRepository.getCurrentLocation().getValue() != null) {
-            Log.d(LOG_TAG, "Lat from repository: " + wasRepository.getCurrentLocation().getValue().getLatitude());
+    }
 
-        } else {
-            Log.d(LOG_TAG, "Repository value is null");
-        }
-
-        Log.d(LOG_TAG, "Lng from last known position method: " + positioningManager.getLastKnownPosition().getCoordinate().getLongitude());
-        Log.d(LOG_TAG, "Lng from positioning manager: " + positioningManager.getPosition().getCoordinate().getLongitude());
-        if (wasRepository.getCurrentLocation().getValue() != null) {
-            Log.d(LOG_TAG, "Lng from repository: " + wasRepository.getCurrentLocation().getValue().getLongitude());
-
-        } else {
-            Log.d(LOG_TAG, "Repository value is null");
+    public void setMapCenterToCurrentLocation() {
+        if (wasRepository.getMap() != null && wasRepository.getCurrentLocation().getValue() != null) {
+            wasRepository.getMap().setCenter(wasRepository.getCurrentLocation().getValue(), Map.Animation.LINEAR);
         }
     }
 
