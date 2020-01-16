@@ -157,13 +157,11 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
     @Override
     public void onClick(View v) {
         if (v == floatingActionButtonFollowMode) {
-            if (mapActivityViewModel.getFollowState().getValue() == eFollowState.FOLLOW_USER) {
-                mapActivityViewModel.updateFollowState(eFollowState.FREE_ROAM);
-            } else {
-                mapActivityViewModel.updateFollowState(eFollowState.FOLLOW_USER);
-            }
-        }
 
+                mapActivityViewModel.updateFollowState(eFollowState.FOLLOW_USER);
+
+
+        }
     }
 
     public void initiateMap(boolean success) {
