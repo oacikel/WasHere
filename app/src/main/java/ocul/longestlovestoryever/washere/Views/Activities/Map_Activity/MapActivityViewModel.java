@@ -33,6 +33,7 @@ import ocul.longestlovestoryever.washere.models.Was;
 import ocul.longestlovestoryever.washere.models.eDownloadingState;
 import ocul.longestlovestoryever.washere.models.eFollowState;
 import ocul.longestlovestoryever.washere.models.eLoginState;
+import ocul.longestlovestoryever.washere.models.ePermissionStatus;
 import ocul.longestlovestoryever.washere.models.eRecordState;
 import ocul.longestlovestoryever.washere.repositories.WasRepository;
 
@@ -219,6 +220,14 @@ public class MapActivityViewModel extends AndroidViewModel {
             Log.i(LOG_TAG, "Setting up markers. Marker count in cluster is: " + wasRepository.getClusterLayer().getMarkers().size());
             wasRepository.getMap().addClusterLayer(wasRepository.getClusterLayer());
         }
+    }
+
+    public MutableLiveData<ePermissionStatus>getPermissionStatus(){
+        return wasRepository.getPermissionStatus();
+    }
+
+    public void updatePermissionStatus(ePermissionStatus status){
+        wasRepository.setUpdatePermissionStatus(status);
     }
 
     public void updateSelectedWasList(ViewObject object) {

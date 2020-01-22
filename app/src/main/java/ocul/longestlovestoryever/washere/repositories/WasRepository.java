@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData;
 import ocul.longestlovestoryever.washere.models.Was;
 import ocul.longestlovestoryever.washere.models.eDownloadingState;
 import ocul.longestlovestoryever.washere.models.eFollowState;
+import ocul.longestlovestoryever.washere.models.ePermissionStatus;
 import ocul.longestlovestoryever.washere.models.eUploadingState;
 import ocul.longestlovestoryever.washere.models.eRecordState;
 
@@ -60,6 +61,7 @@ public class WasRepository extends AppCompatActivity {
     private EventListener<QuerySnapshot> wasChangeListener;
     private CollectionReference wasCollectionReference;
     private GeoCoordinate lastKnownLocation;
+    private MutableLiveData<ePermissionStatus> permissionStatus=new MutableLiveData<>();
 
     public static WasRepository getInstance() {
         if (instance == null) {
@@ -359,5 +361,13 @@ public class WasRepository extends AppCompatActivity {
 
     public void setLastKnownLocation(GeoCoordinate lastKnownLocation) {
         this.lastKnownLocation = lastKnownLocation;
+    }
+
+    public MutableLiveData<ePermissionStatus> getPermissionStatus() {
+        return permissionStatus;
+    }
+
+    public void setUpdatePermissionStatus(ePermissionStatus permissionStatus) {
+        this.permissionStatus.setValue(permissionStatus);
     }
 }

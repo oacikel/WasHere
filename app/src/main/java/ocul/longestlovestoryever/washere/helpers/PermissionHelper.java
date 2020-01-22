@@ -9,17 +9,22 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import ocul.longestlovestoryever.washere.models.ePermissionStatus;
+import ocul.longestlovestoryever.washere.repositories.WasRepository;
+
 public class PermissionHelper extends AppCompatActivity {
     private Activity activity;
 
+    private static String LOG_TAG = "0CUL - PermissionHelper";
     private final static int REQUEST_CODE_ASK_PERMISSIONS = 1;
-
+    private WasRepository wasRepository;
     private static final String[] REQUIRED_SDK_PERMISSIONS = new String[]{
             Manifest.permission.RECORD_AUDIO,
             Manifest.permission.INTERNET,
@@ -41,6 +46,7 @@ public class PermissionHelper extends AppCompatActivity {
 
     public PermissionHelper(Activity activity) {
         this.activity = activity;
+        wasRepository=WasRepository.getInstance();
     }
 
     @Override
@@ -50,11 +56,17 @@ public class PermissionHelper extends AppCompatActivity {
             case REQUEST_CODE_ASK_PERMISSIONS:
                 for (int index = permissions.length - 1; index >= 0; --index) {
                     if (grantResults[index] != PackageManager.PERMISSION_GRANTED) {
+                        Log.w(LOG_TAG,"Permission not granted");
                         // exit the app if one permission is not granted
                         Toast.makeText(this, "Required permission '" + permissions[index]
                                 + "' not granted, exiting", Toast.LENGTH_LONG).show();
+                        wasRepository.setUpdatePermissionStatus(ePermissionStatus.PERMISSONS_NOT_GRANTED);
                         return;
                     }
+                    else{
+                        Log.w(LOG_TAG,"Permission granted");
+                    }
+                    wasRepository.setUpdatePermissionStatus(ePermissionStatus.PERMISSONS_GRANTED);
                 }
                 break;
         }

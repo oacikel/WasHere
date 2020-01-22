@@ -9,6 +9,8 @@ import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import ocul.longestlovestoryever.washere.R;
+import ocul.longestlovestoryever.washere.helpers.PermissionHelper;
+
 import com.google.android.material.tabs.TabItem;
 import com.google.android.material.tabs.TabLayout;
 
@@ -19,6 +21,7 @@ public class UserEntranceActivity extends AppCompatActivity implements TabLayout
     private TabLayout tabLayoutLoginOrRegister;
     private TabItem tabItemSignIn, tabItemRegister;
     private ViewPager viewPagerLoginOrRegister;
+    private PermissionHelper permissionHelper;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -58,7 +61,14 @@ public class UserEntranceActivity extends AppCompatActivity implements TabLayout
         tabLayoutLoginOrRegister.setupWithViewPager(viewPagerLoginOrRegister);
         tabLayoutLoginOrRegister.getTabAt(0).setText(R.string.create_new_account);
         tabLayoutLoginOrRegister.getTabAt(1).setText(R.string.login);
+        permissionHelper=new PermissionHelper(this);
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        permissionHelper.checkPermissions();
+        super.onDestroy();
     }
 
     private void setListeners(){

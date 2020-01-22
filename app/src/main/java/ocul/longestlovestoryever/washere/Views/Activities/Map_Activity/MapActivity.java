@@ -23,6 +23,7 @@ import ocul.longestlovestoryever.washere.adapters.WasCardAdapter;
 import ocul.longestlovestoryever.washere.helpers.PermissionHelper;
 import ocul.longestlovestoryever.washere.models.eDownloadingState;
 import ocul.longestlovestoryever.washere.models.eFollowState;
+import ocul.longestlovestoryever.washere.models.ePermissionStatus;
 import ocul.longestlovestoryever.washere.models.eRecordState;
 import ocul.longestlovestoryever.washere.repositories.WasRepository;
 
@@ -39,7 +40,7 @@ import java.util.List;
 
 public class MapActivity extends AppCompatActivity implements View.OnClickListener, WasCardAdapter.OnMarkerListener {
 
-    private static String LOG_TAG = ("OCUL- MainActivity");
+    private static String LOG_TAG = ("OCUL- Map Activity");
     SupportMapFragment supportMapFragment;
     Map map;
     MapActivityViewModel mapActivityViewModel;
@@ -67,7 +68,7 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
         //Permission management end
 
         //Map initiation
-        initiateMap(mapActivityViewModel.isSuccess());
+        //initiateMap(mapActivityViewModel.isSuccess());
 
         //Observers
         //Observe Changes in Current Location
@@ -98,6 +99,16 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
                             Log.i(LOG_TAG, "Record Dialog already visible");
                         }
                     }
+                }
+            }
+        });
+
+        //Observe Changes In Permission Status
+        mapActivityViewModel.getPermissionStatus().observe(this, new Observer<ePermissionStatus>() {
+            @Override
+            public void onChanged(ePermissionStatus ePermissionStatus) {
+                if (ePermissionStatus == ocul.longestlovestoryever.washere.models.ePermissionStatus.PERMISSONS_GRANTED) {
+                    initiateMap(mapActivityViewModel.isSuccess());
                 }
             }
         });
@@ -145,11 +156,16 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
         if (requestCode == PermissionHelper.getRequestCodeAskPermissions()) {
             for (int index = permissions.length - 1; index >= 0; --index) {
                 if (grantResults[index] != PackageManager.PERMISSION_GRANTED) {
+                    Log.w(LOG_TAG, "Permissions are not granted");
+                    mapActivityViewModel.updatePermissionStatus(ePermissionStatus.PERMISSONS_GRANTED);
                     // exit the app if one permission is not granted
                     return;
+                } else {
+                    Log.w(LOG_TAG, "Permissions are granted");
+                    mapActivityViewModel.updatePermissionStatus(ePermissionStatus.PERMISSONS_GRANTED);
                 }
             }
-            initiateMap(mapActivityViewModel.isSuccess());
+
 
         }
     }
@@ -158,7 +174,7 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
     public void onClick(View v) {
         if (v == floatingActionButtonFollowMode) {
 
-                mapActivityViewModel.updateFollowState(eFollowState.FOLLOW_USER);
+            mapActivityViewModel.updateFollowState(eFollowState.FOLLOW_USER);
 
 
         }
@@ -283,7 +299,6 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
                                     Toast.LENGTH_LONG).show();
                             Log.e(LOG_TAG, "Cannot initialize Map with error " + error);
                         }
-
                     }
                 });
             }

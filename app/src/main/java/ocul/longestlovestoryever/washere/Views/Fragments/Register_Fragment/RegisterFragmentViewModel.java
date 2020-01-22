@@ -106,7 +106,7 @@ public class RegisterFragmentViewModel extends AndroidViewModel {
 
                         } else {
                             // If sign in fails, display a message to the user.
-                            Log.w(LOG_TAG, "Failed to sign in with eMail", task.getException());
+                            Log.w(LOG_TAG, "Failed to sign in with eMail. ", task.getException());
                             setLoginState(eLoginState.LOGIN_FAILED);
                             message = ("Login failed... " + task.getException().getMessage());
                         }
