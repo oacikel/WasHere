@@ -100,8 +100,13 @@ public class AudioHelper {
         Log.d(LOG_TAG, "The uploaded file name is: " + wasRepository.getUploadFile().getName() +
                 "\n The uploaded file exists (True/False): " + wasRepository.getUploadFile().exists() +
                 "\n The uploaded file length is: " + wasRepository.getUploadFile().length());
-        mediaRecorder.stop();
+        try{
+            mediaRecorder.stop();
+        } catch (RuntimeException e) {
+            Log.e(LOG_TAG,"Error stopping media recorder: "+e.getMessage());
+        }
         mediaRecorder.release();
+
         wasRepository.setMediaRecorder(null);
     }
 
