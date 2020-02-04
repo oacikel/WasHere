@@ -5,6 +5,7 @@ import android.graphics.PointF;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -23,8 +24,10 @@ import ocul.longestlovestoryever.washere.adapters.WasCardAdapter;
 import ocul.longestlovestoryever.washere.helpers.PermissionHelper;
 import ocul.longestlovestoryever.washere.models.eDownloadingState;
 import ocul.longestlovestoryever.washere.models.eFollowState;
+import ocul.longestlovestoryever.washere.models.eLocationStatus;
 import ocul.longestlovestoryever.washere.models.ePermissionStatus;
 import ocul.longestlovestoryever.washere.models.eRecordState;
+import ocul.longestlovestoryever.washere.models.eViewMode;
 import ocul.longestlovestoryever.washere.repositories.WasRepository;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -51,6 +54,7 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
     FragmentTransaction fragmentTransaction;
     Fragment previousFragment;
     FloatingActionButton floatingActionButtonFollowMode;
+    Button buttonOnlyMe, buttonAll;
 
 
     @Override
@@ -62,6 +66,7 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
         setOnClickListeners();
         mapActivityViewModel = ViewModelProviders.of(this).get(MapActivityViewModel.class);
         initiateMainButtonsFragment();
+        mapActivityViewModel.changeViewMode(eViewMode.VIEW_MINE);
         //Permission management start
         permissionHelper = new PermissionHelper(this);
         permissionHelper.checkPermissions();
@@ -78,7 +83,31 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
                 if (geoCoordinate != null && mapActivityViewModel.getFollowState().getValue() == eFollowState.FOLLOW_USER) {
                     map = WasRepository.getInstance().getMap();
                     map.setCenter(geoCoordinate, Map.Animation.LINEAR);
+                   mapActivityViewModel.changeMapMarkersAccordingToDistance(geoCoordinate);
                     Log.w(LOG_TAG, "Changed position");
+                }
+            }
+        });
+
+        //Observe Changes In Location Status
+        mapActivityViewModel.getLocationStatus().observe(this, new Observer<eLocationStatus>() {
+            @Override
+            public void onChanged(eLocationStatus eLocationStatus) {
+                if (eLocationStatus== ocul.longestlovestoryever.washere.models.eLocationStatus.AVAILABLE){
+                    Log.i(LOG_TAG,"Location Status is available");
+                    mapActivityViewModel.initiateCurrentLocation();
+                }else if (eLocationStatus== ocul.longestlovestoryever.washere.models.eLocationStatus.TEMPORARILY_UNAVAILABLE){
+                    Log.e(LOG_TAG,"Location Status is temporarily unavailable");
+                    mapActivityViewModel.startPositionManager();
+                    mapActivityViewModel.managePositionStatus();
+                }else if (eLocationStatus== ocul.longestlovestoryever.washere.models.eLocationStatus.OUT_OF_SERVICE){
+                    Log.e(LOG_TAG,"Location Status is out of service");
+                    mapActivityViewModel.startPositionManager();
+                    mapActivityViewModel.managePositionStatus();
+                }else if (eLocationStatus== ocul.longestlovestoryever.washere.models.eLocationStatus.WRONG_LOCATION){
+                    Log.i(LOG_TAG,"Location Status has the wrong location");
+                    mapActivityViewModel.startPositionManager();
+                    mapActivityViewModel.managePositionStatus();
                 }
             }
         });
@@ -165,18 +194,21 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
                     mapActivityViewModel.updatePermissionStatus(ePermissionStatus.PERMISSONS_GRANTED);
                 }
             }
-
-
         }
     }
 
     @Override
     public void onClick(View v) {
         if (v == floatingActionButtonFollowMode) {
-
             mapActivityViewModel.updateFollowState(eFollowState.FOLLOW_USER);
-
-
+        } else if (v == buttonAll) {
+            mapActivityViewModel.clearUserWasList();
+            mapActivityViewModel.changeViewMode(eViewMode.VIEW_ALL);
+            mapActivityViewModel.placeMarkersOnMap();
+        } else if (v == buttonOnlyMe) {
+            mapActivityViewModel.clearAllWasList();
+            mapActivityViewModel.changeViewMode(eViewMode.VIEW_MINE);
+            mapActivityViewModel.placeMarkersOnMap();
         }
     }
 
@@ -315,10 +347,15 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
         wasCardAdapter = new WasCardAdapter(this);
         recyclerViewWasCard.setAdapter(wasCardAdapter);
         floatingActionButtonFollowMode = findViewById(R.id.floatingActionButtonFollowMode);
+        buttonAll = findViewById(R.id.buttonAll);
+        buttonOnlyMe = findViewById(R.id.buttonOnlyMe);
+        buttonAll = findViewById(R.id.buttonAll);
     }
 
     public void setOnClickListeners() {
         floatingActionButtonFollowMode.setOnClickListener(this);
+        buttonAll.setOnClickListener(this);
+        buttonOnlyMe.setOnClickListener(this);
     }
 
     public void initiateMainButtonsFragment() {
@@ -337,4 +374,5 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
         super.onDestroy();
         mapActivityViewModel.saveLastKnownLocation();
     }
+
 }

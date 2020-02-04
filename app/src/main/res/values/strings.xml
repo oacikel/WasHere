@@ -18,10 +18,11 @@
     <string name="empty_title">no title…</string>
     <string name="uploading">Uploading please wait…</string>
     <string name="upload_successful">Upload successful!</string>
-
+    <string name="switch_private">private</string>
 
     <string name="discard_recording">Cancel</string>
     <string name="retake_recording">Retry</string>
     <string name="send_recording">Send</string>
+
 
 </resources>

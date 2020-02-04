@@ -12,8 +12,10 @@ import androidx.lifecycle.MutableLiveData;
 import ocul.longestlovestoryever.washere.R;
 import ocul.longestlovestoryever.washere.helpers.AudioHelper;
 import ocul.longestlovestoryever.washere.helpers.WasUploadHelper;
+import ocul.longestlovestoryever.washere.models.ePrivacyStatus;
 import ocul.longestlovestoryever.washere.models.eUploadingState;
 import ocul.longestlovestoryever.washere.models.eRecordState;
+import ocul.longestlovestoryever.washere.models.eViewMode;
 import ocul.longestlovestoryever.washere.repositories.WasRepository;
 
 public class RecordWasDialogViewModel extends AndroidViewModel {
@@ -142,4 +144,7 @@ public class RecordWasDialogViewModel extends AndroidViewModel {
 
     }
 
+    public void setPrivacyStatus(ePrivacyStatus aPrivate) {
+        wasRepository.setPrivacyStatus(aPrivate);
+    }
 }

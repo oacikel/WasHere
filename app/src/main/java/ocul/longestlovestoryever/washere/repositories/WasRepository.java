@@ -9,9 +9,12 @@ import androidx.lifecycle.MutableLiveData;
 import ocul.longestlovestoryever.washere.models.Was;
 import ocul.longestlovestoryever.washere.models.eDownloadingState;
 import ocul.longestlovestoryever.washere.models.eFollowState;
+import ocul.longestlovestoryever.washere.models.eLocationStatus;
 import ocul.longestlovestoryever.washere.models.ePermissionStatus;
+import ocul.longestlovestoryever.washere.models.ePrivacyStatus;
 import ocul.longestlovestoryever.washere.models.eUploadingState;
 import ocul.longestlovestoryever.washere.models.eRecordState;
+import ocul.longestlovestoryever.washere.models.eViewMode;
 
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.EventListener;
@@ -35,9 +38,11 @@ public class WasRepository extends AppCompatActivity {
     private static MutableLiveData<eRecordState> wasRecordingState = new MutableLiveData<>();
     private MutableLiveData<eUploadingState> uploadingState = new MutableLiveData<>();
     private MutableLiveData<eDownloadingState> downloadingState = new MutableLiveData<>();
-    private MutableLiveData<Integer> locationStatus = new MutableLiveData<>();
+    private MutableLiveData<eLocationStatus> locationStatus = new MutableLiveData<>();
     private MutableLiveData<eFollowState> followState = new MutableLiveData<>();
-    private ArrayList<Was> wasList;
+    private eViewMode viewMode;
+    private ArrayList<Was> allWasList;
+    private ArrayList<Was> myWasList;
     private MutableLiveData<GeoCoordinate> currentLocation = new MutableLiveData<>();
     private ClusterLayer existingClusterLayer;
     private MutableLiveData<ClusterViewObject> clusterViewObject = new MutableLiveData<>();
@@ -54,14 +59,15 @@ public class WasRepository extends AppCompatActivity {
     private ArrayList<Was> selectedWasList;
     private String downloadUrl;
     private Map map;
-    private ClusterLayer clusterLayer;
+    private ClusterLayer allClusterLayer, myClusterLayer;
     private static long MAX_WAS_LENGTH = 35000;
     private CollectionReference wasItemsReference;
     private SupportMapFragment supportMapFragment;
     private EventListener<QuerySnapshot> wasChangeListener;
     private CollectionReference wasCollectionReference;
     private GeoCoordinate lastKnownLocation;
-    private MutableLiveData<ePermissionStatus> permissionStatus=new MutableLiveData<>();
+    private MutableLiveData<ePermissionStatus> permissionStatus = new MutableLiveData<>();
+    private ePrivacyStatus privacyStatus;
 
     public static WasRepository getInstance() {
         if (instance == null) {
@@ -85,11 +91,15 @@ public class WasRepository extends AppCompatActivity {
     1-Location Available
     2-Location Not Available
      */
-    public MutableLiveData<Integer> getLocationStatus() {
+    public MutableLiveData<eLocationStatus> getLocationStatus() {
         return locationStatus;
     }
 
-    public void updateLocationStatus(int status) {
+    public void updateLocationStatus(eLocationStatus status) {
+        locationStatus.setValue(status);
+    }
+
+    public void setUpdateLocationStatus(eLocationStatus status){
         locationStatus.setValue(status);
     }
 
@@ -121,6 +131,14 @@ public class WasRepository extends AppCompatActivity {
 
     public void setDownloadingState(MutableLiveData<eDownloadingState> downloadingState) {
         this.downloadingState = downloadingState;
+    }
+
+    public eViewMode getViewMode() {
+        return viewMode;
+    }
+
+    public void setViewMode(eViewMode viewMode) {
+        this.viewMode = viewMode;
     }
 
     public void setUpdateDownloadingState(eDownloadingState state) {
@@ -186,6 +204,10 @@ public class WasRepository extends AppCompatActivity {
         return currentLocation;
     }
 
+    public void setUpdateCurrentLocation(GeoCoordinate currentLocation){
+        this.currentLocation.setValue(currentLocation);
+    }
+
     public ClusterLayer getExistingClusterLayer() {
         return existingClusterLayer;
     }
@@ -196,13 +218,24 @@ public class WasRepository extends AppCompatActivity {
 
     //Regarding Was Objects
 
-
-    public ArrayList<Was> getWasList() {
-        return wasList;
+    //Global Was List
+    public ArrayList<Was> getAllWasList() {
+        return allWasList;
     }
 
-    public void setWasList(ArrayList<Was> wasList) {
-        this.wasList = wasList;
+    public void setAllWasList(ArrayList<Was> allWasList) {
+        this.allWasList = allWasList;
+    }
+
+    //My Was List
+
+
+    public ArrayList<Was> getMyWasList() {
+        return myWasList;
+    }
+
+    public void setMyWasList(ArrayList<Was> myWasList) {
+        this.myWasList = myWasList;
     }
 
     public MutableLiveData<ClusterViewObject> getClusterViewObject() {
@@ -237,12 +270,20 @@ public class WasRepository extends AppCompatActivity {
         this.markerSelected = markerSelected;
     }
 
-    public ClusterLayer getClusterLayer() {
-        return clusterLayer;
+    public ClusterLayer getAllClusterLayer() {
+        return allClusterLayer;
     }
 
-    public void setClusterLayer(ClusterLayer clusterLayer) {
-        this.clusterLayer = clusterLayer;
+    public void setAllClusterLayer(ClusterLayer allClusterLayer) {
+        this.allClusterLayer = allClusterLayer;
+    }
+
+    public ClusterLayer getMyClusterLayer() {
+        return myClusterLayer;
+    }
+
+    public void setMyClusterLayer(ClusterLayer myClusterLayer) {
+        this.myClusterLayer = myClusterLayer;
     }
 
     public ArrayList<Was> getSelectedWasList() {
@@ -254,8 +295,8 @@ public class WasRepository extends AppCompatActivity {
     }
 
     public void clearWasItems() {
-        wasList = null;
-        clusterLayer = null;
+        allWasList = null;
+        allClusterLayer = null;
     }
 
     public CollectionReference getWasItemsReference() {
@@ -369,5 +410,14 @@ public class WasRepository extends AppCompatActivity {
 
     public void setUpdatePermissionStatus(ePermissionStatus permissionStatus) {
         this.permissionStatus.setValue(permissionStatus);
+    }
+
+    public ePrivacyStatus getPrivacyStatus() {
+        return privacyStatus;
+    }
+
+    public void setPrivacyStatus(ePrivacyStatus privacyStatus) {
+        this.privacyStatus = privacyStatus;
+
     }
 }

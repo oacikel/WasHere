@@ -28,6 +28,7 @@ public class WasUploadHelper {
             String uploadTitle = wasRepository.getUploadTitle();
             File uploadFile = wasRepository.getUploadFile();
             wasToUpload = new Was(uploadLocation.getLatitude(), uploadLocation.getLongitude(), uploadLocation.getAltitude(), uploadTitle, uploaderName, uploadTime, uploadDate, uploadFile);
+            wasToUpload.setPrivacyStatus(wasRepository.getPrivacyStatus().name());
             wasRepository.setWasToUpload(wasToUpload);
             Log.i(LOG_TAG, "A Was Object to upload is added to Repository.");
         } else {

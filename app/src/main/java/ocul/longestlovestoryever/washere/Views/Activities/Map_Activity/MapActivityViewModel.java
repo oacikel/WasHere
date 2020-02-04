@@ -24,23 +24,27 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
+import ocul.longestlovestoryever.washere.R;
 import ocul.longestlovestoryever.washere.Views.Dialogs.Record_WAS_Dialog.RecordWasDialog;
 import ocul.longestlovestoryever.washere.adapters.WasCardAdapter;
 import ocul.longestlovestoryever.washere.helpers.AudioHelper;
 import ocul.longestlovestoryever.washere.helpers.DatabaseHelper;
+import ocul.longestlovestoryever.washere.helpers.MapHelper;
 import ocul.longestlovestoryever.washere.models.CONSTANTS;
 import ocul.longestlovestoryever.washere.models.Was;
 import ocul.longestlovestoryever.washere.models.eDownloadingState;
 import ocul.longestlovestoryever.washere.models.eFollowState;
-import ocul.longestlovestoryever.washere.models.eLoginState;
+import ocul.longestlovestoryever.washere.models.eLocationStatus;
 import ocul.longestlovestoryever.washere.models.ePermissionStatus;
 import ocul.longestlovestoryever.washere.models.eRecordState;
+import ocul.longestlovestoryever.washere.models.eViewMode;
 import ocul.longestlovestoryever.washere.repositories.WasRepository;
 
 import com.here.android.mpa.cluster.ClusterLayer;
 import com.here.android.mpa.cluster.ClusterViewObject;
 import com.here.android.mpa.common.GeoCoordinate;
 import com.here.android.mpa.common.GeoPosition;
+import com.here.android.mpa.common.Image;
 import com.here.android.mpa.common.PositioningManager;
 import com.here.android.mpa.common.ViewObject;
 import com.here.android.mpa.mapping.Map;
@@ -49,6 +53,7 @@ import com.here.android.mpa.mapping.MapObject;
 import com.here.android.mpa.mapping.MapProxyObject;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
@@ -56,6 +61,7 @@ public class MapActivityViewModel extends AndroidViewModel {
     private static String LOG_TAG = ("OCUL- MainActivityViewModel");
     private String intentName;
     private Context context;
+    private MapHelper mapHelper = new MapHelper();
     private MutableLiveData<GeoCoordinate> currentLocation = WasRepository.getInstance().getCurrentLocation();
     private PositioningManager positioningManager;
     private AudioHelper audioHelper = new AudioHelper();
@@ -70,18 +76,20 @@ public class MapActivityViewModel extends AndroidViewModel {
     private MapMarker selectedMarker;
     private ArrayList<Was> selectedWasList;
     private ArrayList<Was> fullWasList;
+    private Image withinRadiusMarker, outsideDistanceMarker;
 
     public MapActivityViewModel(@NonNull Application application) {
         super(application);
         context = application.getApplicationContext();
     }
 
+
     //Location Status
-    public MutableLiveData<Integer> getLocationStatus() {
+    public MutableLiveData<eLocationStatus> getLocationStatus() {
         return wasRepository.getLocationStatus();
     }
 
-    private void updateLocationStatus(int status) {
+    private void updateLocationStatus(eLocationStatus status) {
         wasRepository.getLocationStatus().setValue(status);
     }
 
@@ -139,70 +147,37 @@ public class MapActivityViewModel extends AndroidViewModel {
 
             @Override
             public void onPositionUpdated(PositioningManager.LocationMethod locationMethod, GeoPosition geoPosition, boolean b) {
-                currentLocation.setValue(geoPosition.getCoordinate());
+                Log.w(LOG_TAG,"Position changed");
+                wasRepository.setUpdateCurrentLocation(geoPosition.getCoordinate());
             }
 
             @Override
             public void onPositionFixChanged(PositioningManager.LocationMethod locationMethod, PositioningManager.LocationStatus locationStatus) {
-                if (locationStatus == PositioningManager.LocationStatus.OUT_OF_SERVICE) {
-                    positioningManager.start(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR);
-                    Log.w(LOG_TAG, "Location Status is OUT OF SERVICE");
-                    updateLocationStatus(2);
-                } else if (locationStatus == PositioningManager.LocationStatus.TEMPORARILY_UNAVAILABLE) {
-                    positioningManager.start(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR);
-                    Log.w(LOG_TAG, "Location Status is TEMPORARILY UNAVAILABLE");
-                    updateLocationStatus(2);
-                } else if (locationStatus == PositioningManager.LocationStatus.AVAILABLE) {
-                    Log.w(LOG_TAG, "Location Status is AVAILABLE");
-                    updateLocationStatus(1);
-                }
-                currentLocation.setValue(PositioningManager.getInstance().getPosition().getCoordinate());
+                Log.w(LOG_TAG,"Position fix changed");
+                mapHelper.managePositionStatus(positioningManager, locationStatus);
+                wasRepository.setUpdateCurrentLocation(positioningManager.getPosition().getCoordinate());
             }
         };
         positioningManager.addListener(new WeakReference<>(positionListener));
-        positioningManager.start(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR);
-
-        while (positioningManager.getLocationStatus(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR) == PositioningManager.LocationStatus.TEMPORARILY_UNAVAILABLE) {
-            checkIfLocationIsHealthy();
-            //Log.w("OCUL - While Loop", "Location Status is TEMPORARILY UNAVAILABLE");
-            positioningManager.start(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR);
-            updateLocationStatus(2);
-        }
-        checkIfLocationIsHealthy();
-        if (positioningManager.getLocationStatus(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR) == PositioningManager.LocationStatus.OUT_OF_SERVICE) {
-            Log.w("OCUL - Positioning", "Location Status is OUT OF SERVICE");
-            positioningManager.start(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR);
-            updateLocationStatus(2);
-        } else if (positioningManager.getLocationStatus(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR) == PositioningManager.LocationStatus.AVAILABLE) {
-            Log.w("OCUL - Positioning", "Location Status is AVAILABLE.");
-            if (positioningManager.getPosition().getCoordinate().getLatitude() != -1.7976931348623157E308 && positioningManager.getPosition().getCoordinate().getLongitude() != -1.7976931348623157E308) {
-                currentLocation.setValue(PositioningManager.getInstance().getPosition().getCoordinate());
-                updateLocationStatus(1);
-            } else {
-                while (positioningManager.getPosition().getCoordinate().getLatitude() == -1.7976931348623157E308 && positioningManager.getPosition().getCoordinate().getLongitude() == -1.7976931348623157E308) {
-                    Log.w("OCUL - Positioning", "Wrong location pulled");
-                    positioningManager.start(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR);
-                    updateLocationStatus(2);
-                }
-
-
-            }
-        }
+        startPositionManager();
+        managePositionStatus();
     }
 
-    public void checkIfLocationIsHealthy() {
-        if (positioningManager.hasValidPosition()) {
-            Log.d(LOG_TAG, "Manager has a valid position!");
-        } else {
-            Log.d(LOG_TAG, "Manager DOES NOT have a valid position!");
+    public void startPositionManager(){
+        mapHelper.startPositionManager(positioningManager);
+    }
 
-        }
+    public void initiateCurrentLocation(){
+        wasRepository.setUpdateCurrentLocation(positioningManager.getPosition().getCoordinate());
+    }
+
+    public void managePositionStatus(){
+        mapHelper.managePositionStatus(positioningManager, positioningManager.getLocationStatus(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR));
     }
 
     MutableLiveData<GeoCoordinate> getCurrentLocation() {
         return wasRepository.getCurrentLocation();
     }
-
 
     public void setWasObjectsAndMarkers() {
         databaseHelper.updateWasObjects();
@@ -215,25 +190,47 @@ public class MapActivityViewModel extends AndroidViewModel {
 
 
     public void placeMarkersOnMap() {
-        //wasRepository.getMap().removeClusterLayer(wasRepository.getClusterLayer());
-        if (wasRepository.getClusterLayer() != null) {
-            Log.i(LOG_TAG, "Setting up markers. Marker count in cluster is: " + wasRepository.getClusterLayer().getMarkers().size());
-            wasRepository.getMap().addClusterLayer(wasRepository.getClusterLayer());
+        if (wasRepository.getViewMode() == eViewMode.VIEW_ALL) {
+            if (wasRepository.getAllClusterLayer() != null) {
+                Log.i(LOG_TAG, "Setting up markers. Marker count in cluster is: " + wasRepository.getAllClusterLayer().getMarkers().size());
+                wasRepository.getMap().addClusterLayer(wasRepository.getAllClusterLayer());
+            }
+        } else if (wasRepository.getViewMode() == eViewMode.VIEW_MINE) {
+            if (wasRepository.getMyClusterLayer() != null) {
+                Log.i(LOG_TAG, "Setting up  my markers. My Marker count in cluster is: " + wasRepository.getMyClusterLayer().getMarkers().size());
+                wasRepository.getMap().addClusterLayer(wasRepository.getMyClusterLayer());
+            }
         }
     }
 
-    public MutableLiveData<ePermissionStatus>getPermissionStatus(){
+    public void clearUserWasList() {
+        if (wasRepository.getMyClusterLayer() != null) {
+            wasRepository.getMap().removeClusterLayer(wasRepository.getMyClusterLayer());
+        }
+    }
+
+    public void clearAllWasList() {
+        if (wasRepository.getAllClusterLayer() != null) {
+            wasRepository.getMap().removeClusterLayer(wasRepository.getAllClusterLayer());
+        }
+    }
+
+    public void changeViewMode(eViewMode mode) {
+        wasRepository.setViewMode(mode);
+    }
+
+    public MutableLiveData<ePermissionStatus> getPermissionStatus() {
         return wasRepository.getPermissionStatus();
     }
 
-    public void updatePermissionStatus(ePermissionStatus status){
+    public void updatePermissionStatus(ePermissionStatus status) {
         wasRepository.setUpdatePermissionStatus(status);
     }
 
     public void updateSelectedWasList(ViewObject object) {
 
         selectedWasList = new ArrayList<>();
-        fullWasList = wasRepository.getWasList();
+        fullWasList = wasRepository.getAllWasList();
         if (wasRepository.getSelectedWasList() == null) {
             wasRepository.setSelectedWasList(new ArrayList<Was>());
         }
@@ -246,7 +243,7 @@ public class MapActivityViewModel extends AndroidViewModel {
                 clusterViewObject = (ClusterViewObject) mapProxyObject;
                 selectedMarkerList = new ArrayList<>(clusterViewObject.getMarkers());
                 for (int i = 0; i < selectedMarkerList.size(); i++) {
-                    for (int a = 0; a < wasRepository.getWasList().size(); a++) {
+                    for (int a = 0; a < wasRepository.getAllWasList().size(); a++) {
                         if (selectedMarkerList.get(i).getTitle().equals(fullWasList.get(a).getUniqueId())) {
                             selectedWasList.add(fullWasList.get(a));
                         }
@@ -319,6 +316,42 @@ public class MapActivityViewModel extends AndroidViewModel {
         if (wasRepository.getMap() != null && wasRepository.getCurrentLocation().getValue() != null) {
             wasRepository.getMap().setCenter(wasRepository.getCurrentLocation().getValue(), Map.Animation.LINEAR);
         }
+    }
+
+    public eViewMode getViewMode() {
+        return wasRepository.getViewMode();
+    }
+
+    public void changeMapMarkersAccordingToDistance(GeoCoordinate currentLocation) {
+        if (withinRadiusMarker == null) {
+            withinRadiusMarker = new Image();
+            try {
+                withinRadiusMarker.setImageResource(R.drawable.place_holder_icon);
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("Error in setting image Resource: " + e.getMessage());
+            }
+        }
+        if (outsideDistanceMarker == null) {
+            outsideDistanceMarker = new Image();
+            try {
+                outsideDistanceMarker.setImageResource(R.drawable.outside_range_icon);
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("Error in setting image Resource: " + e.getMessage());
+            }
+        }
+
+        for (MapMarker marker : wasRepository.getAllClusterLayer().getMarkers()) {
+            if (marker.getCoordinate().distanceTo(currentLocation) <= CONSTANTS.VIEW_DISTANCE) {
+                Log.i(LOG_TAG, "Marker is within viewing distance.");
+                marker.setIcon(withinRadiusMarker);
+            } else {
+                marker.setIcon(outsideDistanceMarker);
+                Log.i(LOG_TAG, "Marker is outside the viewing distance.");
+            }
+        }
+
     }
 
 }

@@ -25,22 +25,22 @@
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/textInputEditTextEnterEMail"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:drawableStart="@drawable/icon_email"
-            android:hint="@string/e_mail_hint"
-            android:inputType="textEmailAddress"
-
+            android:layout_height="48dp"
             android:alpha="80"
-            android:theme="@style/HintTextApperance"
             android:backgroundTint="@color/primaryLightColor"
+            android:drawableStart="@drawable/icon_email"
+
             android:drawablePadding="@dimen/margin_paddings_tiny"
             android:fontFamily="@font/raleway_semibold"
+            android:hint="@string/e_mail_hint"
+            android:inputType="textEmailAddress"
             android:singleLine="true"
             android:textColor="@color/primaryTextColor"
             android:textColorHighlight="@color/secondaryColor"
             android:textColorHint="@color/primaryHintColor"
             android:textColorLink="@color/primaryColor"
-            android:textCursorDrawable="@color/primaryColor"/>
+            android:textCursorDrawable="@color/primaryColor"
+            android:theme="@style/HintTextApperance" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -59,26 +59,25 @@
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/textInputEditTextEnterPassword"
 
+            style="@style/NoAllCapsTextApperance"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
             android:alpha="80"
-            android:theme="@style/HintTextApperance"
             android:backgroundTint="@color/primaryLightColor"
             android:drawableStart="@drawable/icon_new_user"
             android:drawablePadding="@dimen/margin_paddings_tiny"
             android:fontFamily="@font/raleway_semibold"
+            android:hint="@string/create_password_hint"
+            android:inputType="textPassword"
             android:singleLine="true"
             android:textColor="@color/primaryTextColor"
+
             android:textColorHighlight="@color/secondaryColor"
             android:textColorHint="@color/primaryHintColor"
             android:textColorLink="@color/primaryColor"
+
             android:textCursorDrawable="@color/primaryColor"
-
-            style="@style/NoAllCapsTextApperance"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-
-            android:hint="@string/create_password_hint"
-            android:inputType="textPassword"
-            />
+            android:theme="@style/HintTextApperance" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.button.MaterialButton
@@ -101,7 +100,7 @@
     <TextView
         android:id="@+id/textViewForgotPassword"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:text="@string/forgot_password"
         android:textColor="@color/primaryHintColor"
         app:layout_constraintBottom_toBottomOf="@+id/checkBoxRememberMe"
@@ -112,13 +111,13 @@
         android:id="@+id/checkBoxRememberMe"
         style="@style/NoAllCapsTextApperance"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:layout_marginTop="16dp"
+        android:buttonTint="@color/primaryColor"
         android:fontFamily="@font/raleway_semibold"
         android:text="@string/remember_me"
         android:textColor="@color/primaryHintColor"
         app:layout_constraintStart_toStartOf="@+id/textFieldInputLayoutEnterPassword"
-        app:layout_constraintTop_toBottomOf="@+id/textFieldInputLayoutEnterPassword"
-        android:buttonTint="@color/primaryColor"/>
+        app:layout_constraintTop_toBottomOf="@+id/textFieldInputLayoutEnterPassword" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

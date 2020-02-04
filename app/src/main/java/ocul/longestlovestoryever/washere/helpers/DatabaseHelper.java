@@ -1,5 +1,7 @@
 package ocul.longestlovestoryever.washere.helpers;
 
+import android.content.res.Resources;
+import android.graphics.Color;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -8,8 +10,12 @@ import androidx.annotation.Nullable;
 import ocul.longestlovestoryever.washere.R;
 import ocul.longestlovestoryever.washere.models.Was;
 import ocul.longestlovestoryever.washere.models.eDownloadingState;
+import ocul.longestlovestoryever.washere.models.ePrivacyStatus;
 import ocul.longestlovestoryever.washere.models.eUploadingState;
+import ocul.longestlovestoryever.washere.models.eViewMode;
+import ocul.longestlovestoryever.washere.repositories.UserRepository;
 import ocul.longestlovestoryever.washere.repositories.WasRepository;
+
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
@@ -19,7 +25,11 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.here.android.mpa.cluster.BasicClusterStyle;
+import com.here.android.mpa.cluster.ClusterDensityRange;
 import com.here.android.mpa.cluster.ClusterLayer;
+import com.here.android.mpa.cluster.ClusterStyle;
+import com.here.android.mpa.cluster.ClusterTheme;
 import com.here.android.mpa.common.GeoCoordinate;
 import com.here.android.mpa.common.Image;
 import com.here.android.mpa.mapping.MapMarker;
@@ -35,108 +45,85 @@ public class DatabaseHelper {
     private FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
     private CollectionReference collectionReference;
     private WasRepository wasRepository = WasRepository.getInstance();
+    private UserRepository userRepository = UserRepository.getInstance();
 
     public void updateWasObjects() {
-        //wasRepository.clearWasItems();
-            CollectionReference wasItemReference=firebaseFirestore.collection("wasItems");
-        if (wasRepository.getWasList() == null) {
-            Log.i(LOG_TAG, "Was List is null. Creating new one");
-            wasRepository.setWasList(new ArrayList<Was>());
+        CollectionReference wasItemReference = firebaseFirestore.collection("wasItems");
+        if (wasRepository.getAllWasList() == null) {
+            Log.i(LOG_TAG, "Global Was List is null. Creating new one");
+            wasRepository.setAllWasList(new ArrayList<Was>());
         }
-        if (wasRepository.getClusterLayer() == null) {
-            wasRepository.setClusterLayer(new ClusterLayer());
-            Log.i(LOG_TAG, "Cluster layer is null. Creating new one");
+        if (wasRepository.getAllClusterLayer() == null) {
+            wasRepository.setAllClusterLayer(new ClusterLayer());
+            Log.i(LOG_TAG, "Global Cluster layer is null. Creating new one");
         }
-            wasItemReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
-                @Override
-                public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException e) {
-                    {
-                        if (e != null) {
-                            Log.e(LOG_TAG, "Error receiving updates from database: " + e.getMessage());
-                        } else {
 
-                            for (DocumentChange change : value.getDocumentChanges()) {
-                                Was changedWas = createWasFromDocumentChange(change);
-                                switch (change.getType()) {
-                                    case ADDED:
-                                        Log.i(LOG_TAG, "New was item received with id: " + change.getDocument().getId());
+        //Set My WasList
+        if (wasRepository.getMyWasList() == null) {
+            Log.i(LOG_TAG, "Private Was List is null. Creating new one");
+            wasRepository.setMyWasList(new ArrayList<Was>());
+        }
+        if (wasRepository.getMyClusterLayer() == null) {
+            wasRepository.setMyClusterLayer(new ClusterLayer());
+            Log.i(LOG_TAG, "Private Cluster layer is null. Creating new one");
+        }
 
-                                        wasRepository.getWasList().add(changedWas);
-                                        wasRepository.getClusterLayer().addMarker(changedWas.getMapMarker());
-
-                                        break;
-                                    case MODIFIED:
-                                        Log.i(LOG_TAG, "Was item modified");
-
-                                        break;
-                                    case REMOVED:
-                                        Log.i(LOG_TAG, "Was item removed");
-
-
-                                        break;
-                                }
+        wasItemReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.e(LOG_TAG, "Error receiving updates from database: " + e.getMessage());
+                } else {
+                    for (DocumentChange change : value.getDocumentChanges()) {
+                        Was changedWas = createWasFromDocumentChange(change);
+                        //Add Was if uploader is me
+                        if (changedWas.getUploaderName().equals(userRepository.getCurrentUser().getUserName())) {
+                            Log.d(LOG_TAG, "This was is created by current user");
+                            switch (change.getType()) {
+                                case ADDED:
+                                    Log.i(LOG_TAG, "Users was is received with ID: " + change.getDocument().getId());
+                                    wasRepository.getAllWasList().add(changedWas);
+                                    wasRepository.getAllClusterLayer().addMarker(changedWas.getMapMarker());
+                                    wasRepository.getMyWasList().add(changedWas);
+                                    wasRepository.getMyClusterLayer().addMarker(changedWas.getMapMarker());
+                                    break;
+                                case MODIFIED:
+                                    Log.i(LOG_TAG, "Was item modified");
+                                    break;
+                                case REMOVED:
+                                    Log.i(LOG_TAG, "Was item removed");
+                                    break;
                             }
-                            wasRepository.getMap().removeClusterLayer(wasRepository.getClusterLayer());
-                            wasRepository.setUpdateDownloadingState(eDownloadingState.WAS_ITEM_ADDED);
+                        }
+                        //If uploader isn't me take only the non private ones
+                        else if (ePrivacyStatus.PRIVATE.name().equals(changedWas.getPrivacyStatus())) {
+                            Log.d(LOG_TAG, "This was is created by " + changedWas.getUploaderName() + " but is private");
+                        } else {
+                            Log.d(LOG_TAG, "This was is created by " + changedWas.getUploaderName() + " and is not private");
+                            switch (change.getType()) {
+                                case ADDED:
+                                    Log.i(LOG_TAG, "New was item received with id: " + change.getDocument().getId());
 
+                                    wasRepository.getAllWasList().add(changedWas);
+                                    wasRepository.getAllClusterLayer().addMarker(changedWas.getMapMarker());
+
+                                    break;
+                                case MODIFIED:
+                                    Log.i(LOG_TAG, "Was item modified");
+
+                                    break;
+                                case REMOVED:
+                                    Log.i(LOG_TAG, "Was item removed");
+                                    break;
+                            }
                         }
                     }
                 }
-            });
-
-            /*
-        if (wasRepository.getWasItemsReference() == null) {
-            wasRepository.setWasItemsReference(firebaseFirestore.collection("wasItems"));
-        }
-        if (wasRepository.getWasChangeListener() == null) {
-            wasRepository.setWasChangeListener(new EventListener<QuerySnapshot>() {
-                @Override
-                public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException e) {
-                    {
-                        if (e != null) {
-                            Log.e(LOG_TAG, "Error receiving updates from database: " + e.getMessage());
-                        } else {
-
-                            for (DocumentChange change : value.getDocumentChanges()) {
-                                Was changedWas = createWasFromDocumentChange(change);
-                                if (wasRepository.getWasList() == null) {
-                                    Log.i(LOG_TAG, "Was List is null. Creating new one");
-                                    wasRepository.setWasList(new ArrayList<Was>());
-                                }
-                                if (wasRepository.getClusterLayer() == null) {
-                                    wasRepository.setClusterLayer(new ClusterLayer());
-                                    Log.i(LOG_TAG, "Cluster layer is null. Creating new one");
-                                }
-                                switch (change.getType()) {
-                                    case ADDED:
-                                        Log.i(LOG_TAG, "New was item received with id: " + change.getDocument().getId());
-
-                                        wasRepository.getWasList().add(changedWas);
-                                        wasRepository.getClusterLayer().addMarker(changedWas.getMapMarker());
-
-                                        break;
-                                    case MODIFIED:
-                                        Log.i(LOG_TAG, "Was item modified");
-
-                                        break;
-                                    case REMOVED:
-                                        Log.i(LOG_TAG, "Was item removed");
-
-
-                                        break;
-                                }
-                            }
-                            wasRepository.getMap().removeClusterLayer(wasRepository.getClusterLayer());
-                            wasRepository.setUpdateDownloadingState(eDownloadingState.WAS_ITEM_ADDED);
-
-                        }
-                    }
-                }
-            });
-            wasRepository.getWasItemsReference().addSnapshotListener(wasRepository.getWasChangeListener());
-        }
-        wasRepository.setWasListenerInvokedOnce(false);
-        */
+                wasRepository.getMap().removeClusterLayer(wasRepository.getAllClusterLayer());
+                wasRepository.getMap().removeClusterLayer(wasRepository.getMyClusterLayer());
+                wasRepository.setUpdateDownloadingState(eDownloadingState.WAS_ITEM_ADDED);
+            }
+        });
     }
 
     //Take a Was Map And Send It To The Firestore
@@ -152,6 +139,7 @@ public class DatabaseHelper {
             wasObject.put("uploadDate", was.getUploadDate());
             wasObject.put("uploadTime", was.getUploadTime());
             wasObject.put("uploadTitle", was.getUploadTitle());
+            wasObject.put("privacySetting", was.getPrivacyStatus());
 
             collectionReference = firebaseFirestore.collection("wasItems");
             collectionReference.add(wasObject).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -187,6 +175,7 @@ public class DatabaseHelper {
                 (String) wasMap.get("uploadTime"),
                 (String) wasMap.get("uploadDate"));
         was.setUniqueId(change.getDocument().getId());
+        was.setPrivacyStatus((String) wasMap.get("privacySetting"));
         MapMarker marker = new MapMarker();
         marker.setCoordinate(new GeoCoordinate((double) wasMap.get("locationLatitude"), (double) wasMap.get("locationLongitude")));
         marker.setTitle(was.getUniqueId());

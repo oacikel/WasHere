@@ -19,6 +19,7 @@ public class Was {
     private String uploadDate;
     private String uploadTitle;
     private String uniqueId;
+    private String privacyStatus;
 
     public Was() {
     }
@@ -31,7 +32,7 @@ public class Was {
         this.uploadTime = uploadTime;
         this.uploadDate = uploadDate;
         this.uploadTitle = uploadTitle;
-        this.audioFile=audioFile;
+        this.audioFile = audioFile;
     }
 
     public Was(double locationLatitude, double locationLongitude, double locationAltitude, String uploadTitle, String downloadUrl, String uploaderName, String uploadTime, String uploadDate) {
@@ -151,4 +152,11 @@ public class Was {
         this.uniqueId = uniqueId;
     }
 
+    public String getPrivacyStatus() {
+        return privacyStatus;
+    }
+
+    public void setPrivacyStatus(String privacyStatus) {
+        this.privacyStatus = privacyStatus;
+    }
 }

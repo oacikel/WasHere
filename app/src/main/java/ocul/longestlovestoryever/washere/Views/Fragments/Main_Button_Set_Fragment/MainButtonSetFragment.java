@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import ocul.longestlovestoryever.washere.R;
+import ocul.longestlovestoryever.washere.models.eLocationStatus;
 
 public class MainButtonSetFragment extends Fragment implements View.OnClickListener {
 
@@ -47,13 +48,13 @@ public class MainButtonSetFragment extends Fragment implements View.OnClickListe
         //Observers
 
         //Location Status
-        mainButtonSetFragmentViewModel.getLocationStatus().observe(this, new Observer<Integer>() {
+        mainButtonSetFragmentViewModel.getLocationStatus().observe(this, new Observer<eLocationStatus>() {
             @Override
-            public void onChanged(Integer state) {
+            public void onChanged(eLocationStatus state) {
                 if (state != null) {
-                    if (state == 1) {
+                    if (state == eLocationStatus.AVAILABLE) {
                         buttonRecordAudio.setVisibility(View.VISIBLE);
-                    } else if (state == 2) {
+                    } else if (state == eLocationStatus.OUT_OF_SERVICE) {
                         buttonRecordAudio.setVisibility(View.GONE);
                     }
                 }

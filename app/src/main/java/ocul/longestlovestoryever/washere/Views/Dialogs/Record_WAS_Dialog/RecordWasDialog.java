@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -19,9 +20,11 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import ocul.longestlovestoryever.washere.R;
+import ocul.longestlovestoryever.washere.models.ePrivacyStatus;
 import ocul.longestlovestoryever.washere.models.eUploadingState;
 import ocul.longestlovestoryever.washere.models.eRecordState;
 import ocul.longestlovestoryever.washere.repositories.WasRepository;
+
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -37,6 +40,7 @@ public class RecordWasDialog extends DialogFragment implements View.OnClickListe
     private ValueAnimator animator;
     private ConstraintLayout constraintLayoutRecord;
     private ConstraintLayout constraintLayoutUploading;
+    private CheckBox checkBoxMakePrivate;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -45,7 +49,7 @@ public class RecordWasDialog extends DialogFragment implements View.OnClickListe
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull final LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.dialog_new_post, container, false);
         setCancelable(true);
         initViews(view);
@@ -59,34 +63,40 @@ public class RecordWasDialog extends DialogFragment implements View.OnClickListe
         recordWasDialogViewModel.getUploadingState().observe(this, new Observer<eUploadingState>() {
             @Override
             public void onChanged(eUploadingState state) {
-                if (state==eUploadingState.UPLOADING_TO_STORAGE){
-                    Log.i(LOG_TAG,"Uploading to storage");
+                if (state == eUploadingState.UPLOADING_TO_STORAGE) {
+                    Log.i(LOG_TAG, "Uploading to storage");
                     if (editTextWasTitle.getText().toString().isEmpty()) {
                         recordWasDialogViewModel.setUploadTitle(getString(R.string.empty_title));
                     } else {
                         recordWasDialogViewModel.setUploadTitle(editTextWasTitle.getText().toString());
+                    }
+                    if (checkBoxMakePrivate.isChecked()) {
+                        recordWasDialogViewModel.setPrivacyStatus(ePrivacyStatus.PRIVATE);
+
+                    } else {
+                        recordWasDialogViewModel.setPrivacyStatus(ePrivacyStatus.PUBLIC);
                     }
                     textViewUploadingOrUploaded.setText(R.string.uploading);
                     constraintLayoutRecord.setVisibility(View.INVISIBLE);
                     constraintLayoutUploading.setVisibility(View.VISIBLE);
                     recordWasDialogViewModel.uploadWasToStorage();
 
-                } else if(state==eUploadingState.STORAGE_UPLOAD_COMPLETE){
-                    Log.i(LOG_TAG,"Upload to storeage complete");
+                } else if (state == eUploadingState.STORAGE_UPLOAD_COMPLETE) {
+                    Log.i(LOG_TAG, "Upload to storeage complete");
                     recordWasDialogViewModel.updateUploadingState(eUploadingState.UPLOADING_TO_DATABASE);
-                }else if(state==eUploadingState.UPLOADING_TO_DATABASE){
-                    Log.i(LOG_TAG,"Uploading to database");
+                } else if (state == eUploadingState.UPLOADING_TO_DATABASE) {
+                    Log.i(LOG_TAG, "Uploading to database");
                     recordWasDialogViewModel.uploadWasToDatabase();
 
-                }else if (state==eUploadingState.DATABASE_UPLOAD_COMPLETE){
-                    Log.i(LOG_TAG,"Storage upload complete.");
+                } else if (state == eUploadingState.DATABASE_UPLOAD_COMPLETE) {
+                    Log.i(LOG_TAG, "Storage upload complete.");
                     showUploadSuccessful();
                     dismiss();
-                }else if(state==eUploadingState.ERROR){
-                    Log.e(LOG_TAG,"Error uploading");
+                } else if (state == eUploadingState.ERROR) {
+                    Log.e(LOG_TAG, "Error uploading");
 
-                }else if(state==eUploadingState.UPLOAD_CANCELED){
-                    Log.w(LOG_TAG,"Upload canceled");
+                } else if (state == eUploadingState.UPLOAD_CANCELED) {
+                    Log.w(LOG_TAG, "Upload canceled");
                     recordWasDialogViewModel.exit();
                     dismiss();
                 }
@@ -143,7 +153,6 @@ public class RecordWasDialog extends DialogFragment implements View.OnClickListe
                         materialButtonRetry.setVisibility(View.VISIBLE);
                         floatingActionButtonControlRecording.setImageResource(R.drawable.icon_play);
                         materialButtonSend.setVisibility(View.VISIBLE);
-
                     }
                 }
             }
@@ -185,7 +194,6 @@ public class RecordWasDialog extends DialogFragment implements View.OnClickListe
         } else if (view == materialButtonSend) {
             recordWasDialogViewModel.updateUploadingState(eUploadingState.UPLOADING_TO_STORAGE);
         }
-
     }
 
     private void initViews(View view) {
@@ -198,6 +206,8 @@ public class RecordWasDialog extends DialogFragment implements View.OnClickListe
         constraintLayoutUploading = view.findViewById(R.id.constraintLayoutUploading);
         constraintLayoutRecord = view.findViewById(R.id.constraintLayoutRecord);
         textViewUploadingOrUploaded = view.findViewById(R.id.textViewUploadingOrUploaded);
+        checkBoxMakePrivate = view.findViewById(R.id.checkBoxMakePrivate);
+
     }
 
     private void setOnClickListeners() {
@@ -241,10 +251,10 @@ public class RecordWasDialog extends DialogFragment implements View.OnClickListe
         progressBarRemainingTime.setProgress((int) animation.getAnimatedValue());
     }
 
-    public void showUploadSuccessful(){
+    public void showUploadSuccessful() {
         Runnable runnable = new Runnable() {
             @Override
-            public void run(){
+            public void run() {
                 textViewUploadingOrUploaded.setText(R.string.upload_successful);
             }
         };
