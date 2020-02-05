@@ -15,7 +15,7 @@ public class MapHelper {
     public void managePositionStatus(PositioningManager positioningManager, PositioningManager.LocationStatus locationStatus) {
         if (locationStatus == PositioningManager.LocationStatus.TEMPORARILY_UNAVAILABLE) {
             wasRepository.setUpdateLocationStatus(eLocationStatus.TEMPORARILY_UNAVAILABLE);
-            Log.w(LOG_TAG, "Location Status is TEMPORARILY UNAVAILABLE");
+            //Log.w(LOG_TAG, "Location Status is TEMPORARILY UNAVAILABLE");
         } else if (locationStatus == PositioningManager.LocationStatus.OUT_OF_SERVICE) {
             Log.w(LOG_TAG, "Location Status is OUT OF SERVICE");
             wasRepository.setUpdateLocationStatus(eLocationStatus.OUT_OF_SERVICE);

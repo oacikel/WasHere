@@ -10,6 +10,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import ocul.longestlovestoryever.washere.R;
 import ocul.longestlovestoryever.washere.helpers.PermissionHelper;
+import ocul.longestlovestoryever.washere.helpers.VersionHelper;
 
 import com.google.android.material.tabs.TabItem;
 import com.google.android.material.tabs.TabLayout;
@@ -64,6 +65,8 @@ public class UserEntranceActivity extends AppCompatActivity implements TabLayout
         permissionHelper=new PermissionHelper(this);
 
     }
+
+
 
     @Override
     protected void onDestroy() {

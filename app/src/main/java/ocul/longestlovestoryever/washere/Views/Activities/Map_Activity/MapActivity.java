@@ -22,6 +22,7 @@ import ocul.longestlovestoryever.washere.R;
 import ocul.longestlovestoryever.washere.Views.Fragments.Main_Button_Set_Fragment.MainButtonSetFragment;
 import ocul.longestlovestoryever.washere.adapters.WasCardAdapter;
 import ocul.longestlovestoryever.washere.helpers.PermissionHelper;
+import ocul.longestlovestoryever.washere.helpers.VersionHelper;
 import ocul.longestlovestoryever.washere.models.eDownloadingState;
 import ocul.longestlovestoryever.washere.models.eFollowState;
 import ocul.longestlovestoryever.washere.models.eLocationStatus;
@@ -62,6 +63,7 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
         Log.i(LOG_TAG, "Main Activity Created");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        checkForUpdates();
         initViews();
         setOnClickListeners();
         mapActivityViewModel = ViewModelProviders.of(this).get(MapActivityViewModel.class);
@@ -97,7 +99,7 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
                     Log.i(LOG_TAG,"Location Status is available");
                     mapActivityViewModel.initiateCurrentLocation();
                 }else if (eLocationStatus== ocul.longestlovestoryever.washere.models.eLocationStatus.TEMPORARILY_UNAVAILABLE){
-                    Log.e(LOG_TAG,"Location Status is temporarily unavailable");
+                    //Log.e(LOG_TAG,"Location Status is temporarily unavailable");
                     mapActivityViewModel.startPositionManager();
                     mapActivityViewModel.managePositionStatus();
                 }else if (eLocationStatus== ocul.longestlovestoryever.washere.models.eLocationStatus.OUT_OF_SERVICE){
@@ -373,6 +375,11 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
     protected void onDestroy() {
         super.onDestroy();
         mapActivityViewModel.saveLastKnownLocation();
+    }
+
+    private void checkForUpdates(){
+        VersionHelper versionHelper=new VersionHelper(this);
+        versionHelper.manageVersionStatusFromBackend();
     }
 
 }
