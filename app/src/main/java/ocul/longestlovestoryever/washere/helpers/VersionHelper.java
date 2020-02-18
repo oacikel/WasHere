@@ -19,13 +19,17 @@ import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import ocul.longestlovestoryever.washere.BuildConfig;
+import ocul.longestlovestoryever.washere.models.CONSTANTS;
 
 import static ocul.longestlovestoryever.washere.models.CONSTANTS.FB_RC_KEY_DESCRIPTION;
 import static ocul.longestlovestoryever.washere.models.CONSTANTS.FB_RC_KEY_FORCE_UPDATE_VERSION;
 import static ocul.longestlovestoryever.washere.models.CONSTANTS.FB_RC_KEY_LATEST_VERSION;
 import static ocul.longestlovestoryever.washere.models.CONSTANTS.FB_RC_KEY_TITLE;
+import static ocul.longestlovestoryever.washere.models.CONSTANTS.RANGE_IN_METERS;
 import static ocul.longestlovestoryever.washere.models.CONSTANTS.UPDATE_URL;
 import static ocul.longestlovestoryever.washere.models.CONSTANTS.UPDATE_URL_TAG;
+import static ocul.longestlovestoryever.washere.models.CONSTANTS.KEY_RANGE_IN_METERS;
+
 
 public class VersionHelper {
 
@@ -38,7 +42,7 @@ public class VersionHelper {
     // Instance to access the remote config parameters
     FirebaseRemoteConfig mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
     private Context context;
-    private String title, description, forceUpdateVersion, latestAppVersion,updateUrl;
+    private String title, description, forceUpdateVersion, latestAppVersion, updateUrl, rangeInMeters;
 
     public VersionHelper(Activity context) {
         this.context = context;
@@ -46,13 +50,14 @@ public class VersionHelper {
         versionMap.put(FB_RC_KEY_DESCRIPTION, "A new version of the application is available please click below to update the latest version.");
         versionMap.put(FB_RC_KEY_FORCE_UPDATE_VERSION, "" + versionCode);
         versionMap.put(FB_RC_KEY_LATEST_VERSION, "" + versionCode);
-        versionMap.put(UPDATE_URL_TAG,UPDATE_URL);
+        versionMap.put(UPDATE_URL_TAG, UPDATE_URL);
+        versionMap.put(KEY_RANGE_IN_METERS, CONSTANTS.RANGE_IN_METERS);
         // To set the default values for the remote config parameters
         mFirebaseRemoteConfig.setDefaults(versionMap);
     }
 
 
-    public void manageVersionStatusFromBackend() {
+    public void manageRemoteConfigFeatures() {
 
         Task<Void> fetchTask = mFirebaseRemoteConfig.fetch(BuildConfig.DEBUG ? 0 : TimeUnit.HOURS.toSeconds(4));
 
@@ -67,24 +72,30 @@ public class VersionHelper {
                     description = mFirebaseRemoteConfig.getString(FB_RC_KEY_DESCRIPTION);
                     forceUpdateVersion = mFirebaseRemoteConfig.getString(FB_RC_KEY_FORCE_UPDATE_VERSION);
                     latestAppVersion = mFirebaseRemoteConfig.getString(FB_RC_KEY_LATEST_VERSION);
-                    updateUrl=mFirebaseRemoteConfig.getString(UPDATE_URL_TAG);
-                    String a =mFirebaseRemoteConfig.getString("latest_version");
+                    updateUrl = mFirebaseRemoteConfig.getString(UPDATE_URL_TAG);
+                    rangeInMeters = mFirebaseRemoteConfig.getString(KEY_RANGE_IN_METERS);
+
+                    String a = mFirebaseRemoteConfig.getString("latest_version");
                     Log.i(LOG_TAG, "Fetched Data:");
-                    Log.i(LOG_TAG,"Title: "+title+"\nDescription: "+description+"\nForce Update Version: "+forceUpdateVersion+"\n Latest App Version: "+latestAppVersion+"\nUpdate URL: "+updateUrl);
+                    Log.i(LOG_TAG, "Title: " + title + "\nDescription: " + description + "\nForce Update Version: " + forceUpdateVersion + "\n Latest App Version: " + latestAppVersion + "\nUpdate URL: " + updateUrl);
 
 
                     versionMap.put(FB_RC_KEY_TITLE, title);
                     versionMap.put(FB_RC_KEY_DESCRIPTION, description);
                     versionMap.put(FB_RC_KEY_FORCE_UPDATE_VERSION, forceUpdateVersion);
                     versionMap.put(FB_RC_KEY_LATEST_VERSION, latestAppVersion);
-                    versionMap.put(UPDATE_URL_TAG,updateUrl);
+                    versionMap.put(UPDATE_URL_TAG, updateUrl);
 
-                    if (isUpdateNecessary(versionCode,versionMap.get(FB_RC_KEY_FORCE_UPDATE_VERSION).toString())){
+                    //Retrieve Viewing Range From Backend
+                    CONSTANTS.setRangeInMeters(Double.parseDouble(rangeInMeters));
+
+
+                    if (isUpdateNecessary(versionCode, versionMap.get(FB_RC_KEY_FORCE_UPDATE_VERSION).toString())) {
                         showUpdateNeededAlert();
                     }
                 } else {
                     Log.e(LOG_TAG, "Fetching Data failed");
-                    if (isUpdateNecessary(versionCode,versionMap.get(FB_RC_KEY_FORCE_UPDATE_VERSION).toString())){
+                    if (isUpdateNecessary(versionCode, versionMap.get(FB_RC_KEY_FORCE_UPDATE_VERSION).toString())) {
                         showUpdateNeededAlert();
                     }
                 }

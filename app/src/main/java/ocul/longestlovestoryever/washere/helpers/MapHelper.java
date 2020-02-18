@@ -1,9 +1,13 @@
 package ocul.longestlovestoryever.washere.helpers;
 
+import android.os.Handler;
 import android.util.Log;
 
 import com.here.android.mpa.common.PositioningManager;
 
+import java.lang.ref.WeakReference;
+
+import ocul.longestlovestoryever.washere.models.CONSTANTS;
 import ocul.longestlovestoryever.washere.models.eLocationStatus;
 import ocul.longestlovestoryever.washere.repositories.WasRepository;
 
@@ -34,5 +38,22 @@ public class MapHelper {
 
     public void startPositionManager(PositioningManager positioningManager) {
         positioningManager.start(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR);
+    }
+
+    public void updateLocation(final PositioningManager positioningManager) {
+        final Handler handler = new Handler();
+        final int delay = CONSTANTS.MAP_REFRESH_TIME;
+
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                if (wasRepository.getCurrentLocation().getValue() == null)
+                    wasRepository.setUpdateCurrentLocation(positioningManager.getPosition().getCoordinate());
+                else if(wasRepository.getCurrentLocation().getValue().distanceTo(positioningManager.getPosition().getCoordinate())>CONSTANTS.MAP_REFRESH_DISTANCE){
+                    Log.d(LOG_TAG, "Location changed by"+CONSTANTS.MAP_REFRESH_DISTANCE+" meters...");
+                    wasRepository.setUpdateCurrentLocation(positioningManager.getPosition().getCoordinate());
+                }
+                handler.postDelayed(this, delay);
+            }
+        }, delay);
     }
 }

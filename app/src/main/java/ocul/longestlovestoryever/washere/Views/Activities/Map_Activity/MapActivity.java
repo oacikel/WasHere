@@ -74,8 +74,6 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
         permissionHelper.checkPermissions();
         //Permission management end
 
-        //Map initiation
-        //initiateMap(mapActivityViewModel.isSuccess());
 
         //Observers
         //Observe Changes in Current Location
@@ -85,9 +83,9 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
                 if (geoCoordinate != null && mapActivityViewModel.getFollowState().getValue() == eFollowState.FOLLOW_USER) {
                     map = WasRepository.getInstance().getMap();
                     map.setCenter(geoCoordinate, Map.Animation.LINEAR);
-                   mapActivityViewModel.changeMapMarkersAccordingToDistance(geoCoordinate);
                     Log.w(LOG_TAG, "Changed position");
                 }
+                mapActivityViewModel.changeMapMarkersAccordingToDistance(geoCoordinate);
             }
         });
 
@@ -326,6 +324,7 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
                             mapActivityViewModel.placeMarkersOnMap();
                             map.setZoomLevel(16);
                             mapActivityViewModel.setMapCenterToLastKnownLocation(map);
+                            mapActivityViewModel.updateLocation();
                             map.setCenter(PositioningManager.getInstance().getPosition().getCoordinate(), Map.Animation.LINEAR);
                             mapActivityViewModel.updateFollowState(eFollowState.FOLLOW_USER);
                         } else {
@@ -379,7 +378,7 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
 
     private void checkForUpdates(){
         VersionHelper versionHelper=new VersionHelper(this);
-        versionHelper.manageVersionStatusFromBackend();
+        versionHelper.manageRemoteConfigFeatures();
     }
 
 }

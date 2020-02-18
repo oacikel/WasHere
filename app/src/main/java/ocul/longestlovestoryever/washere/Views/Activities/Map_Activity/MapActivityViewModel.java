@@ -106,6 +106,7 @@ public class MapActivityViewModel extends AndroidViewModel {
         }
         fragmentTransaction.addToBackStack(null);
         recordWasDialog = new RecordWasDialog();
+        recordWasDialog.setCancelable(false);
         recordWasDialog.show(fragmentTransaction, "WAS_DIALOG");
     }
 
@@ -147,31 +148,35 @@ public class MapActivityViewModel extends AndroidViewModel {
 
             @Override
             public void onPositionUpdated(PositioningManager.LocationMethod locationMethod, GeoPosition geoPosition, boolean b) {
-                Log.w(LOG_TAG,"Position changed");
+                Log.w(LOG_TAG, "Position changed");
                 wasRepository.setUpdateCurrentLocation(geoPosition.getCoordinate());
             }
 
             @Override
             public void onPositionFixChanged(PositioningManager.LocationMethod locationMethod, PositioningManager.LocationStatus locationStatus) {
-                Log.w(LOG_TAG,"Position fix changed");
+                Log.w(LOG_TAG, "Position fix changed");
                 mapHelper.managePositionStatus(positioningManager, locationStatus);
                 wasRepository.setUpdateCurrentLocation(positioningManager.getPosition().getCoordinate());
             }
+
+
         };
         positioningManager.addListener(new WeakReference<>(positionListener));
         startPositionManager();
         managePositionStatus();
     }
 
-    public void startPositionManager(){
+    public void startPositionManager() {
         mapHelper.startPositionManager(positioningManager);
     }
 
-    public void initiateCurrentLocation(){
-        wasRepository.setUpdateCurrentLocation(positioningManager.getPosition().getCoordinate());
+    public void initiateCurrentLocation() {
+        if (positioningManager!=null){
+            wasRepository.setUpdateCurrentLocation(positioningManager.getPosition().getCoordinate());
+        }
     }
 
-    public void managePositionStatus(){
+    public void managePositionStatus() {
         mapHelper.managePositionStatus(positioningManager, positioningManager.getLocationStatus(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR));
     }
 
@@ -314,7 +319,11 @@ public class MapActivityViewModel extends AndroidViewModel {
 
     public void setMapCenterToCurrentLocation() {
         if (wasRepository.getMap() != null && wasRepository.getCurrentLocation().getValue() != null) {
-            wasRepository.getMap().setCenter(wasRepository.getCurrentLocation().getValue(), Map.Animation.LINEAR);
+            wasRepository.getMap().setCenter(positioningManager.getPosition().getCoordinate(), Map.Animation.LINEAR);
+            //wasRepository.getMap().setCenter(wasRepository.getCurrentLocation().getValue(), Map.Animation.LINEAR);
+            Log.d(LOG_TAG, "Current position according to the positioning manager is: " + positioningManager.getPosition().getCoordinate().getLatitude() + " lat and " + positioningManager.getPosition().getCoordinate().getLongitude() + "long.");
+            Log.w(LOG_TAG, "Current position according to the repository is: " + wasRepository.getCurrentLocation().getValue().getLatitude() + " lat and " + wasRepository.getCurrentLocation().getValue().getLongitude() + "long.");
+
         }
     }
 
@@ -343,15 +352,16 @@ public class MapActivityViewModel extends AndroidViewModel {
         }
 
         for (MapMarker marker : wasRepository.getAllClusterLayer().getMarkers()) {
-            if (marker.getCoordinate().distanceTo(currentLocation) <= CONSTANTS.VIEW_DISTANCE) {
-                Log.i(LOG_TAG, "Marker is within viewing distance.");
+            if (marker.getCoordinate().distanceTo(currentLocation) <= CONSTANTS.RANGE_IN_METERS) {
                 marker.setIcon(withinRadiusMarker);
             } else {
                 marker.setIcon(outsideDistanceMarker);
-                Log.i(LOG_TAG, "Marker is outside the viewing distance.");
             }
         }
 
     }
 
+    public void updateLocation() {
+        mapHelper.updateLocation(positioningManager);
+    }
 }
