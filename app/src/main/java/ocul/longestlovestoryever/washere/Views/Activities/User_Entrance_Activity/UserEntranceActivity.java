@@ -63,7 +63,6 @@ public class UserEntranceActivity extends AppCompatActivity implements TabLayout
         tabLayoutLoginOrRegister.getTabAt(0).setText(R.string.create_new_account);
         tabLayoutLoginOrRegister.getTabAt(1).setText(R.string.login);
         permissionHelper=new PermissionHelper(this);
-
     }
 
 

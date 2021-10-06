@@ -95,10 +95,6 @@ public class WasRepository extends AppCompatActivity {
         return locationStatus;
     }
 
-    public void updateLocationStatus(eLocationStatus status) {
-        locationStatus.setValue(status);
-    }
-
     public void setUpdateLocationStatus(eLocationStatus status){
         locationStatus.setValue(status);
     }

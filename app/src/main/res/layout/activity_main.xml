@@ -54,24 +54,19 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/icon_follow_user" />
 
-    <Button
-        android:id="@+id/buttonOnlyMe"
+    <Switch
+        android:id="@+id/switchOnlyMe"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:text="Me Only"
+        android:showText="false"
+        android:text="show only me"
+        android:textColor="@color/primaryColor"
+        android:textSize="24sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/hereMapFragment" />
-
-    <Button
-        android:id="@+id/buttonAll"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:text="Everyone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonOnlyMe" />
+        app:layout_constraintTop_toTopOf="@+id/hereMapFragment"
+        tools:checked="true" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

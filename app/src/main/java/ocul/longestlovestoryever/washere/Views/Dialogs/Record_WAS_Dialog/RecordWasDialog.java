@@ -3,6 +3,7 @@ package ocul.longestlovestoryever.washere.Views.Dialogs.Record_WAS_Dialog;
 import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -36,10 +37,10 @@ public class RecordWasDialog extends DialogFragment implements View.OnClickListe
     private ProgressBar progressBarRemainingTime;
     private FloatingActionButton floatingActionButtonControlRecording;
     private TextInputEditText textInputEditTextTitle;
-    private TextView editTextWasTitle, textViewUploadingOrUploaded;
+    private TextView editTextWasTitle, textViewUploadingOrUploaded,textViewRecordingState,textViewTimeToStart;
     private ValueAnimator animator;
-    private ConstraintLayout constraintLayoutRecord;
-    private ConstraintLayout constraintLayoutUploading;
+    private ConstraintLayout constraintLayoutRecordingPart;
+    private ConstraintLayout constraintLayoutUploading,constraintLayoutPreRecording;
     private CheckBox checkBoxMakePrivate;
 
     @Override
@@ -51,7 +52,8 @@ public class RecordWasDialog extends DialogFragment implements View.OnClickListe
     @Override
     public View onCreateView(@NonNull final LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.dialog_new_post, container, false);
-        setCancelable(true);
+
+        setCancelable(false);
         initViews(view);
         initOtherObjects();
         setOnClickListeners();
@@ -77,7 +79,7 @@ public class RecordWasDialog extends DialogFragment implements View.OnClickListe
                         recordWasDialogViewModel.setPrivacyStatus(ePrivacyStatus.PUBLIC);
                     }
                     textViewUploadingOrUploaded.setText(R.string.uploading);
-                    constraintLayoutRecord.setVisibility(View.INVISIBLE);
+                    constraintLayoutRecordingPart.setVisibility(View.INVISIBLE);
                     constraintLayoutUploading.setVisibility(View.VISIBLE);
                     recordWasDialogViewModel.uploadWasToStorage();
 
@@ -108,17 +110,27 @@ public class RecordWasDialog extends DialogFragment implements View.OnClickListe
             public void onChanged(eRecordState state) {
                 if (state != null) {
                     if (state == eRecordState.READY_TO_RECORD) {
-                        constraintLayoutRecord.setVisibility(View.VISIBLE);
-                        constraintLayoutUploading.setVisibility(View.INVISIBLE);
+                        constraintLayoutPreRecording.setVisibility(View.VISIBLE);
+                        recordWasDialogViewModel.setCountDownText(textViewTimeToStart);
+                        constraintLayoutRecordingPart.setVisibility(View.INVISIBLE);
+                        constraintLayoutUploading.setVisibility(View.GONE);
                         materialButtonSend.setVisibility(View.GONE);
-                        materialButtonRetry.setVisibility(View.INVISIBLE);
+                        materialButtonRetry.setVisibility(View.GONE);
                         floatingActionButtonControlRecording.setImageResource(R.drawable.icon_record);
                         progressBarRemainingTime.setVisibility(View.INVISIBLE);
 
                     } else if (state == eRecordState.RECORDING) {
+                        constraintLayoutPreRecording.setVisibility(View.INVISIBLE);
+                        constraintLayoutRecordingPart.setVisibility(View.VISIBLE);
+                        constraintLayoutUploading.setVisibility(View.GONE);
+                        materialButtonSend.setVisibility(View.GONE);
+                        materialButtonRetry.setVisibility(View.GONE);
+                        floatingActionButtonControlRecording.setImageResource(R.drawable.icon_record);
+                        progressBarRemainingTime.setVisibility(View.INVISIBLE);
                         materialButtonSend.setVisibility(View.GONE);
                         materialButtonRetry.setVisibility(View.GONE);
                         floatingActionButtonControlRecording.setImageResource(R.drawable.icon_stop);
+                        textViewRecordingState.setText(R.string.recordin_state_recording);
                         //Start Recording
                         recordWasDialogViewModel.recordAudio();
                         recordWasDialogViewModel.setDateTimeLocation();
@@ -139,10 +151,12 @@ public class RecordWasDialog extends DialogFragment implements View.OnClickListe
                     } else if (state == eRecordState.READY_TO_PLAY) {
                         materialButtonRetry.setVisibility(View.VISIBLE);
                         floatingActionButtonControlRecording.setImageResource(R.drawable.icon_play);
+                        textViewRecordingState.setText(R.string.recordin_state_ready_to_play);
                         materialButtonSend.setVisibility(View.VISIBLE);
                     } else if (state == eRecordState.PLAYING) {
                         materialButtonRetry.setVisibility(View.VISIBLE);
                         floatingActionButtonControlRecording.setImageResource(R.drawable.icon_pause);
+                        textViewRecordingState.setText(R.string.recordin_state_playing);
                         recordWasDialogViewModel.playAudio();
                         materialButtonSend.setVisibility(View.VISIBLE);
                     } else if (state == eRecordState.PAUSED) {
@@ -165,16 +179,8 @@ public class RecordWasDialog extends DialogFragment implements View.OnClickListe
     public void onClick(View view) {
         if (view == floatingActionButtonControlRecording) {
             eRecordState state = WasRepository.getInstance().getWasRecordingState().getValue();
-
-            if (state == eRecordState.READY_TO_RECORD) {
-                //Change state to RECORDING
-                recordWasDialogViewModel.updateWasUploadState(eRecordState.RECORDING);
-
-            } else if (state == eRecordState.RECORDING) {
-
+            if (state == eRecordState.RECORDING) {
                 recordWasDialogViewModel.updateWasUploadState(eRecordState.FINISHED_RECORDING);
-
-
             } else if (state == eRecordState.FINISHED_RECORDING) {
             } else if (state == eRecordState.READY_TO_PLAY) {
                 recordWasDialogViewModel.updateWasUploadState(eRecordState.PLAYING);
@@ -204,9 +210,12 @@ public class RecordWasDialog extends DialogFragment implements View.OnClickListe
         progressBarRemainingTime = view.findViewById(R.id.progressBarRemainingTime);
         editTextWasTitle = view.findViewById(R.id.textInputEditTextTitle);
         constraintLayoutUploading = view.findViewById(R.id.constraintLayoutUploading);
-        constraintLayoutRecord = view.findViewById(R.id.constraintLayoutRecord);
+        constraintLayoutRecordingPart = view.findViewById(R.id.constraintLayoutRecordingPart);
         textViewUploadingOrUploaded = view.findViewById(R.id.textViewUploadingOrUploaded);
         checkBoxMakePrivate = view.findViewById(R.id.checkBoxMakePrivate);
+        textViewRecordingState=view.findViewById(R.id.textViewRecordingState);
+        textViewTimeToStart=view.findViewById(R.id.textViewTimeToStart);
+        constraintLayoutPreRecording=view.findViewById(R.id.constraintLayoutPreRecording);
 
     }
 

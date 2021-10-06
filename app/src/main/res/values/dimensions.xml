@@ -11,6 +11,8 @@
 
     //Radius
     //Text Size
+    <dimen name="text_size_huge">84dp</dimen>
+    <dimen name="text_size_title">24dp</dimen>
     //Icon Size
 
 

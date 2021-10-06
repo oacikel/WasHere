@@ -23,12 +23,12 @@ public class MainButtonSetFragment extends Fragment implements View.OnClickListe
 
     private Button buttonRecordAudio;
     private MainButtonSetFragmentViewModel mainButtonSetFragmentViewModel;
+    private static String LOG_TAG ="OCUL - MainButtonSetFragment";
 
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
     }
 
 
@@ -52,6 +52,7 @@ public class MainButtonSetFragment extends Fragment implements View.OnClickListe
             @Override
             public void onChanged(eLocationStatus state) {
                 if (state != null) {
+                    Log.d(LOG_TAG,"State is: "+ state);
                     if (state == eLocationStatus.AVAILABLE) {
                         buttonRecordAudio.setVisibility(View.VISIBLE);
                     } else if (state == eLocationStatus.OUT_OF_SERVICE) {

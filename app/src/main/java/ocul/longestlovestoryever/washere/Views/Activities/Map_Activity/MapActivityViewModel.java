@@ -15,6 +15,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -77,6 +78,7 @@ public class MapActivityViewModel extends AndroidViewModel {
     private ArrayList<Was> selectedWasList;
     private ArrayList<Was> fullWasList;
     private Image withinRadiusMarker, outsideDistanceMarker;
+    private Handler handler = new Handler();
 
     public MapActivityViewModel(@NonNull Application application) {
         super(application);
@@ -106,8 +108,8 @@ public class MapActivityViewModel extends AndroidViewModel {
         }
         fragmentTransaction.addToBackStack(null);
         recordWasDialog = new RecordWasDialog();
-        recordWasDialog.setCancelable(false);
         recordWasDialog.show(fragmentTransaction, "WAS_DIALOG");
+        recordWasDialog.setCancelable(false);
     }
 
 
@@ -158,12 +160,19 @@ public class MapActivityViewModel extends AndroidViewModel {
                 mapHelper.managePositionStatus(positioningManager, locationStatus);
                 wasRepository.setUpdateCurrentLocation(positioningManager.getPosition().getCoordinate());
             }
-
-
         };
         positioningManager.addListener(new WeakReference<>(positionListener));
         startPositionManager();
         managePositionStatus();
+    }
+
+    public void handleMapNotAvailableStatus() {
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                startPositionManager();
+                managePositionStatus();
+            }
+        }, 2500);
     }
 
     public void startPositionManager() {
@@ -171,7 +180,7 @@ public class MapActivityViewModel extends AndroidViewModel {
     }
 
     public void initiateCurrentLocation() {
-        if (positioningManager!=null){
+        if (positioningManager != null && positioningManager.getPosition() != null) {
             wasRepository.setUpdateCurrentLocation(positioningManager.getPosition().getCoordinate());
         }
     }
@@ -334,6 +343,7 @@ public class MapActivityViewModel extends AndroidViewModel {
     public void changeMapMarkersAccordingToDistance(GeoCoordinate currentLocation) {
         if (withinRadiusMarker == null) {
             withinRadiusMarker = new Image();
+
             try {
                 withinRadiusMarker.setImageResource(R.drawable.place_holder_icon);
             } catch (IOException e) {
@@ -352,11 +362,14 @@ public class MapActivityViewModel extends AndroidViewModel {
         }
 
         for (MapMarker marker : wasRepository.getAllClusterLayer().getMarkers()) {
-            if (marker.getCoordinate().distanceTo(currentLocation) <= CONSTANTS.RANGE_IN_METERS) {
-                marker.setIcon(withinRadiusMarker);
-            } else {
-                marker.setIcon(outsideDistanceMarker);
+            if (currentLocation.isValid()) {
+                if (marker.getCoordinate().distanceTo(currentLocation) <= CONSTANTS.RANGE_IN_METERS) {
+                    marker.setIcon(withinRadiusMarker);
+                } else {
+                    marker.setIcon(outsideDistanceMarker);
+                }
             }
+
         }
 
     }

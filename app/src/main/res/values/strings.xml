@@ -23,6 +23,10 @@
     <string name="discard_recording">Cancel</string>
     <string name="retake_recording">Retry</string>
     <string name="send_recording">Send</string>
+    <string name="recordin_state_recording">Now recording...</string>
+    <string name="recordin_state_ready_to_play">Press play to preview</string>
+    <string name="recordin_state_playing">Now playing...</string>
+    <string name="recording_starting">Recording will start in...</string>
 
 
 </resources>

@@ -2,6 +2,7 @@ package ocul.longestlovestoryever.washere.Views.Dialogs.Record_WAS_Dialog;
 
 import android.animation.ValueAnimator;
 import android.app.Application;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.widget.TextView;
 
@@ -52,6 +53,22 @@ public class RecordWasDialogViewModel extends AndroidViewModel {
 
     public MutableLiveData<eUploadingState> getUploadingState(){
         return wasRepository.getUploadingState();
+    }
+
+    //Pre Record Countdown
+    public void setCountDownText(final TextView textView){
+        new CountDownTimer(4000, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+                textView.setText(String.valueOf (millisUntilFinished / 1000));
+            }
+
+            public void onFinish() {
+                textView.setText("GO!");
+                updateWasUploadState(eRecordState.RECORDING);
+            }
+
+        }.start();
     }
 
     //Preparing and Uploading Was Items:

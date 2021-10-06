@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -56,6 +57,7 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
     Fragment previousFragment;
     FloatingActionButton floatingActionButtonFollowMode;
     Button buttonOnlyMe, buttonAll;
+    Switch switchOnlyMe;
 
 
     @Override
@@ -93,21 +95,18 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
         mapActivityViewModel.getLocationStatus().observe(this, new Observer<eLocationStatus>() {
             @Override
             public void onChanged(eLocationStatus eLocationStatus) {
-                if (eLocationStatus== ocul.longestlovestoryever.washere.models.eLocationStatus.AVAILABLE){
-                    Log.i(LOG_TAG,"Location Status is available");
+                if (eLocationStatus == ocul.longestlovestoryever.washere.models.eLocationStatus.AVAILABLE) {
+                    Log.i(LOG_TAG, "Location Status is available");
                     mapActivityViewModel.initiateCurrentLocation();
-                }else if (eLocationStatus== ocul.longestlovestoryever.washere.models.eLocationStatus.TEMPORARILY_UNAVAILABLE){
+                } else if (eLocationStatus == ocul.longestlovestoryever.washere.models.eLocationStatus.TEMPORARILY_UNAVAILABLE) {
                     //Log.e(LOG_TAG,"Location Status is temporarily unavailable");
-                    mapActivityViewModel.startPositionManager();
-                    mapActivityViewModel.managePositionStatus();
-                }else if (eLocationStatus== ocul.longestlovestoryever.washere.models.eLocationStatus.OUT_OF_SERVICE){
-                    Log.e(LOG_TAG,"Location Status is out of service");
-                    mapActivityViewModel.startPositionManager();
-                    mapActivityViewModel.managePositionStatus();
-                }else if (eLocationStatus== ocul.longestlovestoryever.washere.models.eLocationStatus.WRONG_LOCATION){
-                    Log.i(LOG_TAG,"Location Status has the wrong location");
-                    mapActivityViewModel.startPositionManager();
-                    mapActivityViewModel.managePositionStatus();
+                    mapActivityViewModel.handleMapNotAvailableStatus();
+                } else if (eLocationStatus == ocul.longestlovestoryever.washere.models.eLocationStatus.OUT_OF_SERVICE) {
+                    Log.e(LOG_TAG, "Location Status is out of service");
+                    mapActivityViewModel.handleMapNotAvailableStatus();
+                } else if (eLocationStatus == ocul.longestlovestoryever.washere.models.eLocationStatus.WRONG_LOCATION) {
+                    Log.i(LOG_TAG, "Location Status has the wrong location");
+                    mapActivityViewModel.handleMapNotAvailableStatus();
                 }
             }
         });
@@ -201,14 +200,16 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
     public void onClick(View v) {
         if (v == floatingActionButtonFollowMode) {
             mapActivityViewModel.updateFollowState(eFollowState.FOLLOW_USER);
-        } else if (v == buttonAll) {
-            mapActivityViewModel.clearUserWasList();
-            mapActivityViewModel.changeViewMode(eViewMode.VIEW_ALL);
-            mapActivityViewModel.placeMarkersOnMap();
-        } else if (v == buttonOnlyMe) {
-            mapActivityViewModel.clearAllWasList();
-            mapActivityViewModel.changeViewMode(eViewMode.VIEW_MINE);
-            mapActivityViewModel.placeMarkersOnMap();
+        } else if (v == switchOnlyMe) {
+            if (switchOnlyMe.isChecked()) {
+                mapActivityViewModel.clearAllWasList();
+                mapActivityViewModel.changeViewMode(eViewMode.VIEW_MINE);
+                mapActivityViewModel.placeMarkersOnMap();
+            } else {
+                mapActivityViewModel.clearUserWasList();
+                mapActivityViewModel.changeViewMode(eViewMode.VIEW_ALL);
+                mapActivityViewModel.placeMarkersOnMap();
+            }
         }
     }
 
@@ -348,15 +349,12 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
         wasCardAdapter = new WasCardAdapter(this);
         recyclerViewWasCard.setAdapter(wasCardAdapter);
         floatingActionButtonFollowMode = findViewById(R.id.floatingActionButtonFollowMode);
-        buttonAll = findViewById(R.id.buttonAll);
-        buttonOnlyMe = findViewById(R.id.buttonOnlyMe);
-        buttonAll = findViewById(R.id.buttonAll);
+        switchOnlyMe = findViewById(R.id.switchOnlyMe);
     }
 
     public void setOnClickListeners() {
         floatingActionButtonFollowMode.setOnClickListener(this);
-        buttonAll.setOnClickListener(this);
-        buttonOnlyMe.setOnClickListener(this);
+        switchOnlyMe.setOnClickListener(this);
     }
 
     public void initiateMainButtonsFragment() {
@@ -376,8 +374,8 @@ public class MapActivity extends AppCompatActivity implements View.OnClickListen
         mapActivityViewModel.saveLastKnownLocation();
     }
 
-    private void checkForUpdates(){
-        VersionHelper versionHelper=new VersionHelper(this);
+    private void checkForUpdates() {
+        VersionHelper versionHelper = new VersionHelper(this);
         versionHelper.manageRemoteConfigFeatures();
     }
 

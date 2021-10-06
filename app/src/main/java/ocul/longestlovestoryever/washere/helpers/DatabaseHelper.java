@@ -74,47 +74,42 @@ public class DatabaseHelper {
                 if (e != null) {
                     Log.e(LOG_TAG, "Error receiving updates from database: " + e.getMessage());
                 } else {
-                    for (DocumentChange change : value.getDocumentChanges()) {
-                        Was changedWas = createWasFromDocumentChange(change);
-                        //Add Was if uploader is me
-                        if (changedWas.getUploaderName().equals(userRepository.getCurrentUser().getUserName())) {
-                            Log.d(LOG_TAG, "This was is created by current user");
-                            switch (change.getType()) {
-                                case ADDED:
-                                    Log.i(LOG_TAG, "Users was is received with ID: " + change.getDocument().getId());
-                                    wasRepository.getAllWasList().add(changedWas);
-                                    wasRepository.getAllClusterLayer().addMarker(changedWas.getMapMarker());
-                                    wasRepository.getMyWasList().add(changedWas);
-                                    wasRepository.getMyClusterLayer().addMarker(changedWas.getMapMarker());
-                                    break;
-                                case MODIFIED:
-                                    Log.i(LOG_TAG, "Was item modified");
-                                    break;
-                                case REMOVED:
-                                    Log.i(LOG_TAG, "Was item removed");
-                                    break;
+                    if (userRepository.getCurrentUser().getUserName() != null) {
+                        for (DocumentChange change : value.getDocumentChanges()) {
+                            Was changedWas = createWasFromDocumentChange(change);
+                            //Add Was if uploader is me
+                            if (changedWas.getUploaderName().equals(userRepository.getCurrentUser().getUserName())) {
+                                switch (change.getType()) {
+                                    case ADDED:
+                                        wasRepository.getAllWasList().add(changedWas);
+                                        wasRepository.getAllClusterLayer().addMarker(changedWas.getMapMarker());
+                                        wasRepository.getMyWasList().add(changedWas);
+                                        wasRepository.getMyClusterLayer().addMarker(changedWas.getMapMarker());
+                                        break;
+                                    case MODIFIED:
+                                        Log.i(LOG_TAG, "Was item modified");
+                                        break;
+                                    case REMOVED:
+                                        Log.i(LOG_TAG, "Was item removed");
+                                        break;
+                                }
                             }
-                        }
-                        //If uploader isn't me take only the non private ones
-                        else if (ePrivacyStatus.PRIVATE.name().equals(changedWas.getPrivacyStatus())) {
-                            Log.d(LOG_TAG, "This was is created by " + changedWas.getUploaderName() + " but is private");
-                        } else {
-                            Log.d(LOG_TAG, "This was is created by " + changedWas.getUploaderName() + " and is not private");
-                            switch (change.getType()) {
-                                case ADDED:
-                                    Log.i(LOG_TAG, "New was item received with id: " + change.getDocument().getId());
+                            //If uploader isn't me take only the non private ones
+                            else if (ePrivacyStatus.PRIVATE.name().equals(changedWas.getPrivacyStatus())) {
+                            } else {
+                                switch (change.getType()) {
+                                    case ADDED:
+                                        wasRepository.getAllWasList().add(changedWas);
+                                        wasRepository.getAllClusterLayer().addMarker(changedWas.getMapMarker());
+                                        break;
+                                    case MODIFIED:
+                                        Log.i(LOG_TAG, "Was item modified");
 
-                                    wasRepository.getAllWasList().add(changedWas);
-                                    wasRepository.getAllClusterLayer().addMarker(changedWas.getMapMarker());
-
-                                    break;
-                                case MODIFIED:
-                                    Log.i(LOG_TAG, "Was item modified");
-
-                                    break;
-                                case REMOVED:
-                                    Log.i(LOG_TAG, "Was item removed");
-                                    break;
+                                        break;
+                                    case REMOVED:
+                                        Log.i(LOG_TAG, "Was item removed");
+                                        break;
+                                }
                             }
                         }
                     }

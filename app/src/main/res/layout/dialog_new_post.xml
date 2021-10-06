@@ -3,141 +3,217 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/constraintLayoutRecord"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_margin="@dimen/margin_paddings_tiny"
     android:alpha="80"
     android:background="@color/secondaryColor">
 
 
-    <CheckBox
-        android:id="@+id/checkBoxMakePrivate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:fontFamily="@font/raleway_semibold"
-        android:text="@string/switch_private"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ProgressBar
-        android:id="@+id/progressBarRemainingTime"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="270dp"
-        android:layout_height="270dp"
-        android:max="1000"
-        android:progress="700"
-        android:progressDrawable="@drawable/circle"
-        android:visibility="visible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.495"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/textInputLayout"
-        style="@style/NoAllCapsTextApperance"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayoutPreRecording"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-
-        android:textColorHint="@color/primaryHintColor"
+        android:layout_height="0dp"
         android:visibility="visible"
-        app:hintTextAppearance="@style/HintTextApperance"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/progressBarRemainingTime">
+        app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/textInputEditTextTitle"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/textViewRecordingStarting"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/montserrat"
+            android:text="@string/recording_starting"
+            android:textColor="@color/primaryColor"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            android:alpha="80"
-            android:backgroundTint="@color/primaryLightColor"
-            android:drawablePadding="@dimen/margin_paddings_tiny"
+        <TextView
+            android:id="@+id/textViewTimeToStart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/montserrat"
+            android:text="5"
+            android:textColor="@color/primaryDarkColor"
+            android:textSize="@dimen/text_size_huge"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayoutRecordingPart"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <CheckBox
+            android:id="@+id/checkBoxMakePrivate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:backgroundTint="@color/common_google_signin_btn_text_dark_default"
+            android:buttonTint="@color/primaryLightColor"
             android:fontFamily="@font/raleway_semibold"
-            android:hint="@string/editTextWasTitle_hint"
-            android:singleLine="true"
-            android:textColor="@color/primaryTextColor"
-            android:textColorHighlight="@color/secondaryColor"
-            android:textColorHint="@color/primaryHintColor"
-            android:textColorLink="@color/primaryColor"
-            android:theme="@style/HintTextApperance" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:text="@string/switch_private"
+            android:textColor="@color/primaryColor"
+            android:textColorHint="@color/primaryColor"
+            android:textSize="24sp"
+            app:layout_constraintBottom_toBottomOf="@+id/textInputLayout"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-    <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:orientation="horizontal"
-        android:visibility="visible"
-        app:layout_constraintEnd_toEndOf="@+id/progressBarRemainingTime"
-        app:layout_constraintStart_toStartOf="@+id/progressBarRemainingTime"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout">
+        <ProgressBar
+            android:id="@+id/progressBarRemainingTime"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:max="1000"
+            android:progress="700"
+            android:progressDrawable="@drawable/circle"
+            android:scaleX="3"
+            android:scaleY="3"
+            android:visibility="visible"
+            app:layout_constraintBottom_toTopOf="@+id/checkBoxMakePrivate"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/materialButtonDiscardRecording"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputLayout"
             style="@style/NoAllCapsTextApperance"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:layout_marginEnd="4dp"
 
-            android:layout_weight="1"
-            android:text="@string/discard_recording"
-            android:textColor="@color/secondaryTextColor"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
             android:textColorHint="@color/primaryHintColor"
+            android:visibility="visible"
+            app:hintTextAppearance="@style/HintTextApperance"
+            app:layout_constraintEnd_toStartOf="@+id/checkBoxMakePrivate"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/floatingActionButtonControlRecording">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/textInputEditTextTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:alpha="80"
+                android:backgroundTint="@color/primaryLightColor"
+                android:drawablePadding="@dimen/margin_paddings_tiny"
+                android:fontFamily="@font/raleway_semibold"
+                android:hint="@string/editTextWasTitle_hint"
+                android:singleLine="true"
+                android:textColor="@color/primaryTextColor"
+                android:textColorHighlight="@color/secondaryColor"
+                android:textColorHint="@color/primaryHintColor"
+                android:textColorLink="@color/primaryColor"
+                android:theme="@style/HintTextApperance" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayoutButtonSet"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/materialButtonDiscardRecording"
+                style="@style/NoAllCapsTextApperance"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="4dp"
+                android:layout_weight="1"
+                android:text="@string/discard_recording"
+                android:textColor="@color/secondaryTextColor"
+                android:textColorHint="@color/primaryHintColor"
+                app:backgroundTint="@android:color/holo_red_light"
+                app:cornerRadius="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/materialButtonRetry"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/materialButtonRetry"
+                style="@style/NoAllCapsTextApperance"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_weight="1"
+                android:text="@string/retake_recording"
+                android:textColor="@color/secondaryTextColor"
+                android:textColorHint="@color/primaryHintColor"
+                app:backgroundTint="@color/primaryLightColor"
+                app:cornerRadius="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/materialButtonSend"
+                app:layout_constraintStart_toEndOf="@+id/materialButtonDiscardRecording"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/materialButtonSend"
+                style="@style/NoAllCapsTextApperance"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:text="@string/send_recording"
+                android:textColor="@color/secondaryTextColor"
+                android:textColorHint="@color/primaryHintColor"
+                app:backgroundTint="@android:color/holo_green_light"
+                app:cornerRadius="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/materialButtonRetry"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/floatingActionButtonControlRecording"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:visibility="visible"
             app:backgroundTint="@color/primaryLightColor"
-            app:cornerRadius="0dp" />
+            app:elevation="@dimen/elevation_high"
+            app:layout_constraintBottom_toBottomOf="@+id/progressBarRemainingTime"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/progressBarRemainingTime"
+            app:srcCompat="@drawable/icon_record" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/materialButtonRetry"
-            style="@style/NoAllCapsTextApperance"
-            android:layout_width="0dp"
+        <TextView
+            android:id="@+id/textViewRecordingState"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:layout_marginEnd="4dp"
-
-            android:layout_weight="1"
-            android:text="@string/retake_recording"
-            android:textColor="@color/secondaryTextColor"
-            android:textColorHint="@color/primaryHintColor"
-            app:backgroundTint="@color/primaryLightColor"
-            app:cornerRadius="0dp" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/materialButtonSend"
-            style="@style/NoAllCapsTextApperance"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:layout_marginEnd="4dp"
-
-            android:layout_weight="1"
-            android:text="@string/send_recording"
-            android:textColor="@color/secondaryTextColor"
-            android:textColorHint="@color/primaryHintColor"
-            app:backgroundTint="@color/primaryColor"
-            app:cornerRadius="0dp" />
-    </LinearLayout>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/floatingActionButtonControlRecording"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        android:scaleX="2"
-        android:scaleY="2"
-        android:visibility="visible"
-        app:backgroundTint="@color/primaryLightColor"
-        app:elevation="@dimen/elevation_high"
-        app:layout_constraintBottom_toBottomOf="@+id/progressBarRemainingTime"
-        app:layout_constraintEnd_toEndOf="@+id/progressBarRemainingTime"
-        app:layout_constraintStart_toStartOf="@+id/progressBarRemainingTime"
-        app:layout_constraintTop_toTopOf="@+id/progressBarRemainingTime"
-        app:srcCompat="@drawable/icon_record" />
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="16dp"
+            android:text="@string/recordin_state_recording"
+            android:textColor="@color/primaryColor"
+            app:layout_constraintEnd_toStartOf="@+id/floatingActionButtonControlRecording"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/progressBarRemainingTime" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayoutUploading"
@@ -146,18 +222,16 @@
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0">
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/imageViewUploading"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
             android:layout_centerHorizontal="true"
             android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/textViewUploadingOrUploaded"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -171,16 +245,16 @@
             android:layout_below="@+id/imageViewUploading"
             android:layout_alignStart="@+id/imageViewUploading"
             android:layout_alignEnd="@+id/imageViewUploading"
-            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
             android:fontFamily="@font/raleway_semibold"
             android:text="@string/uploading"
             android:textAlignment="center"
             android:textColor="@color/primaryTextColor"
             android:textSize="16sp"
             android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/imageViewUploading"
-            app:layout_constraintStart_toStartOf="@+id/imageViewUploading"
-            app:layout_constraintTop_toBottomOf="@+id/imageViewUploading" />
+            app:layout_constraintStart_toStartOf="@+id/imageViewUploading" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
